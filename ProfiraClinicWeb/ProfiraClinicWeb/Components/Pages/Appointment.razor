@@ -1,0 +1,29 @@
+﻿@page "/appointment"
+
+<PageTitle>Appointment</PageTitle>
+
+<h1>Appointment</h1>
+
+Welcome to your new app.
+
+<ProfiraClinicWeb.Components.Form.DatePickerMulti Label="Woww" @bind-MarkedDates="markedDates" />
+
+@for (int x = 1; x < 6; x++)
+{
+    <li>
+        Item @x
+    </li>
+}
+
+@foreach (DateTime date in markedDates)
+{
+    // Pass the Dto properties to the component
+    <p>@date.ToString()</p>
+}
+
+
+
+
+@code {
+    private List<DateTime> markedDates = new List<DateTime>();
+}
