@@ -45,6 +45,9 @@
     [Parameter]
     public string Label { get; set; } = "Dates";
 
+    [Parameter]
+    public string MarkedDayColor { get; set; } = "red";
+
     private string CheckDate(DateTime date)
     {
         // compare only the date portion to find a match
@@ -59,6 +62,6 @@
 
 <style>
     .marked-day {
-        color: red !important;
+        color: @MarkedDayColor !important;
     }
 </style>
