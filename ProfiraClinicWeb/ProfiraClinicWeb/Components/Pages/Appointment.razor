@@ -7,26 +7,42 @@
 <h1>Appointment</h1>
 
 <main class="container">
-    <div class="row">
-        <ProfiraClinicWeb.Components.Form.DatePickerMulti Label="Woww" @bind-MarkedDates="markedDates" MarkedDayColor="green" />
-    </div>
-    <MudTimePicker Color="MudBlazor.Color.Primary" MinuteSelectionStep="1" Text="03:37 PM" />
     <MudGrid>
-        <MudItem xs="12" sm="7">
+        <MudItem xs="12" sm="12">
             <MudPaper Class="pa-4">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
                     <MudGrid Class="justify-content-center align-items-center">
-                        <MudItem xs="5">
+                        <MudItem xs="4">
                             <label>Tanggal</label>
                         </MudItem>
-                        <MudItem xs="7">
+                        <MudItem xs="8" class="d-flex">
                             <ProfiraClinicWeb.Components.Form.DatePickerMulti Label="Woww" @bind-MarkedDates="markedDates" MarkedDayColor="green" />
                         </MudItem>
-                        <MudItem xs="5">
+                        <MudItem xs="4">
                             <label>Jam</label>
                         </MudItem>
-                        <MudItem xs="7">
+                        <MudItem xs="8">
                             <MudTimePicker Color="MudBlazor.Color.Primary" MinuteSelectionStep="1" Text="03:37 PM" Class="mt-0" />
+                        </MudItem>
+                        <MudItem xs="4">
+                            <label>Lokasi Klinik</label>
+                        </MudItem>
+                        <MudItem xs="8">
+                            <MudSelect T="string" Label="Lokasi Klinik" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@("Manyar")" />
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <label>App. dng Dokter</label>
+                        </MudItem>
+                        <MudItem xs="8">
+                            <MudTextField T="string" Label="App. dng Dokter"/>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <label>Keterangan</label>
+                        </MudItem>
+                        <MudItem xs="8">
+                            <MudTextField T="string" Label="Keterangan" Variant="Variant.Text" Lines="5" />
                         </MudItem>
                         @* <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" />
                         <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"

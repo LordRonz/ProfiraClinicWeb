@@ -1,0 +1,38 @@
+﻿@page "/pasien"
+@using System.Net.Http.Json
+@using ProfiraClinicWeb.Models
+@inject HttpClient httpClient
+
+<MudTable HeaderClass="bg-warning" Items="@Elements.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+    <HeaderContent>
+        <MudTh Class="fw-bold">Nr</MudTh>
+        <MudTh Class="fw-bold">Sign</MudTh>
+        <MudTh Class="fw-bold">Name</MudTh>
+        <MudTh Class="fw-bold">Position</MudTh>
+        <MudTh Class="fw-bold">Molar mass</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.Number</MudTd>
+        <MudTd DataLabel="Sign">@context.Sign</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Position" HideSmall="_hidePosition">@context.Position</MudTd>
+        <MudTd DataLabel="Molar mass">@context.Molar</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private IEnumerable<Element> Elements = new List<Element>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = new List<Element>()
+        {
+            new Element("Tess", 69, "waduh", 102),
+            new Element("Tesss", 691, "waduhos", 101),
+            new Element("Tessss", 694, "waduh", 103),
+        };
+    }
+
+}

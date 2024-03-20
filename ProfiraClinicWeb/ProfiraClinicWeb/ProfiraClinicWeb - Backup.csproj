@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="NewFolder1\**" />
+    <Compile Remove="NewFolder\**" />
     <Content Remove="NewFolder1\**" />
+    <Content Remove="NewFolder\**" />
     <EmbeddedResource Remove="NewFolder1\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
     <None Remove="NewFolder1\**" />
+    <None Remove="NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +23,10 @@
     <PackageReference Include="BootstrapBlazor.FontAwesome" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
     <PackageReference Include="MudBlazor" Version="6.17.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\NewFolder\" />
   </ItemGroup>
 
 </Project>
