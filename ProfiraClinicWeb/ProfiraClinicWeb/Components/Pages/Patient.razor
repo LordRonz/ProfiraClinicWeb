@@ -3,27 +3,60 @@
 @using ProfiraClinicWeb.Models
 @inject HttpClient httpClient
 
-<MudTable HeaderClass="bg-warning" Items="@Elements.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
-    <HeaderContent>
-        <MudTh Class="fw-bold">Nr</MudTh>
-        <MudTh Class="fw-bold">Sign</MudTh>
-        <MudTh Class="fw-bold">Name</MudTh>
-        <MudTh Class="fw-bold">Position</MudTh>
-        <MudTh Class="fw-bold">Molar mass</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Nr">@context.Number</MudTd>
-        <MudTd DataLabel="Sign">@context.Sign</MudTd>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Position" HideSmall="_hidePosition">@context.Position</MudTd>
-        <MudTd DataLabel="Molar mass">@context.Molar</MudTd>
-    </RowTemplate>
-</MudTable>
+@using PatientModel = ProfiraClinicWeb.Models.Patient
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Produk">
+        <MudTable HeaderClass="bg-warning" Items="@Patients.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+            <HeaderContent>
+                <MudTh Class="fw-bold">Klinik</MudTh>
+                <MudTh Class="fw-bold">Tgl</MudTh>
+                <MudTh Class="fw-bold">No. Faktur</MudTh>
+                <MudTh Class="fw-bold">Nama Treatment</MudTh>
+                <MudTh Class="fw-bold">Qty</MudTh>
+                <MudTh Class="fw-bold">Dokter</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Klinik">@context.Klinik</MudTd>
+                <MudTd DataLabel="Tgl">@context.Tanggal.ToShortDateString()</MudTd>
+                <MudTd DataLabel="No. Faktur">@context.NoFaktur</MudTd>
+                <MudTd DataLabel="Nama Treatment" HideSmall="_hidePosition">@context.NamaTreatment</MudTd>
+                <MudTd DataLabel="Qty">@context.Quantity</MudTd>
+                <MudTd DataLabel="Dokter">@context.Doctor</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudTabPanel>
+    <MudTabPanel Text="Perawatan">
+        <MudTable HeaderClass="bg-warning" Items="@Patients.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+            <HeaderContent>
+                <MudTh Class="fw-bold">Klinik</MudTh>
+                <MudTh Class="fw-bold">Tgl</MudTh>
+                <MudTh Class="fw-bold">No. Faktur</MudTh>
+                <MudTh Class="fw-bold">Nama Treatment</MudTh>
+                <MudTh Class="fw-bold">Qty</MudTh>
+                <MudTh Class="fw-bold">Dokter</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Klinik">@context.Klinik</MudTd>
+                <MudTd DataLabel="Tgl">@context.Tanggal.ToShortDateString()</MudTd>
+                <MudTd DataLabel="No. Faktur">@context.NoFaktur</MudTd>
+                <MudTd DataLabel="Nama Treatment" HideSmall="_hidePosition">@context.NamaTreatment</MudTd>
+                <MudTd DataLabel="Qty">@context.Quantity</MudTd>
+                <MudTd DataLabel="Dokter">@context.Doctor</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudTabPanel>
+    <MudTabPanel Text="Paket">
+        <MudText>Paket</MudText>
+    </MudTabPanel>
+</MudTabs>
 
 @code {
     private bool _hidePosition;
     private bool _loading;
     private IEnumerable<Element> Elements = new List<Element>();
+
+    private IEnumerable<PatientModel> Patients = new List<PatientModel>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,6 +65,12 @@
             new Element("Tess", 69, "waduh", 102),
             new Element("Tesss", 691, "waduhos", 101),
             new Element("Tessss", 694, "waduh", 103),
+        };
+
+        Patients = new List<PatientModel>()
+        {
+            new PatientModel("Profira Manyar", new DateTime(), "TR01", "White Glow Facial", 1, "dr novita"),
+            new PatientModel("Profira Central", new DateTime(), "TR02", "White Glow Facial", 1, "dr aleg")
         };
     }
 
