@@ -1,0 +1,25 @@
+﻿@using ProfiraClinicWeb.Utils
+
+<MudTable HeaderClass="bg-warning" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+    <HeaderContent>
+        @foreach (TableColumn col in Config.GetColumn())
+        {
+            // Pass the Dto properties to the component
+            <MudTh Class="fw-bold">@col.Caption</MudTh>
+        }
+    </HeaderContent>
+    <RowTemplate>
+        @foreach (TableColumn col in Config.GetColumn())
+        {
+            // Pass the Dto properties to the component
+            <MudTd DataLabel="@col.Caption">@context[col.DataField]</MudTd>
+        }
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private bool _loading;
+
+    [Parameter]
+    public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+}
