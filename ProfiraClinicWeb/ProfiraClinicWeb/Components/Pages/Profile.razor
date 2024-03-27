@@ -1,0 +1,69 @@
+﻿@page "/profile"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using Color = MudBlazor.Color
+
+<PageTitle>Profile</PageTitle>
+
+<main class="container">
+    <MudPaper Class="pa-4 mb-8" Elevation="3">
+        <div class="d-flex align-items-center gap-4">
+            <image src="/images/profile.jpg" class="rounded-circle profile-image"></image>
+            <div>
+                <h2 class="h4">Joanne Anabel</h2>
+                <h3 class="h6">Member Premium</h3>
+            </div>
+        </div>
+    </MudPaper>
+    <MudGrid>
+        <MudItem xs="12" sm="12">
+            <MudPaper Class="pa-4" Elevation="3">
+                <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
+                    <MudTextField T="string" Label="Username" />
+                    <MudTextField T="string" Label="Nama Lengkap" />
+                    <MudTextField T="string" Label="Email" RequiredError="Email is required!"
+                                    Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+                    <MudTextField T="string" Label="Alamat" />
+                    <MudTextField T="string" Label="No. HP" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true">Simpan</MudButton>
+                </MudForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</main>
+
+
+
+
+@code {
+    private List<DateTime> markedDates = new List<DateTime>();
+
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+}

@@ -1,0 +1,53 @@
+﻿@page "/login"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using Color = MudBlazor.Color
+
+<PageTitle>Login</PageTitle>
+
+<main class="container w-50">
+    <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100" Elevation="3">
+        <h1 class="h4">Sari Rasa</h1>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
+            <MudTextField T="string" Label="Username" />
+            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="InputType.Password" />
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true">Log In</MudButton>
+        </MudForm>
+    </MudPaper>
+</main>
+
+
+
+
+@code {
+    private List<DateTime> markedDates = new List<DateTime>();
+
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+}
