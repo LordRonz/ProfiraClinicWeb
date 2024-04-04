@@ -2,16 +2,17 @@
 
 <PageTitle>Home</PageTitle>
 
-Welcome to your new app.
-<div class="d-flex">
-    <ProfiraClinicWeb.Components.Form.DatePickerMulti Label="Woww" @bind-MarkedDates="markedDates" />
-</div>
+<MudContainer Class="mb-16">
+    <div class="d-flex">
+        <ProfiraClinicWeb.Components.Form.DatePickerMulti Label="Woww" @bind-MarkedDates="markedDates" />
+    </div>
 
-@foreach (DateTime date in markedDates)
-{
-    // Pass the Dto properties to the component
-    <p>@date.ToString()</p>
-}
+    @foreach (DateTime date in markedDates)
+    {
+        // Pass the Dto properties to the component
+        <p>@date.ToString()</p>
+    }
+</MudContainer>
 
 
 
