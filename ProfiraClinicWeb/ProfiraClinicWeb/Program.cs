@@ -1,6 +1,8 @@
+using BlazorReports.Extensions;
 using MudBlazor.Services;
 using ProfiraClinicWeb.Client.Pages;
 using ProfiraClinicWeb.Components;
+using ProfiraClinicWeb.Properties.Report;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 builder.Services.AddBootstrapBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddBlazorReports();
 
 var app = builder.Build();
 
@@ -30,9 +35,16 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blazor API V1");
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(ProfiraClinicWeb.Client._Imports).Assembly);
+app.MapGroup("reports").MapBlazorReport<Report, HelloReportData>();
 
 app.Run();
