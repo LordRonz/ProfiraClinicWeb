@@ -5,57 +5,100 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-    <MudTabPanel Text="Produk">
-        <MudTable HeaderClass="bg-warning" Items="@Patients.Take(4)" Hover="true" Bordered="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
-            <HeaderContent>
-                <MudTh Class="fw-bold">Klinik</MudTh>
-                <MudTh Class="fw-bold">Tgl</MudTh>
-                <MudTh Class="fw-bold">No. Faktur</MudTh>
-                <MudTh Class="fw-bold">Nama Treatment</MudTh>
-                <MudTh Class="fw-bold">Qty</MudTh>
-                <MudTh Class="fw-bold">Dokter</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Klinik">@context.Klinik</MudTd>
-                <MudTd DataLabel="Tgl">@context.Tanggal.ToShortDateString()</MudTd>
-                <MudTd DataLabel="No. Faktur">@context.NoFaktur</MudTd>
-                <MudTd DataLabel="Nama Treatment" HideSmall="_hidePosition">@context.NamaTreatment</MudTd>
-                <MudTd DataLabel="Qty">@context.Quantity</MudTd>
-                <MudTd DataLabel="Dokter">@context.Doctor</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager InfoFormat="@infoFormat" HideRowsPerPage="true" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" Class="justify-content-around d-flex w-100" />
-            </PagerContent>
-        </MudTable>
-    </MudTabPanel>
-    <MudTabPanel Text="Perawatan">
-        <MudTable HeaderClass="bg-warning" Items="@Patients.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
-            <HeaderContent>
-                <MudTh Class="fw-bold">Klinik</MudTh>
-                <MudTh Class="fw-bold">Tgl</MudTh>
-                <MudTh Class="fw-bold">No. Faktur</MudTh>
-                <MudTh Class="fw-bold">Nama Treatment</MudTh>
-                <MudTh Class="fw-bold">Qty</MudTh>
-                <MudTh Class="fw-bold">Dokter</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Klinik">@context.Klinik</MudTd>
-                <MudTd DataLabel="Tgl">@context.Tanggal.ToShortDateString()</MudTd>
-                <MudTd DataLabel="No. Faktur">@context.NoFaktur</MudTd>
-                <MudTd DataLabel="Nama Treatment" HideSmall="_hidePosition">@context.NamaTreatment</MudTd>
-                <MudTd DataLabel="Qty">@context.Quantity</MudTd>
-                <MudTd DataLabel="Dokter">@context.Doctor</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-    </MudTabPanel>
-    <MudTabPanel Text="Paket">
-        <MudText>Paket</MudText>
-    </MudTabPanel>
-</MudTabs>
+<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Profile Pasien</MudText>
+<MudCard>
+    <MudGrid Style="padding: 20px;">
+        <MudItem xs="4">
+            <MudCard Class="d-flex flex-column align-items-center h-100 w-100 justify-content-center">
+                <MudImage src="/images/pasien.png" Class="rounded-circle" Width="160" Height="160"></MudImage>
+                <MudText>Ninik Angelina</MudText>
+                <MudText>MEM00102</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="8">
+            <MudCard Style="padding: 20px">
+                <MudGrid>
+                    <MudItem xs="6">
+                        <MudText>Member Klinik</MudText>
+                        <MudText>Jenis Kelamin</MudText>
+                        <MudText>Alamat</MudText>
+                        <MudText>No. Telepon/HP</MudText>
+                        <MudText>Tanggal Lahir</MudText>
+                        <MudText>Tanggal Registrasi</MudText>
+                        <MudText>Transaksi Terakhir</MudText>
+                        <MudText>Active</MudText>
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudText>Profira Manyar</MudText>
+                        <MudText>Perempuan</MudText>
+                        <MudText>
+                            Darmahusada Regency 12 Surabaya
+                        </MudText>
+                        <MudText>081232332020</MudText>
+                        <MudText>10/10/1980</MudText>
+                        <MudText>01/11/2005</MudText>
+                        <MudText>
+                            05/12/2023
+                        </MudText>
+                        <MudCheckBox Value="true" Dense="true" Disabled="true"></MudCheckBox>
+                    </MudItem>
+                </MudGrid>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Produk">
+            <MudTable HeaderClass="bg-warning" Items="@Patients.Take(4)" Hover="true" Bordered="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+                <HeaderContent>
+                    <MudTh Class="fw-bold">Klinik</MudTh>
+                    <MudTh Class="fw-bold">Tgl</MudTh>
+                    <MudTh Class="fw-bold">No. Faktur</MudTh>
+                    <MudTh Class="fw-bold">Nama Treatment</MudTh>
+                    <MudTh Class="fw-bold">Qty</MudTh>
+                    <MudTh Class="fw-bold">Dokter</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Klinik">@context.Klinik</MudTd>
+                    <MudTd DataLabel="Tgl">@context.Tanggal.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="No. Faktur">@context.NoFaktur</MudTd>
+                    <MudTd DataLabel="Nama Treatment" HideSmall="_hidePosition">@context.NamaTreatment</MudTd>
+                    <MudTd DataLabel="Qty">@context.Quantity</MudTd>
+                    <MudTd DataLabel="Dokter">@context.Doctor</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager InfoFormat="@infoFormat" HideRowsPerPage="true" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" Class="justify-content-around d-flex w-100" />
+                </PagerContent>
+            </MudTable>
+        </MudTabPanel>
+        <MudTabPanel Text="Perawatan">
+            <MudTable HeaderClass="bg-warning" Items="@Patients.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+                <HeaderContent>
+                    <MudTh Class="fw-bold">Klinik</MudTh>
+                    <MudTh Class="fw-bold">Tgl</MudTh>
+                    <MudTh Class="fw-bold">No. Faktur</MudTh>
+                    <MudTh Class="fw-bold">Nama Treatment</MudTh>
+                    <MudTh Class="fw-bold">Qty</MudTh>
+                    <MudTh Class="fw-bold">Dokter</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Klinik">@context.Klinik</MudTd>
+                    <MudTd DataLabel="Tgl">@context.Tanggal.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="No. Faktur">@context.NoFaktur</MudTd>
+                    <MudTd DataLabel="Nama Treatment" HideSmall="_hidePosition">@context.NamaTreatment</MudTd>
+                    <MudTd DataLabel="Qty">@context.Quantity</MudTd>
+                    <MudTd DataLabel="Dokter">@context.Doctor</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudTabPanel>
+        <MudTabPanel Text="Paket">
+            <MudText>Paket</MudText>
+        </MudTabPanel>
+    </MudTabs>
+</MudCard>
 
 @code {
     private bool _hidePosition;
