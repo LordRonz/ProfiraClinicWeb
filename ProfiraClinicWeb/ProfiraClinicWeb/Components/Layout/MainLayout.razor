@@ -33,9 +33,25 @@
 <MudDialogProvider @rendermode="InteractiveServer" />
 
 <MudLayout>
-    <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        My Application
+    <MudAppBar Style="background: #f8eab9;">
+        @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+        <div style="width: 25%;" class="d-flex align-items-center gap-1">
+            <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
+            <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="searh"></MudIconButton>
+        </div>
+        <MudSpacer></MudSpacer>
+        <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
+            <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+        </MudBadge>
+        <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+            <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
+        </MudBadge>
+        <div class="d-flex align-items-center gap-2">
+            <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
+            <MudAvatar>
+                <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+            </MudAvatar>
+        </div>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <MudDrawerHeader>
@@ -54,6 +70,8 @@
 
 @code {
     bool _drawerOpen = true;
+
+    public string Search { get; set; }
 
     void DrawerToggle()
     {
