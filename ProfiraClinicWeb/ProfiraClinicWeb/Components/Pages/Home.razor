@@ -1,22 +1,38 @@
 ﻿@page "/"
+@using BlazorCalendar
+@using BlazorCalendar.Models
 
 <PageTitle>Home</PageTitle>
 
 <MudContainer Class="mb-16">
-    <div class="d-flex">
+    @* <div class="d-flex">
         <ProfiraClinicWeb.Components.Form.DatePickerMulti Label="Woww" @bind-MarkedDates="markedDates" />
-    </div>
+    </div> *@
 
-    @foreach (DateTime date in markedDates)
-    {
-        // Pass the Dto properties to the component
-        <p>@date.ToString()</p>
-    }
+	<CalendarContainer DisplayedView="DisplayedView.Monthly" TasksList="TasksList.ToArray()">
+		<MonthlyView />
+	</CalendarContainer>
+
 </MudContainer>
 
 
 
 
 @code {
-    private List<DateTime> markedDates = new List<DateTime>();
+	private List<DateTime> markedDates = new List<DateTime>();
+
+	private List<Tasks> TasksList;
+
+	protected override void OnInitialized()
+	{
+		var today = DateTime.Now;
+		TasksList = new()
+		{
+			new Tasks { ID = 1, DateStart = today.AddDays(8), DateEnd = today.AddDays(8), Code = "CP", Color = "#19C319", Caption = "Lorem ipsum dolor sit amet" },
+			new Tasks { ID = 2, DateStart = today.AddDays(50), DateEnd = today.AddDays(52), Code = "DEV", Color = "#FFD800", Caption = "Fusce quis purus eu ante" },
+			new Tasks { ID = 3, DateStart = today.AddDays(62), DateEnd = today.AddDays(62), Code = "DEV", Color = "#FFD800" },
+			new Tasks { ID = 4, DateStart = today.AddDays(62), DateEnd = today.AddDays(62), Code = "FORM", Color = "#FFC3FF", Caption = "Ut sit amet turpis eget" } ,
+			new Tasks { ID = 5, DateStart = today.AddDays(73).AddHours(8), DateEnd = today.AddDays(73).AddHours(9), Code = "MEETING", Color = "#2DD7D7" }
+		};
+	}
 }

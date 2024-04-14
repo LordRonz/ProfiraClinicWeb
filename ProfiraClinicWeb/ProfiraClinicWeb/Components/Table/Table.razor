@@ -12,13 +12,17 @@
         @foreach (TableColumn col in Config.GetColumn())
         {
             // Pass the Dto properties to the component
-            <MudTd DataLabel="@col.Caption">@context[col.DataField]</MudTd>
+            <MudTd DataLabel="@col.Caption">@context.GetValueOrDefault(col.DataField)</MudTd>
         }
     </RowTemplate>
+    <PagerContent>
+        <MudTablePager InfoFormat="@infoFormat" HideRowsPerPage="true" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" Class="justify-content-around d-flex w-100" />
+    </PagerContent>
 </MudTable>
 
 @code {
     private bool _loading;
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
