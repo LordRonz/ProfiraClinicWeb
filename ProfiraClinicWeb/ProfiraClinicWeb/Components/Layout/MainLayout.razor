@@ -46,11 +46,22 @@
         <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
             <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
         </MudBadge>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
             <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
             <MudAvatar>
                 <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
             </MudAvatar>
+            <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+		        <div class="d-flex flex-column pa-1">
+                    <MudList Clickable="true">
+                        <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
+                        <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
+                        <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
+                        <MudDivider />
+                        <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" />
+                    </MudList>
+		        </div>
+	        </MudPopover>
         </div>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
@@ -76,5 +87,12 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    public bool _isProfilePopoverOpen = false;
+
+    public void ToggleProfilePopover()
+    {
+        _isProfilePopoverOpen = !_isProfilePopoverOpen;
     }
 }
