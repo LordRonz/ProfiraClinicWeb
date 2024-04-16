@@ -19,6 +19,7 @@
     <PackageReference Include="BlazorReports" Version="0.20.0" />
     <PackageReference Include="BootstrapBlazor" Version="8.3.0" />
     <PackageReference Include="BootstrapBlazor.FontAwesome" Version="8.0.1" />
+    <PackageReference Include="Excubo.Blazor.Canvas" Version="3.2.48" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
     <PackageReference Include="MudBlazor" Version="6.17.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
