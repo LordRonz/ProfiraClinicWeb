@@ -40,14 +40,16 @@
 
         var patients = new List<object>()
         {
-            (object) new { memberId = "MEM00102", namaPasien = "Ninik", alamat="Darmahusada Regency 12",  noHp="081232332020", tglLahir = DateTime.Now },
-            (object) new { memberId = "MEM00103", namaPasien = "Fenny", alamat="Ploso Baru 22",  noHp="087171728282", tglLahir = DateTime.Now },
-            (object) new { memberId = "MEM00105", namaPasien = "Sandra", alamat="Kartini 10",  noHp="082128288822", tglLahir = DateTime.Now },
-            (object) new { memberId = "MEM00106", namaPasien = "Renata", alamat="Ngagel Wasana V/5",  noHp="085122838449", tglLahir = DateTime.Now },
-            (object) new { memberId = "MEM00107", namaPasien = "Irene", alamat="Manyar Jaya 7/8",  noHp="081399495959", tglLahir = DateTime.Now },
+            (object) new { view="/pasien", edit="/edit-pasien", memberId = "MEM00102", namaPasien = "Ninik", alamat="Darmahusada Regency 12",  noHp="081232332020", tglLahir = DateTime.Now },
+            (object) new { view="/pasien", edit="/edit-pasien", memberId = "MEM00103", namaPasien = "Fenny", alamat="Ploso Baru 22",  noHp="087171728282", tglLahir = DateTime.Now },
+            (object) new { view="/pasien", edit="/edit-pasien", memberId = "MEM00105", namaPasien = "Sandra", alamat="Kartini 10",  noHp="082128288822", tglLahir = DateTime.Now },
+            (object) new { view="/pasien", edit="/edit-pasien", memberId = "MEM00106", namaPasien = "Renata", alamat="Ngagel Wasana V/5",  noHp="085122838449", tglLahir = DateTime.Now },
+            (object) new { view="/pasien", edit="/edit-pasien", memberId = "MEM00107", namaPasien = "Irene", alamat="Manyar Jaya 7/8",  noHp="081399495959", tglLahir = DateTime.Now },
         };
 
         PatientTableConfig = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
+                new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
                 new TableColumn { Caption="Member ID", DataField="memberId" },
                 new TableColumn { Caption="Nama Pasien", DataField="namaPasien" },
                 new TableColumn { Caption="Alamat", DataField="alamat" },

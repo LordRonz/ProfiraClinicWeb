@@ -3,11 +3,19 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace ProfiraClinicWeb.Utils
 {
+    public enum ColumnType
+    {
+        Data,
+        Edit,
+        View,
+    }
+
     public class TableColumn
     {
         public string Caption { get; set; }
         public string DataField { get; set; }
         public string Alignment { get; set; }
+        public ColumnType? Type { get; set; } = ColumnType.Data;
     }
 
     public class TableConfig(List<TableColumn> column, List<object> dataSource)
