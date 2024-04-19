@@ -1,0 +1,25 @@
+﻿@page "/pasien/{Id}"
+
+@using System.Net.Http.Json
+@using ProfiraClinicWeb.Models
+@using ProfiraClinicWeb.Utils;
+@inject HttpClient httpClient
+
+@using PatientModel = ProfiraClinicWeb.Models.Patient
+
+<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Profile Pasien</MudText>
+<MudCard>
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Produk">
+            b
+        </MudTabPanel>
+        <MudTabPanel Text="Perawatan">
+            a
+        </MudTabPanel>
+    </MudTabs>
+</MudCard>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+}
