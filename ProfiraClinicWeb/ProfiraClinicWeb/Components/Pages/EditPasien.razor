@@ -11,10 +11,10 @@
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
 <MudContainer>
-    <MudText Typo="Typo.h4" Style="padding: 20px 0px;">Profile Pasien</MudText>
+    <MudText Typo="Typo.h4" Style="padding: 20px 0px;">Informasi Pasien</MudText>
     <MudCard>
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
-            <MudTabPanel Text="Produk">
+            <MudTabPanel Text="Data Pasien">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
                     <MudTextField T="string" Label="Nama Pasien" />
                     <MudRadioGroup @bind-Value="@SelectedOption">
@@ -85,8 +85,10 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true">Simpan</MudButton>
                 </MudForm>
             </MudTabPanel>
-            <MudTabPanel Text="Perawatan">
-                a
+            <MudTabPanel Text="Riwayat Awal Pasien">
+                <MudForm>
+                    <MudTextField T="string" Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)" Lines="3" />
+                </MudForm>
             </MudTabPanel>
         </MudTabs>
     </MudCard>

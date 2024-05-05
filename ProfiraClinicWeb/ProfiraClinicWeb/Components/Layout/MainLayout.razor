@@ -69,7 +69,15 @@
             <MudText Typo="Typo.h6">My App</MudText>
         </MudDrawerHeader>
         <MudNavMenu>
-            <MudNavLink Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
+            <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+            <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
+                <MudNavLink Href="/clinic">Klinik</MudNavLink>
+                <MudNavLink Href="/package">Paket</MudNavLink>
+                <MudNavLink Href="/treatment">Perawatan</MudNavLink>
+                <MudNavLink Href="/product">Produk</MudNavLink>
+                <MudNavLink Href="/doctor">Dokter</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
