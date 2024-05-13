@@ -1,0 +1,39 @@
+﻿@page "/pemeriksaan"
+@using System.Net.Http.Json
+@using ProfiraClinicWeb.Models
+@using ProfiraClinicWeb.Utils;
+@inject HttpClient httpClient
+
+@using PatientModel = ProfiraClinicWeb.Models.Patient
+
+<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Pemeriksaan Pasien</MudText>
+<MudCard>
+    @* <MudButton Class="m-4">Add</MudButton> *@
+
+    <ProfiraClinicWeb.Components.Table.Table Config="DoctorTableConfig" />
+</MudCard>
+
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private IEnumerable<Element> Elements = new List<Element>();
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    public TableConfig DoctorTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = new List<object>()
+        {
+            (object) new { view="/pasien/1", tanggalKunjungan = "DR01", noKunjungan = "dr. Fifin" },
+            (object) new { view="/pasien/2", tanggalKunjungan = "DR02", noKunjungan = "dr. Agnes" },
+            (object) new { view="/pasien/3", tanggalKunjungan = "DR03", noKunjungan = "dr. Ruth" },
+        };
+
+        DoctorTableConfig = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
+                new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
+                new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
+        }, patients);
+    }
+}
