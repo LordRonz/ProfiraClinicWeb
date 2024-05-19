@@ -1,0 +1,45 @@
+﻿@page "/penandaan-gambar"
+@using System.Net.Http.Json
+@using ProfiraClinicWeb.Models
+@using ProfiraClinicWeb.Utils;
+@inject HttpClient httpClient
+
+@using PatientModel = ProfiraClinicWeb.Models.Patient
+
+<MudText Typo="Typo.h4" Style="padding: 20px 0px;">PENANDAAN GAMBAR</MudText>
+<MudText Typo="Typo.body1" Style="">Nama Pasien: FELICIA</MudText>
+<MudText Typo="Typo.body1" Style="padding-bottom: 20px">
+    Umur Pasien :
+    35 th
+</MudText>
+<MudFab Href="/penandaan-gambar/add" StartIcon="@Icons.Material.Filled.Add" Style="margin-bottom: 20px" Label="Add" />
+<MudCard>
+    <ProfiraClinicWeb.Components.Table.Table Config="PenandaanGambarTableConfig" />
+</MudCard>
+
+
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private IEnumerable<Element> Elements = new List<Element>();
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    public TableConfig PenandaanGambarTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = new List<object>()
+        {
+            (object) new { view="/pasien/1", tanggalKunjungan = "PKT1", noKunjungan = "Collagen Ampul" },
+            (object) new { view="/pasien/2", tanggalKunjungan = "PKT2", noKunjungan = "Derma Aktif Rejuve" },
+            (object) new { view="/pasien/3", tanggalKunjungan = "PKT3", noKunjungan = "Ozon Ultra Facial" },
+        };
+
+        PenandaanGambarTableConfig = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
+                new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
+                new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
+        }, patients);
+    }
+
+}

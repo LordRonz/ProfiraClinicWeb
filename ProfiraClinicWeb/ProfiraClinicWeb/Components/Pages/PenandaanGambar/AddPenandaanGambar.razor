@@ -1,0 +1,191 @@
+﻿@page "/penandaan-gambar/add";
+@using System.Net.Http.Json;
+@using ProfiraClinicWeb.Models;
+@using ProfiraClinicWeb.Utils;
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using Canvas = Excubo.Blazor.Canvas.Canvas;
+@using Microsoft.JSInterop
+@inject HttpClient httpClient;
+@inject IJSRuntime js;
+
+@using PatientModel = ProfiraClinicWeb.Models.Patient;
+
+<img id="left_face" width="100" height="100" style="display:none" src="images/penandaan_gambar/left_face.jpg" alt="Left Face" />
+
+<img id="front_face" width="100" height="100" style="display:none" src="images/penandaan_gambar/front_face.jpg" alt="Front Face" />
+
+<img id="right_face" width="100" height="100" style="display:none" src="images/penandaan_gambar/right_face.jpg" alt="Right Face" />
+
+<MudContainer>
+    <MudText Typo="Typo.h4" Style="padding: 20px 0px;">PENANDAAN GAMBAR</MudText>
+    <div class="d-flex">
+        <MudCard Class="d-flex flex-column align-items-start flex-grow-1 position-relative">
+            <div @ref="container">
+                <Excubo.Blazor.Canvas.Canvas @onmousemove="MouseMoveCanvasAsync" @onmouseup="MouseUpCanvas" @onmousedown="MouseDownCanvas" width="630" height="630" @ref="_context" style="border: 1px solid red">
+                </Excubo.Blazor.Canvas.Canvas>
+            </div>
+        </MudCard>
+        <MudCard Class="d-flex flex-column align-items-start flex-grow-1">
+            <MudSimpleTable Style="overflow-x: auto; width: 100%;">
+                <thead>
+                    <tr>
+                        @foreach (var h in headings)
+                        {
+                            <th>@h</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in rows)
+                    {
+                        <tr>
+                            @foreach (var x in row.Split())
+                            {
+                                <td>@x</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        </MudCard>
+    </div>
+</MudContainer>
+
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private IEnumerable<Element> Elements = new List<Element>();
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    public TableConfig PenandaanGambarTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = new List<object>()
+        {
+            (object) new { view="/pasien/1", tanggalKunjungan = "PKT1", noKunjungan = "Collagen Ampul" },
+            (object) new { view="/pasien/2", tanggalKunjungan = "PKT2", noKunjungan = "Derma Aktif Rejuve" },
+            (object) new { view="/pasien/3", tanggalKunjungan = "PKT3", noKunjungan = "Ozon Ultra Facial" },
+        };
+
+        PenandaanGambarTableConfig = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
+                new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
+                new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
+        }, patients);
+    }
+
+    string[] headings = { "No", "Keterangan" };
+    string[] rows = {
+        @"1 keterangan 1",
+        @"2 Keterangan 2",
+    };
+
+    private ElementReference container;
+    private Excubo.Blazor.Canvas.Canvas _context;
+    private Excubo.Blazor.Canvas.Contexts.Context2D ctx1;
+    private double canvasx;
+    private double canvasy;
+    private double last_mousex;
+    private double last_mousey;
+    private double mousex;
+    private double mousey;
+    private bool mousedown = false;
+    private string clr = "black";
+
+    private class Position
+    {
+        public double Left { get; set; }
+        public double Top { get; set; }
+    }
+    private async Task ToggleColorAsync()
+    {
+        clr = clr == "black" ? "red" : "black";
+        await ctx1.StrokeStyleAsync(clr);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ctx1 = await _context.GetContext2DAsync();
+            // initialize settings
+            await ctx1.GlobalCompositeOperationAsync(CompositeOperation.Source_Over);
+            await ctx1.StrokeStyleAsync(clr);
+            await ctx1.LineWidthAsync(3);
+            await ctx1.LineJoinAsync(LineJoin.Round);
+            await ctx1.LineCapAsync(LineCap.Round);
+            // this retrieves the top left corner of the canvas container (which is equivalent to the top left corner of the canvas, as we don't have any margins / padding)
+            var p = await js.InvokeAsync<Position>("eval", $"let e = document.querySelector('[_bl_{container.Id}=\"\"]'); e = e.getBoundingClientRect(); e = {{ 'Left': e.x, 'Top': e.y }}; e");
+            (canvasx, canvasy) = (p.Left, p.Top);
+
+            await UpdateCanvasAsync();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public async Task UpdateCanvasAsync()
+    {
+        await js.InvokeVoidAsync("eval", "myimage = document.getElementById('left_face')");
+        await js.InvokeVoidAsync("eval", "myimage1 = document.getElementById('front_face')");
+        await js.InvokeVoidAsync("eval", "myimage2 = document.getElementById('right_face')");
+
+        await ctx1.ClearRectAsync(0, 0, 630, 630);
+        await ctx1.SetTransformAsync(1, 0, 0, 1, 0, 0);
+        await ctx1.RestoreAsync();
+        await ctx1.SaveAsync();
+        await ctx1.DrawImageAsync("myimage", 0, 0, 210, 210);
+        await ctx1.DrawImageAsync("myimage1", 0, 210, 210, 210);
+        await ctx1.DrawImageAsync("myimage2", 0, 420, 210, 210);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void MouseDownCanvas(MouseEventArgs e)
+    {
+        render_required = false;
+        this.last_mousex = mousex = e.ClientX - canvasx;
+        this.last_mousey = mousey = e.ClientY - canvasy;
+        this.mousedown = true;
+    }
+
+    private void MouseUpCanvas(MouseEventArgs e)
+    {
+        render_required = false;
+        mousedown = false;
+    }
+
+    async Task MouseMoveCanvasAsync(MouseEventArgs e)
+    {
+        render_required = false;
+        if (!mousedown)
+        {
+            return;
+        }
+        mousex = e.ClientX - canvasx;
+        mousey = e.ClientY - canvasy;
+        await DrawCanvasAsync(mousex, mousey, last_mousex, last_mousey, clr);
+        last_mousex = mousex;
+        last_mousey = mousey;
+    }
+    async Task DrawCanvasAsync(double prev_x, double prev_y, double x, double y, string clr)
+    {
+        await using (var ctx2 = ctx1.CreateBatch())
+        {
+            await ctx2.BeginPathAsync();
+            await ctx2.MoveToAsync(prev_x, prev_y);
+            await ctx2.LineToAsync(x, y);
+            await ctx2.StrokeAsync();
+        }
+    }
+    private bool render_required = true;
+    protected override bool ShouldRender()
+    {
+        if (!render_required)
+        {
+            render_required = true;
+            return false;
+        }
+        return base.ShouldRender();
+    }
+}
