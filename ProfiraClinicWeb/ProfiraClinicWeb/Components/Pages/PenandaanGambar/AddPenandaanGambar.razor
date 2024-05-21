@@ -22,7 +22,7 @@
     <div class="d-flex">
         <MudCard Class="d-flex flex-column align-items-start flex-grow-1 position-relative">
             <div @ref="container">
-                <Excubo.Blazor.Canvas.Canvas @onmousemove="MouseMoveCanvasAsync" @onmouseup="MouseUpCanvas" @onmousedown="MouseDownCanvas" width="630" height="630" @ref="_context" style="border: 1px solid red">
+                <Excubo.Blazor.Canvas.Canvas id="penandaan-gambar" @onmousemove="MouseMoveCanvasAsync" @onmouseup="MouseUpCanvas" @onmousedown="MouseDownCanvas" width="630" height="630" @ref="_context" style="border: 1px solid red">
                 </Excubo.Blazor.Canvas.Canvas>
             </div>
         </MudCard>
@@ -50,6 +50,19 @@
             </MudSimpleTable>
         </MudCard>
     </div>
+    <a id="link"></a>
+    <Button OnClick="Save">
+        Save
+    </Button>
+    <script>
+      window.canvas2Image = () => {
+        const canvas = document.getElementById('penandaan-gambar');
+        const link = document.getElementById('link');
+        link.setAttribute('download', 'canvas.png');
+        link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+        link.click();
+      };
+    </script>
 </MudContainer>
 
 @code {
@@ -104,6 +117,12 @@
         clr = clr == "black" ? "red" : "black";
         await ctx1.StrokeStyleAsync(clr);
     }
+
+    private async Task Save()
+    {
+        await js.InvokeVoidAsync("canvas2Image");
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -132,6 +151,8 @@
 
         await ctx1.ClearRectAsync(0, 0, 630, 630);
         await ctx1.SetTransformAsync(1, 0, 0, 1, 0, 0);
+        await ctx1.FillStyleAsync("white");
+        await ctx1.FillRectAsync(0, 0, 630, 630);
         await ctx1.RestoreAsync();
         await ctx1.SaveAsync();
         await ctx1.DrawImageAsync("myimage", 0, 0, 210, 210);
