@@ -18,6 +18,6 @@ namespace ProfiraClinicWeb.Data
             optionsBuilder.UseSqlServer(_config.GetConnectionString("DatabaseConnection"));
         }
 
-        public DbSet<MKary> MKary { get; set; }
+        public DbSet<MKARY> MKARY { get; set; }
     }
 }

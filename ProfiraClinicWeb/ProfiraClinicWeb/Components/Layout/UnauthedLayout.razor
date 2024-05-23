@@ -1,0 +1,14 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider @rendermode="InteractiveServer" />
+<MudDialogProvider @rendermode="InteractiveServer" />
+
+<MudLayout Class="min-vh-100">
+    <MudContainer MaxWidth="MaxWidth.Medium" Class="min-vh-100">
+        @Body
+    </MudContainer>
+</MudLayout>
+
+@code {
+}

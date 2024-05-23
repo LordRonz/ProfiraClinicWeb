@@ -2,9 +2,15 @@ using BlazorReports.Extensions;
 using MudBlazor.Services;
 using ProfiraClinicWeb.Client.Pages;
 using ProfiraClinicWeb.Components;
+using ProfiraClinicWeb.Data;
 using ProfiraClinicWeb.Properties.Report;
+using ProfiraClinicWeb.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var root = Directory.GetCurrentDirectory();
+var dotenv = Path.Combine(root, ".env");
+DotEnv.Load(dotenv);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -15,6 +21,7 @@ builder.Services.AddMudServices();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddBlazorReports();
+builder.Services.AddScoped<AppDbContext>();
 
 var app = builder.Build();
 

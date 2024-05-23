@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProfiraClinicWeb.Client\ProfiraClinicWeb.Client.csproj" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="BlazorCalendar" Version="2.6.8" />
     <PackageReference Include="BlazorReports" Version="0.20.0" />
     <PackageReference Include="BootstrapBlazor" Version="8.3.0" />
