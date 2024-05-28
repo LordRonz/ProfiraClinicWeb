@@ -10,19 +10,31 @@
 
 <PageTitle>Login</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center min-vh-100">
-    <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100" Elevation="3">
-        <div class="flex-column d-flex align-items-center justify-content-center">
-            <MudImage Src="/images/logo.png" Class="profile-image" Width="180" Height="180"></MudImage>
+<div class="bg-dark bg-opacity-25">
+    <div class="d-flex align-items-center justify-content-center w-100 gap-8">
+        <div class="d-flex justify-content-end">
+            <MudImage Src="/images/ashley.png" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
         </div>
-        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
-            <MudTextField T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-            <MudTextField T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Log In</MudButton>
-        </MudForm>
-        <MudLink Class="mt-4" Href="/change-password">Change password</MudLink>
-    </MudPaper>
-</MudContainer>
+        <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
+            <MudImage Src="/images/logo.png" Class="profile-image" Width="150" Height="180"></MudImage>
+            <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3" >
+                <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+            
+                    <MudSelect OuterClass="bg-transparent rounded-pill" InputClass="bg-transparent" Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Pilih clinic" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@("Profira Manyar")" />
+                        <MudSelectItem Value="@("Profira HR")" />
+                    </MudSelect>
+                    <MudCheckBox @bind-Value="@rememberMe" Dense="true">
+                        Remember me
+                    </MudCheckBox>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
+                </MudForm>
+            </MudPaper>
+        </MudContainer>
+    </div>
+</div>
 
 
 @inject AppDbContext dbContext
@@ -34,6 +46,7 @@
     List<MKARY> customers = new List<MKARY>();
 
     bool success;
+    bool rememberMe = false;
     string[] errors = { };
     MudTextField<string> pwField;
     MudTextField<string> userNameField;

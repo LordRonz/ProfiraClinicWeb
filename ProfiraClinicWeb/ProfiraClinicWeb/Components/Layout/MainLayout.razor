@@ -83,7 +83,7 @@
     @if (!isDoctor) {
         <MudDrawer @bind-Open="@_drawerOpen">
             <MudDrawerHeader>
-                <MudText Typo="Typo.h6">My App</MudText>
+                <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="65" />
             </MudDrawerHeader>
             <MudNavMenu>
                 <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
@@ -119,6 +119,7 @@
         </MudDrawer>
     }
     <MudMainContent>
+        <MudSwitch @bind-Value="@isDoctor" />
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
             @Body
         </MudContainer>
@@ -128,9 +129,14 @@
 @code {
     bool _drawerOpen = true;
 
-    bool isDoctor = true;
+    bool isDoctor = false;
 
     public string Search { get; set; }
+
+    void ToggleUserType()
+    {
+        isDoctor = !isDoctor;
+    }
 
     void DrawerToggle()
     {

@@ -2,7 +2,15 @@
 @using BlazorCalendar
 @using BlazorCalendar.Models
 @using System.Globalization
+@using Microsoft.EntityFrameworkCore;
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using ProfiraClinicWeb.Data
+@using ProfiraClinicWeb.Models
+@using Color = MudBlazor.Color
 
+@if (loaded)
+{
 <div class="d-flex flex-row mb-2">
     <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
     <button type="button" @onclick="@(m => ClicMonthNavigate(-1))" class="btn">🔼</button>
@@ -33,7 +41,17 @@
 
 <br />
 <div class="console">@fakeConsole</div>
+}
+else
+{
+    <MudContainer Class="d-flex justify-content-center align-items-center vh-100">
+        <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+    </MudContainer>
+}
 
+@inject AppDbContext dbContext
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
 @code {
     private DateTime today = DateTime.Today;
     private int months = 12;
@@ -41,6 +59,8 @@
     private string fakeConsole = "";
     private BlazorCalendar.PriorityLabel PriorityDisplay = PriorityLabel.Code;
     private bool draggable = true;
+    string userName = "";
+    private bool loaded = false;
 
     protected override void OnInitialized()
     {
@@ -60,6 +80,32 @@
             new Tasks { ID = 8, DateStart = today.AddDays(45).AddHours(8), DateEnd = today.AddDays(45).AddHours(9), Code = "MEETING", Color = "#2DD7D7", Comment="Julien's test" },
             new Tasks { ID = 9, DateStart = today.AddDays(-8), DateEnd = today.AddDays(-7), Code = "MEET⭐", Color = "#0d6efd",Caption = "MTG:France" }
         };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await ProtectedSessionStore.GetAsync<string>("token");
+            if (!token.Success)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+            var authPayload = ProfiraClinicWeb.Utils.Auth.ValidateToken(token.Value);
+            if (authPayload == null)
+            {
+                NavManager.NavigateTo("/login");
+                return;
+            }
+
+            userName = ProfiraClinicWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
+            var customer = await dbContext.MKARY.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+
+            loaded = true;
+
+            StateHasChanged();
+        }
     }
 
     private void ChangeFirstDate(string value)
