@@ -20,8 +20,8 @@
             <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3" >
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" HelperText="Choose a strong password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
-            
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+
                     <MudSelect OuterClass="bg-transparent rounded-pill" InputClass="bg-transparent" Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Pilih clinic" AnchorOrigin="Origin.BottomCenter">
                         <MudSelectItem Value="@("Profira Manyar")" />
                         <MudSelectItem Value="@("Profira HR")" />

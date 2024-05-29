@@ -32,11 +32,11 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 
-<MudLayout>
+<MudLayout Class="bg-dark bg-opacity-25" Style='background-image: url("images/wave.png"); background-repeat: no-repeat;'>
     @* Top navbar *@
 
     @if (!isDoctor) {
-        <MudAppBar Style="background: #f8eab9;">
+        <MudAppBar Style="background: transparent;">
             @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
             <div style="width: 25%;" class="d-flex align-items-center gap-1">
                 <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
@@ -46,9 +46,9 @@
             <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
             </MudBadge>
-            <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+            @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
-            </MudBadge>
+            </MudBadge> *@
             <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
                 <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
                 <MudAvatar>
@@ -85,7 +85,7 @@
             <MudDrawerHeader>
                 <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="65" />
             </MudDrawerHeader>
-            <MudNavMenu>
+            <MudNavMenu Color="MudBlazor.Color.Warning">
                 <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
                 <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
                     <MudNavLink Href="/clinic">Klinik</MudNavLink>
