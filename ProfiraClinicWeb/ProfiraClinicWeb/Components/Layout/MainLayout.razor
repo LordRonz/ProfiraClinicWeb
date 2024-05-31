@@ -32,7 +32,7 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 
-<MudLayout Class="bg-dark bg-opacity-25" Style='background-image: url("images/wave.png"); background-repeat: no-repeat;'>
+<MudLayout Class="bg-dark bg-opacity-25" Style='background-image: url("images/wave.png"); background-repeat: no-repeat; height: 100vh;'>
     @* Top navbar *@
 
     @if (!isDoctor) {
@@ -81,21 +81,25 @@
 
     @* Navbar *@
     @if (!isDoctor) {
-        <MudDrawer @bind-Open="@_drawerOpen">
-            <MudDrawerHeader>
-                <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="65" />
-            </MudDrawerHeader>
-            <MudNavMenu Color="MudBlazor.Color.Warning">
-                <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-                <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
-                    <MudNavLink Href="/clinic">Klinik</MudNavLink>
-                    <MudNavLink Href="/package">Paket</MudNavLink>
-                    <MudNavLink Href="/treatment">Perawatan</MudNavLink>
-                    <MudNavLink Href="/product">Produk</MudNavLink>
-                    <MudNavLink Href="/doctor">Dokter</MudNavLink>
-                </MudNavGroup>
-                <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
-            </MudNavMenu>
+        <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent">
+            <div class="p-3 h-100">
+                <div class="bg-white h-100 rounded-3">
+                    <MudDrawerHeader>
+                        <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="65" />
+                    </MudDrawerHeader>
+                    <MudNavMenu Color="MudBlazor.Color.Warning">
+                        <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+                        <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
+                            <MudNavLink Href="/clinic">Klinik</MudNavLink>
+                            <MudNavLink Href="/package">Paket</MudNavLink>
+                            <MudNavLink Href="/treatment">Perawatan</MudNavLink>
+                            <MudNavLink Href="/product">Produk</MudNavLink>
+                            <MudNavLink Href="/doctor">Dokter</MudNavLink>
+                        </MudNavGroup>
+                        <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
+                    </MudNavMenu>
+                </div>
+            </div>
         </MudDrawer>
     } else
     {
@@ -118,9 +122,9 @@
             </MudNavMenu>
         </MudDrawer>
     }
-    <MudMainContent>
+    <MudMainContent Class="h-100">
         <MudSwitch @bind-Value="@isDoctor" />
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100">
             @Body
         </MudContainer>
     </MudMainContent>
