@@ -38,14 +38,14 @@
     @if (!isDoctor) {
         <MudAppBar Style="background: transparent;">
             @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
-            <div style="width: 25%;" class="d-flex align-items-center gap-1">
-                <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-                <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="searh"></MudIconButton>
-            </div>
             <MudSpacer></MudSpacer>
             <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
             </MudBadge>
+            <div class="d-flex align-items-center gap-1 mr-2">
+                <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
+                @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
+            </div>
             @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
             </MudBadge> *@
@@ -85,7 +85,7 @@
             <div class="p-3 h-100">
                 <div class="bg-white h-100 rounded-3">
                     <MudDrawerHeader>
-                        <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="65" />
+                        <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
                     </MudDrawerHeader>
                     <MudNavMenu Color="MudBlazor.Color.Warning">
                         <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
@@ -97,6 +97,8 @@
                             <MudNavLink Href="/doctor">Dokter</MudNavLink>
                         </MudNavGroup>
                         <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.CalendarMonth" Href="/list-pasien" Match="NavLinkMatch.All">Appointment</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Filled.AdsClick" Href="/list-pasien" Match="NavLinkMatch.All">Perawatan</MudNavLink>
                     </MudNavMenu>
                 </div>
             </div>
@@ -123,8 +125,8 @@
         </MudDrawer>
     }
     <MudMainContent Class="h-100">
-        <MudSwitch @bind-Value="@isDoctor" />
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100">
+        <MudSwitch Class="pl-4" @bind-Value="@isDoctor" />
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-75">
             @Body
         </MudContainer>
     </MudMainContent>

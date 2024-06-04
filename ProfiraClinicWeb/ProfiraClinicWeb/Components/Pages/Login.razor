@@ -10,21 +10,21 @@
 
 <PageTitle>Login</PageTitle>
 
-<div class="bg-dark bg-opacity-25">
+<div style="@GetContainerClass()">
     <div class="d-flex align-items-center justify-content-center w-100 gap-8">
         <div class="d-flex justify-content-end">
-            <MudImage Src="/images/ashley.png" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
+            <MudImage Src="@GetLady()" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
         </div>
         <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
-            <MudImage Src="/images/logo.png" Class="profile-image" Width="150" Height="180"></MudImage>
             <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3" >
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
-                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+                    <MudSwitch Class="pl-4" @bind-Value="@isDoctor" />
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9; height: 30px;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
 
-                    <MudSelect OuterClass="bg-transparent rounded-pill" InputClass="bg-transparent" Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Pilih clinic" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@("Profira Manyar")" />
-                        <MudSelectItem Value="@("Profira HR")" />
+                    <MudSelect OuterClass="bg-transparent rounded-pill" Margin="Margin.Dense" InputClass="bg-transparent" Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Pilih clinic" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Style="height: 30px" Value="@("Profira Manyar")" />
+                        <MudSelectItem Style="height: 30px" Value="@("Profira HR")" />
                     </MudSelect>
                     <MudCheckBox @bind-Value="@rememberMe" Dense="true">
                         Remember me
@@ -53,7 +53,18 @@
     string userName = "";
     string userPass = "";
     string ktp = "";
+    bool isDoctor = false;
     MudForm form;
+
+    string GetLady()
+    {
+        return isDoctor ? "/images/login_lady.png" : "/images/ashley.png";
+    }
+
+    string GetContainerClass()
+    {
+        return isDoctor ? "background-color: #BAE0F3;" : "background-color: #C1C1C1;";
+    }
 
     bool isShow;
     InputType PasswordInput = InputType.Password;
@@ -127,3 +138,24 @@
         NavManager.NavigateTo("/");
     }
 }
+
+<style>
+    .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 10px !important;
+    }
+
+    .mud-input-label {
+        font-size: 10px !important;
+        line-height: 10px !important;
+    }
+
+    .mud-input-label-filled.mud-input-label-margin-dense {
+        transform: translate(12px, 20px) scale(1);
+    }
+
+    .mud-input-label-inputcontrol {
+        top: -10px;
+    }
+</style>

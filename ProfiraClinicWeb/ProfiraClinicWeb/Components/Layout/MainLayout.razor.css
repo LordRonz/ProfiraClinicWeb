@@ -94,3 +94,12 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+::deep .search {
+    width: 40px;
+    transition: all 0.5s ease;
+}
+
+::deep .search:focus {
+    width: 100%;
+}

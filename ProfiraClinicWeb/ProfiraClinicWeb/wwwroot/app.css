@@ -2,6 +2,10 @@ a, .btn-link {
     color: #006bb7;
 }
 
+body {
+    font-family: 'Poppins' !important;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
