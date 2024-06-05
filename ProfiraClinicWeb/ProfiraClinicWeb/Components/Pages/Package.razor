@@ -6,7 +6,6 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Paket Perawatan</MudText>
 <MudCard Class="p-4 h-100 rounded-3">
     <MudCard>
     @* <MudButton Class="m-4">Add</MudButton> *@
@@ -15,6 +14,7 @@
     </MudCard>
 </MudCard>
 
+@inject NavigationManager NavManager
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -42,6 +42,16 @@
                 new TableColumn { Caption="Masa Aktif", DataField="masaAktif" },
                 new TableColumn { Caption="Group", DataField="group" },
         }, patients);
+    }
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    public TableConfig ClinicTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Paket", "Master/Paket");
     }
 
 }

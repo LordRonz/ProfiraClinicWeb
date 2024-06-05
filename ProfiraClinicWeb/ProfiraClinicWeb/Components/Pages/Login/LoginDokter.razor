@@ -1,0 +1,161 @@
+﻿@page "/dokter/login"
+@layout ProfiraClinicWeb.Components.Layout.UnauthedLayout;
+@using System.Text.RegularExpressions;
+@using System.ComponentModel.DataAnnotations;
+@using ProfiraClinicWeb.Data;
+@using ProfiraClinicWeb.Models;
+@using Microsoft.EntityFrameworkCore;
+@using Color = MudBlazor.Color;
+@using BC = BCrypt.Net.BCrypt;
+
+<PageTitle>Login</PageTitle>
+
+<div style="@GetContainerClass()">
+    <div class="d-flex align-items-center justify-content-center w-100 gap-8">
+        <div class="d-flex justify-content-end">
+            <MudImage Src="@GetLady()" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
+        </div>
+        <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
+            <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
+                <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
+                    <MudSwitch Class="pl-4" @bind-Value="@isDoctor" />
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9; height: 30px;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+
+                    <MudSelect OuterClass="bg-transparent rounded-pill" Margin="Margin.Dense" InputClass="bg-transparent" Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Pilih clinic" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Style="height: 30px" Value="@("Profira Manyar")" />
+                        <MudSelectItem Style="height: 30px" Value="@("Profira HR")" />
+                    </MudSelect>
+                    <MudCheckBox @bind-Value="@rememberMe" Dense="true">
+                        Remember me
+                    </MudCheckBox>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
+                </MudForm>
+            </MudPaper>
+        </MudContainer>
+    </div>
+</div>
+
+
+@inject AppDbContext dbContext
+@inject ISnackbar Snackbar
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
+@code {
+    private List<DateTime> markedDates = new List<DateTime>();
+    List<MKARY> customers = new List<MKARY>();
+
+    bool success;
+    bool rememberMe = false;
+    string[] errors = { };
+    MudTextField<string> pwField;
+    MudTextField<string> userNameField;
+    string userName = "";
+    string userPass = "";
+    string ktp = "";
+    bool isDoctor = true;
+    MudForm form;
+
+    string GetLady()
+    {
+        return isDoctor ? "/images/login_lady.png" : "/images/ashley.png";
+    }
+
+    string GetContainerClass()
+    {
+        return isDoctor ? "background-color: #BAE0F3;" : "background-color: #C1C1C1;";
+    }
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ButtonVisibilityClick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await dbContext.MKARY.ToListAsync();
+    }
+
+    private void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add(message, severity);
+    }
+
+    public async Task OnSubmit()
+    {
+        var customer = await dbContext.MKARY.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+        if (customer == null)
+        {
+            addSnackbar("User not found");
+            return;
+        }
+        if (!BC.Verify(userPass, customer.UserPassword))
+        {
+            addSnackbar("Invalid username or password");
+            return;
+        }
+
+        var token = ProfiraClinicWeb.Utils.Auth.GenerateToken(customer.UserName);
+
+        await ProtectedSessionStore.SetAsync("token", token);
+
+        addSnackbar("Logged In", Severity.Success);
+
+        NavManager.NavigateTo("/");
+    }
+}
+
+<style>
+    .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 10px !important;
+    }
+
+    .mud-input-label {
+        font-size: 10px !important;
+        line-height: 10px !important;
+    }
+
+    .mud-input-label-filled.mud-input-label-margin-dense {
+        transform: translate(12px, 20px) scale(1);
+    }
+
+    .mud-input-label-inputcontrol {
+        top: -10px;
+    }
+</style>

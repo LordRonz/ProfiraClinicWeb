@@ -32,112 +32,131 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 
-<MudLayout Class="bg-dark bg-opacity-25" Style='background-image: url("images/wave.png"); background-repeat: no-repeat; height: 100vh;'>
-    @* Top navbar *@
+<CascadingValue Value="this">
+    <MudLayout Class="bg-dark bg-opacity-25" Style='background-image: url("images/wave.png"); background-repeat: no-repeat; height: 100vh; background-size: 100% 45%;'>
+        @* Top navbar *@
 
-    @if (!isDoctor) {
-        <MudAppBar Style="background: transparent;">
-            @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
-            <MudSpacer></MudSpacer>
-            <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
-                <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
-            </MudBadge>
-            <div class="d-flex align-items-center gap-1 mr-2">
-                <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-                @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
-            </div>
-            @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
-                <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
-            </MudBadge> *@
-            <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
-                <MudAvatar>
-                    <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
-                </MudAvatar>
-                <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-		            <div class="d-flex flex-column pa-1">
-                        <MudList Clickable="true">
-                            <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
-                            <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
-                            <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
-                            <MudDivider />
-                            <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" />
-                        </MudList>
-		            </div>
-	            </MudPopover>
-            </div>
-        </MudAppBar>
-    } else
-    {
-        <MudAppBar Style="background: #fff;">
-            @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
-            <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
-                <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="55" />
-            </MudLink>
-            <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" />
-        </MudAppBar>
-    }
-
-    @* Navbar *@
-    @if (!isDoctor) {
-        <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent">
-            <div class="p-3 h-100">
-                <div class="bg-white h-100 rounded-3">
-                    <MudDrawerHeader>
-                        <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
-                    </MudDrawerHeader>
-                    <MudNavMenu Color="MudBlazor.Color.Warning">
-                        <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-                        <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
-                            <MudNavLink Href="/clinic">Klinik</MudNavLink>
-                            <MudNavLink Href="/package">Paket</MudNavLink>
-                            <MudNavLink Href="/treatment">Perawatan</MudNavLink>
-                            <MudNavLink Href="/product">Produk</MudNavLink>
-                            <MudNavLink Href="/doctor">Dokter</MudNavLink>
-                        </MudNavGroup>
-                        <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
-                        <MudNavLink Icon="@Icons.Material.Outlined.CalendarMonth" Href="/list-pasien" Match="NavLinkMatch.All">Appointment</MudNavLink>
-                        <MudNavLink Icon="@Icons.Material.Filled.AdsClick" Href="/list-pasien" Match="NavLinkMatch.All">Perawatan</MudNavLink>
-                    </MudNavMenu>
+        @if (!isDoctor) {
+            <MudAppBar Style="background: transparent;" Elevation="0">
+                @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+                <div class="pa-4">
+                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
+                    <MudText Typo="Typo.h4" Color="MudBlazor.Color.Surface">@Title</MudText>
                 </div>
-            </div>
-        </MudDrawer>
-    } else
-    {
-        <MudDrawer @bind-Open="@_drawerOpen" Variant="@DrawerVariant.Temporary" Width="300px">
-            <MudDrawerHeader Style="background-color:  rgb(92, 111, 248)">
-                <div class="d-flex flex-column justify-content-center align-items-center w-100 py-8">
-                    <MudImage src="/images/pasien.png" Class="rounded-circle" Width="70" Height="70"></MudImage>
-                    <MudText Typo="Typo.h6" Style="color: white; font-weight: 400;">JOANNE</MudText>
-                    <MudText Typo="Typo.body2" Style="color: white;">Doctor</MudText>
+                <MudSpacer></MudSpacer>
+                <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+                </MudBadge>
+                <div class="d-flex align-items-center gap-1 mr-2">
+                    <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
+                    @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
                 </div>
-            </MudDrawerHeader>
-            <MudNavMenu>
-                <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-                <MudNavLink Icon="fa fa-stethoscope" Href="/pemeriksaan">Pemeriksaan</MudNavLink>
-                <MudNavLink Icon="@Icons.Material.Filled.Edit" Href="/penandaan-gambar">Penandaan Gambar</MudNavLink>
-                <MudNavLink Icon="@Icons.Material.Filled.PlayCircle" Href="/cppt">CPPT</MudNavLink>
-                <MudNavLink Icon="@Icons.Material.Filled.Checklist" Href="/kontrol">Kontrol</MudNavLink>
-                <MudNavLink Icon="fa fa-user-md" Href="/doctor">Tindakan Perawatan</MudNavLink>
-                <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
-            </MudNavMenu>
-        </MudDrawer>
-    }
-    <MudMainContent Class="h-100">
-        <MudSwitch Class="pl-4" @bind-Value="@isDoctor" />
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-75">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
+                @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+                    <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
+                </MudBadge> *@
+                <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
+                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
+                    <MudAvatar>
+                        <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+                    </MudAvatar>
+                    <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+		                <div class="d-flex flex-column pa-1">
+                            <MudList Clickable="true">
+                                <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
+                                <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
+                                <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
+                                <MudDivider />
+                                <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
+                            </MudList>
+		                </div>
+	                </MudPopover>
+                </div>
+            </MudAppBar>
+        } else
+        {
+            <MudAppBar Style="background: #fff;">
+                @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+                <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
+                    <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="55" />
+                </MudLink>
+                <MudSpacer />
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" />
+            </MudAppBar>
+        }
 
+        @* Navbar *@
+        @if (!isDoctor) {
+            <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent">
+                <div class="p-3 h-100">
+                    <div class="bg-white h-100 rounded-3">
+                        <MudDrawerHeader>
+                            <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
+                        </MudDrawerHeader>
+                        <MudNavMenu Color="MudBlazor.Color.Warning">
+                            <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+                            <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
+                                <MudNavLink Href="/clinic">Klinik</MudNavLink>
+                                <MudNavLink Href="/package">Paket</MudNavLink>
+                                <MudNavLink Href="/treatment">Perawatan</MudNavLink>
+                                <MudNavLink Href="/product">Produk</MudNavLink>
+                                <MudNavLink Href="/doctor">Dokter</MudNavLink>
+                            </MudNavGroup>
+                            <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
+                        </MudNavMenu>
+                    </div>
+                </div>
+            </MudDrawer>
+        } else
+        {
+            <MudDrawer @bind-Open="@_drawerOpen" Variant="@DrawerVariant.Temporary" Width="300px">
+                <MudDrawerHeader Style="background-color:  rgb(92, 111, 248)">
+                    <div class="d-flex flex-column justify-content-center align-items-center w-100 py-8">
+                        <MudImage src="/images/pasien.png" Class="rounded-circle" Width="70" Height="70"></MudImage>
+                        <MudText Typo="Typo.h6" Style="color: white; font-weight: 400;">JOANNE</MudText>
+                        <MudText Typo="Typo.body2" Style="color: white;">Doctor</MudText>
+                    </div>
+                </MudDrawerHeader>
+                <MudNavMenu>
+                    <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+                    <MudNavLink Icon="fa fa-stethoscope" Href="/pemeriksaan">Pemeriksaan</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.Edit" Href="/penandaan-gambar">Penandaan Gambar</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.PlayCircle" Href="/cppt">CPPT</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.Checklist" Href="/kontrol">Kontrol</MudNavLink>
+                    <MudNavLink Icon="fa fa-user-md" Href="/doctor">Tindakan Perawatan</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
+                </MudNavMenu>
+            </MudDrawer>
+        }
+        <MudMainContent Class="h-100">
+            @* <MudSwitch Class="pl-4" @bind-Value="@isDoctor" /> *@
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-75">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</CascadingValue>
+
+@inject NavigationManager NavigationManager;
+@inject IDialogService DialogService
 @code {
     bool _drawerOpen = true;
 
     bool isDoctor = false;
 
+    string path = "";
+
     public string Search { get; set; }
+
+    public string Title { get; set; } = "";
+
+    public string Route { get; set; } = "";
+
+    public void ChangeTitleAndRoute(string newTitle, string newRoute)
+    {
+        Title = newTitle;
+        Route = newRoute;
+        StateHasChanged();
+    }
 
     void ToggleUserType()
     {
@@ -155,4 +174,32 @@
     {
         _isProfilePopoverOpen = !_isProfilePopoverOpen;
     }
+
+    protected override void OnInitialized() {
+        path = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
+    }
+
+    private void OpenDialog()
+    {
+        DialogService.Show<ProfiraClinicWeb.Components.Dialog.LogOutDialog>("Log Out");
+    }
 }
+
+<style>
+    .mud-nav-link-icon-default {
+        color: #0D24EC !important;
+    }
+
+    .mud-nav-link-text {
+        letter-spacing: 0.5px !important;
+    }
+
+    .mud-toolbar-appbar {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .mud-main-content {
+        padding-top: 104px;
+    }
+</style>

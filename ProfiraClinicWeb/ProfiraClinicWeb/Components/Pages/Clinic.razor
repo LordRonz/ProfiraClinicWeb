@@ -6,7 +6,6 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Klinik</MudText>
 <MudCard Class="p-4 h-100 rounded-3">
     <MudCard>
         @* <MudButton Class="m-4">Add</MudButton> *@
@@ -15,13 +14,22 @@
     </MudCard>
 </MudCard>
 
+@inject NavigationManager NavManager
 @code {
     private bool _hidePosition;
     private bool _loading;
     private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
     public TableConfig ClinicTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Klinik", "Master/Klinik");
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -6,7 +6,6 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Produk</MudText>
 <MudCard Class="p-4 h-100 rounded-3">
     <MudCard>
     @* <MudButton Class="m-4">Add</MudButton> *@
@@ -40,6 +39,16 @@
                 new TableColumn { Caption="Disc Member", DataField="discMember" },
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
         }, patients);
+    }
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    public TableConfig ClinicTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Produk", "Master/Produk");
     }
 
 }
