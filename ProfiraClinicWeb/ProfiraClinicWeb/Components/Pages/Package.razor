@@ -2,6 +2,8 @@
 @using System.Net.Http.Json
 @using ProfiraClinicWeb.Models
 @using ProfiraClinicWeb.Utils;
+@using ProfiraClinicWeb.Data;
+@using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
@@ -14,6 +16,7 @@
     </MudCard>
 </MudCard>
 
+@inject AppDbContext dbContext
 @inject NavigationManager NavManager
 @code {
     private bool _hidePosition;
@@ -25,12 +28,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var patients = new List<object>()
+        var packages = await dbContext.PPKTH.OrderBy(c => c.NMPKT).Take(5).ToArrayAsync();
+
+        var dataSource = packages.Select(el =>
         {
-            (object) new { edit="/pasien/1", kode = "PKT1", namaPaket = "Collagen Ampul", harga="750.000",  discMember="15%", discNonMember = "10%", masaAktif="730 hari", group="Medis" },
-            (object) new { edit="/pasien/2", kode = "PKT2", namaPaket = "Derma Aktif Rejuve", harga="5.000.000",  discMember="5%", discNonMember = "0%", masaAktif="730 hari", group="Medis" },
-            (object) new { edit="/pasien/3", kode = "PKT3", namaPaket = "Ozon Ultra Facial", harga="375.000",  discMember="10%", discNonMember = "5%", masaAktif="730 hari", group="Non Medis" },
-        };
+            return (object)new { edit = "/package/" + el.KDPKT, kode = el.KDPKT, namaPaket = el.NMPKT, harga = el.HARGA, discMember = el.DISMB, discNonMember = el.DISNM, masaAktif = el.MALAK + " Hari", group = el.KDJNS };
+        }
+        ).ToList();
 
         PackageTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
@@ -41,7 +45,7 @@
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
                 new TableColumn { Caption="Masa Aktif", DataField="masaAktif" },
                 new TableColumn { Caption="Group", DataField="group" },
-        }, patients);
+        }, dataSource);
     }
 
     [CascadingParameter]

@@ -1,7 +1,9 @@
 ﻿@page "/clinic"
 @using System.Net.Http.Json
 @using ProfiraClinicWeb.Models
+@using ProfiraClinicWeb.Data
 @using ProfiraClinicWeb.Utils;
+@using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
@@ -14,6 +16,7 @@
     </MudCard>
 </MudCard>
 
+@inject AppDbContext dbContext
 @inject NavigationManager NavManager
 @code {
     private bool _hidePosition;
@@ -42,6 +45,14 @@
             (object) new { edit="/pasien/5", kode = "LOK5", namaKlinik = "Profira Makasar", alamat="Sultan Alaudin 126",  kota="Makasar", telepon = "0821299393", namaPt="PT Makmur Ayu Abadi" },
         };
 
+        var clinics = await dbContext.MKlinik.OrderBy(c => c.KETLK).Take(5).ToArrayAsync();
+
+        var dataSource = clinics.Select(el =>
+        {
+            return (object)new { edit = "/klinik/" + el.KDLOK, kode = el.KDLOK, namaKlinik = el.KETLK, alamat = el.ALAMAT, kota = el.KOTA, telepon = el.TELP, namaPt = el.NAMAPT };
+        }
+        ).ToList();
+
         ClinicTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
                 new TableColumn { Caption="Kode", DataField="kode" },
@@ -50,7 +61,7 @@
                 new TableColumn { Caption="Kota", DataField="kota" },
                 new TableColumn { Caption="Telepon", DataField="telepon" },
                 new TableColumn { Caption="Nama PT", DataField="namaPt" },
-        }, patients);
+        }, dataSource);
     }
 
 }

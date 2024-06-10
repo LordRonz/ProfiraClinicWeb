@@ -1,7 +1,9 @@
 ﻿@page "/treatment"
-@using System.Net.Http.Json
-@using ProfiraClinicWeb.Models
+@using System.Net.Http.Json;
+@using ProfiraClinicWeb.Models;
 @using ProfiraClinicWeb.Utils;
+@using ProfiraClinicWeb.Data;
+@using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
@@ -14,6 +16,7 @@
     </MudCard>
 </MudCard>
 
+@inject AppDbContext dbContext
 @inject NavigationManager NavManager
 @code {
     private bool _hidePosition;
@@ -25,22 +28,23 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var patients = new List<object>()
+        var treatments = await dbContext.PPERH.OrderBy(c => c.NMPER).Take(5).ToArrayAsync();
+
+        var dataSource = treatments.Select(el =>
         {
-            (object) new { edit="/pasien/1", kode = "PKT1", namaPaket = "Collagen Ampul", harga="750.000",  discMember="15%", discNonMember = "10%", group="Medis" },
-            (object) new { edit="/pasien/2", kode = "PKT2", namaPaket = "Derma Aktif Rejuve", harga="5.000.000",  discMember="5%", discNonMember = "0%", group="Medis" },
-            (object) new { edit="/pasien/3", kode = "PKT3", namaPaket = "Ozon Ultra Facial", harga="375.000",  discMember="10%", discNonMember = "5%", group="Non Medis" },
-        };
+            return (object)new { edit = "/treatment/" + el.KDPER, kode = el.KDPER, namaPerawatan = el.NMPER, harga = el.HARGA, discMember = el.DISMB, discNonMember = el.DISNM, group = el.KDJNS };
+        }
+        ).ToList();
 
         TreatmentTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
                 new TableColumn { Caption="Kode", DataField="kode" },
-                new TableColumn { Caption="Nama Paket", DataField="namaPaket" },
+                new TableColumn { Caption="Nama Perawatan", DataField="namaPerawatan" },
                 new TableColumn { Caption="Harga", DataField="harga" },
                 new TableColumn { Caption="Disc Member", DataField="discMember" },
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
                 new TableColumn { Caption="Group", DataField="group" },
-        }, patients);
+        }, dataSource);
     }
 
     [CascadingParameter]

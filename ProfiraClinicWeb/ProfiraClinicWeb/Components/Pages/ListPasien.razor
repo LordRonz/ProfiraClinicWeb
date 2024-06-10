@@ -2,6 +2,8 @@
 @using System.Net.Http.Json
 @using ProfiraClinicWeb.Models
 @using ProfiraClinicWeb.Utils;
+@using ProfiraClinicWeb.Data;
+@using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
@@ -14,6 +16,7 @@
     </MudCard>
 </MudCard>
 
+@inject AppDbContext dbContext
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -26,27 +29,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Elements = new List<Element>()
-        {
-            new Element("Tess", 69, "waduh", 102),
-            new Element("Tesss", 691, "waduhos", 101),
-            new Element("Tessss", 694, "waduh", 103),
-        };
+        var patients = await dbContext.MCustomer.OrderBy(c => c.NMCUS).Take(5).ToArrayAsync();
 
-        Patients = new List<PatientModel>()
+        var dataSource = patients.Select(el =>
         {
-            new PatientModel("Profira Manyar", new DateTime(), "TR01", "White Glow Facial", 1, "dr novita"),
-            new PatientModel("Profira Central", new DateTime(), "TR02", "White Glow Facial", 1, "dr aleg")
-        };
-
-        var patients = new List<object>()
-        {
-            (object) new { view="/pasien", edit="/pasien/1", memberId = "MEM00102", namaPasien = "Ninik", alamat="Darmahusada Regency 12",  noHp="081232332020", tglLahir = DateTime.Now },
-            (object) new { view="/pasien", edit="/pasien/2", memberId = "MEM00103", namaPasien = "Fenny", alamat="Ploso Baru 22",  noHp="087171728282", tglLahir = DateTime.Now },
-            (object) new { view="/pasien", edit="/pasien/3", memberId = "MEM00105", namaPasien = "Sandra", alamat="Kartini 10",  noHp="082128288822", tglLahir = DateTime.Now },
-            (object) new { view="/pasien", edit="/pasien/4", memberId = "MEM00106", namaPasien = "Renata", alamat="Ngagel Wasana V/5",  noHp="085122838449", tglLahir = DateTime.Now },
-            (object) new { view="/pasien", edit="/pasien/5", memberId = "MEM00107", namaPasien = "Irene", alamat="Manyar Jaya 7/8",  noHp="081399495959", tglLahir = DateTime.Now },
-        };
+            return (object)new { view = "pasien", edit = "/patient/" + el.KDCUS, memberId = el.KDCUS, namaPasien = el.NMCUS, alamat = el.ALAMAT, noHp = el.NOMHP, tglLahir = el.TGLHR };
+        }
+        ).ToList();
 
         PatientTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
@@ -56,7 +45,7 @@
                 new TableColumn { Caption="Alamat", DataField="alamat" },
                 new TableColumn { Caption="No. HP", DataField="noHp" },
                 new TableColumn { Caption="Tgl Lahir", DataField="tglLahir" },
-        }, patients);
+        }, dataSource);
     }
 
     private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.
