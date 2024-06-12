@@ -1,7 +1,9 @@
 ﻿@page "/product"
-@using System.Net.Http.Json
-@using ProfiraClinicWeb.Models
+@using System.Net.Http.Json;
+@using ProfiraClinicWeb.Models;
+@using ProfiraClinicWeb.Data;
 @using ProfiraClinicWeb.Utils;
+@using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
@@ -14,6 +16,7 @@
     </MudCard>
 </MudCard>
 
+@inject AppDbContext dbContext
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -24,12 +27,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var patients = new List<object>()
+        var products = await dbContext.SpProduk.FromSqlInterpolated($"EXECUTE usp_PProduk_List").ToArrayAsync();
+
+        var dataSource = products.Select(el =>
         {
-            (object) new { edit="/pasien/1", kode = "PRD1", namaProduk = "BC Cream", harga="300.000",  discMember="15%", discNonMember = "10%" },
-            (object) new { edit="/pasien/2", kode = "PRD2", namaProduk = "Cream Pagi", harga="450.000",  discMember="10%", discNonMember = "5%" },
-            (object) new { edit="/pasien/3", kode = "PRD3", namaProduk = "Cream Malam", harga="500.000",  discMember="10%", discNonMember = "5%" },
-        };
+            return (object)new { edit = "/produk/" + el.KDBHN, kode = el.KDBHN, namaProduk = el.NMBHN, harga = el.HRGJL, discMember = el.DISMB + "%", discNonMember = el.DISNM + "%" };
+        }
+        ).ToList();
 
         ProductTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
@@ -38,7 +42,7 @@
                 new TableColumn { Caption="Harga", DataField="harga" },
                 new TableColumn { Caption="Disc Member", DataField="discMember" },
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
-        }, patients);
+        }, dataSource);
     }
 
     [CascadingParameter]

@@ -33,7 +33,7 @@
 
         var dataSource = patients.Select(el =>
         {
-            return (object)new { view = "pasien", edit = "/patient/" + el.KDCUS, memberId = el.KDCUS, namaPasien = el.NMCUS, alamat = el.ALAMAT, noHp = el.NOMHP, tglLahir = el.TGLHR };
+            return (object)new { view = "pasien/" + el.KDCUS, edit = "/patient/" + el.KDCUS, memberId = el.KDCUS, namaPasien = el.NMCUS, alamat = el.ALAMAT, noHp = el.NOMHP, tglLahir = el.TGLHR };
         }
         ).ToList();
 

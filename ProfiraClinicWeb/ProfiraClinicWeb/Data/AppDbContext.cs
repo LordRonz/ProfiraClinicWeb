@@ -23,5 +23,7 @@ namespace ProfiraClinicWeb.Data
         public DbSet<PPKTH> PPKTH { get; set; }
         public DbSet<PPERH> PPERH { get; set; }
         public DbSet<MCustomer> MCustomer { get; set; }
+        public DbSet<SpProduk> SpProduk { get; set; }
+        public DbSet<SpVPenjualanProduk> SpVPenjualanProduk { get; set; }
     }
 }
