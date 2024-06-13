@@ -25,5 +25,9 @@ namespace ProfiraClinicWeb.Data
         public DbSet<MCustomer> MCustomer { get; set; }
         public DbSet<SpProduk> SpProduk { get; set; }
         public DbSet<SpVPenjualanProduk> SpVPenjualanProduk { get; set; }
+        public DbSet<SpVPenjualanPerawatan> SpVPenjualanPerawatan { get; set; }
+        public DbSet<SpVPenjualanPaket> SpVPenjualanPaket { get; set; }
+        public DbSet<SpVSaldoPaket> SpVSaldoPaket { get; set; }
+        public DbSet<SpVSaldoPiutang> SpVSaldoPiutang { get; set; }
     }
 }

@@ -6,20 +6,18 @@ namespace ProfiraClinicWeb.Models
     public class SpVPenjualanPerawatan
     {
         [Key]
-        public string KDBHN { get; set; }
+        public string KDPER { get; set; }
         public string KETLK { get; set; }
         public string NOKON { get; set; }
         [Precision(12, 2)]
-        public decimal HGSAT { get; set; }
-        [Precision(12, 2)]
-        public decimal DISCO { get; set; }
-        [Precision(12, 2)]
-        public decimal NILPR { get; set; }
-        [Precision(11, 3)]
-        public decimal JMLJL { get; set; }
+        public decimal JUMLA { get; set; }
+        public string? INRWT { get; set; }
         public DateTime? TGKON { get; set; }
+        public string? JENIS { get; set; }
         public string? KDCUS { get; set; }
-        public string? UNTJL { get; set; }
+        public string? KDTER { get; set; }
+        public string? NMPER { get; set; }
         public string? NMCUS { get; set; }
+        public string? NMKAR { get; set; }
     }
 }

@@ -166,11 +166,13 @@ else
                 new TableColumn { Caption="Qty", DataField="qty" },
         }, productsDataSource);
 
-        var perawatan = new List<object>()
+        var perawatan = await dbContext.SpVPenjualanPerawatan.FromSqlInterpolated($"EXECUTE usp_VPenjualanPerawatan @KDCUS={customer.KDCUS}").ToArrayAsync();
+
+        var perawatanDataSource = perawatan.Select(el =>
         {
-            (object) new { klinik = "Profira Manyar", tgl = DateTime.Now, nomorFaktur="TR001", namaTreatment = "White Glow Facial", qty = 1, dokter = "" },
-            (object) new { klinik = "Profira Central", tgl = DateTime.Now, nomorFaktur="TR002", namaTreatment = "Peeling", qty = 1, dokter = "dr. Novita" }
-        };
+            return (object)new { klinik = el.KETLK, nomorFaktur = el.NOKON, tgl = el.TGKON, namaTreatment = el.NMPER, qty = el.JUMLA, dokter = el.NMKAR };
+        }
+        ).ToList();
 
         PerawatanTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Klinik", DataField="klinik" },
@@ -179,13 +181,16 @@ else
                 new TableColumn { Caption="Nama Treatment", DataField="namaTreatment" },
                 new TableColumn { Caption="Qty", DataField="qty" },
                 new TableColumn { Caption="Dokter", DataField="dokter" },
-        }, perawatan);
+        }, perawatanDataSource);
 
-        var paket = new List<object>()
+
+        var paket = await dbContext.SpVPenjualanPaket.FromSqlInterpolated($"EXECUTE usp_VPenjualanPaket @KDCUS={customer.KDCUS}").ToArrayAsync();
+
+        var paketDataSource = paket.Select(el =>
         {
-            (object) new { klinik = "Profira Malang", tgl = DateTime.Now, nomorFaktur="FT001", namaPaket = "Pico Laser", qty = 1, expDate = DateTime.Now },
-            (object) new { klinik = "Profira HR", tgl = DateTime.Now, nomorFaktur="FT002", namaPaket = "Peeling", qty = 1, expDate = DateTime.Now }
-        };
+            return (object)new { klinik = el.KETLK, tgl = el.TGFAK, nomorFaktur = el.NOFAK, namaPaket = el.NMPKT, qty = el.JUMLA, expDate = DateTime.Now };
+        }
+        ).ToList();
 
         PaketTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Klinik", DataField="klinik" },
@@ -194,7 +199,7 @@ else
                 new TableColumn { Caption="Nama Paket", DataField="namaPaket" },
                 new TableColumn { Caption="Qty", DataField="qty" },
                 new TableColumn { Caption="Exp Date", DataField="expDate" },
-        }, paket);
+        }, paketDataSource);
 
         var sisaPaket = new List<object>()
         {
@@ -228,11 +233,13 @@ else
                 new TableColumn { Caption="Sisa", DataField="sisa" },
         }, uangMuka);
 
-        var piutang = new List<object>()
+        var piutang = await dbContext.SpVSaldoPiutang.FromSqlInterpolated($"EXECUTE usp_VSaldoPiutang @KDCUS={customer.KDCUS}").ToArrayAsync();
+
+        var piutangDataSource = piutang.Select(el =>
         {
-            (object) new { klinik = "Profira Manyar", tglFaktur = DateTime.Now, nomorFaktur="PK001", piutang = "IDR 10.000.000", bayar = "IDR 5.000.000", sisa = "IDR 5.000.000" },
-            (object) new { klinik = "Profira Central", tglFaktur = DateTime.Now, nomorFaktur="PK002", piutang = "IDR 9.500.000", bayar = "IDR 3.000.000", sisa = "IDR 6.500.000" }
-        };
+            return (object)new { klinik = el.KETLK, tglFaktur = el.TGFAK, nomorFaktur = el.NOFAK, piutang = el.NILAI, bayar = el.NILBY, sisa = el.SISA };
+        }
+        ).ToList();
 
         PiutangTableConfig = new TableConfig(new List<TableColumn> {
                 new TableColumn { Caption="Klinik", DataField="klinik" },
@@ -241,7 +248,7 @@ else
                 new TableColumn { Caption="Nilai Piutang", DataField="piutang" },
                 new TableColumn { Caption="Nilai Bayar", DataField="bayar" },
                 new TableColumn { Caption="Sisa", DataField="sisa" },
-        }, piutang);
+        }, piutangDataSource);
     }
 
     private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.
