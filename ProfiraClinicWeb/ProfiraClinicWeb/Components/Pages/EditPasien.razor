@@ -103,6 +103,14 @@
 
     public bool IsActive { get; set; } = true;
 
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Pasien", "Edit Pasien");
+    }
+
     bool success;
     string[] errors = { };
     MudTextField<string> pwField1;

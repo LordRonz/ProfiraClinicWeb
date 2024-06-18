@@ -11,7 +11,6 @@
 
 @if (customer != null)
 {
-<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Profile Pasien</MudText>
 <MudCard>
     <MudGrid Style="padding: 20px;">
         <MudItem xs="4">
@@ -97,6 +96,14 @@ else
     private bool _loading;
     private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Pasien", "Detail Pasien");
+    }
 
     [Parameter]
     public string Kdcus { get; set; }

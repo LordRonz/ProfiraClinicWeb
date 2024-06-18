@@ -23,6 +23,14 @@
     private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Pasien", "List Pasien");
+    }
+
     private IEnumerable<PatientModel> Patients = new List<PatientModel>();
 
     public TableConfig PatientTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
