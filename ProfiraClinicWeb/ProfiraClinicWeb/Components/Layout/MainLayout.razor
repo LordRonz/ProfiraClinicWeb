@@ -33,7 +33,7 @@
 <MudDialogProvider @rendermode="InteractiveServer" />
 
 <CascadingValue Value="this">
-    <MudLayout Class="bg-dark bg-opacity-25" Style='background-image: url("images/wave.png"); background-repeat: no-repeat; height: 100vh; background-size: 100% 45%;'>
+    <MudLayout Class="bg-dark bg-opacity-25" Style='@GetBgClass()'>
         @* Top navbar *@
 
         @if (!isDoctor) {
@@ -74,13 +74,45 @@
             </MudAppBar>
         } else
         {
-            <MudAppBar Style="background: #fff;">
+            <MudAppBar Style="background: transparent;" Elevation="0">
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
                 <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
-                    <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="55" />
+                    <MudImage Src="images/logo-white.png" Alt="Profira" Class="" Height="85" />
                 </MudLink>
-                <MudSpacer />
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" />
+                @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" /> *@
+                @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
+                <div class="pa-4">
+                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
+                    <MudText Typo="Typo.h4" Color="MudBlazor.Color.Surface">@Title</MudText>
+                </div>
+                <MudSpacer></MudSpacer>
+                <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
+                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+                </MudBadge>
+                <div class="d-flex align-items-center gap-1 mr-2">
+                    <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
+                    @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
+                </div>
+                @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+            <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
+            </MudBadge> *@
+                <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
+                    <MudText Typo="Typo.body2">Valerie Luna</MudText>
+                    <MudAvatar>
+                        <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+                    </MudAvatar>
+                    <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                        <div class="d-flex flex-column pa-1">
+                            <MudList Clickable="true">
+                                <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
+                                <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
+                                <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
+                                <MudDivider />
+                                <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
+                            </MudList>
+                        </div>
+                    </MudPopover>
+                </div>
             </MudAppBar>
         }
 
@@ -106,7 +138,7 @@
                     </div>
                 </div>
             </MudDrawer>
-        } else
+        } @* else
         {
             <MudDrawer @bind-Open="@_drawerOpen" Variant="@DrawerVariant.Temporary" Width="300px">
                 <MudDrawerHeader Style="background-color:  rgb(92, 111, 248)">
@@ -126,7 +158,7 @@
                     <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
                 </MudNavMenu>
             </MudDrawer>
-        }
+        } *@
         <MudMainContent Class="h-100">
             @* <MudSwitch Class="pl-4" @bind-Value="@isDoctor" /> *@
             <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-75">
@@ -155,6 +187,18 @@
     {
         Title = newTitle;
         Route = newRoute;
+        StateHasChanged();
+    }
+
+    string GetBgClass()
+    {
+        string wave = isDoctor ? "wave-blue" : "wave";
+        return $"""background-image: url("images/{wave}.png"); background-repeat: no-repeat; height: 100vh; background-size: 100% 45%;""";
+    }
+
+    public void SetIsDoctor(Boolean newIsDoctor)
+    {
+        isDoctor = newIsDoctor;
         StateHasChanged();
     }
 

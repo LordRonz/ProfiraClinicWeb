@@ -1,6 +1,10 @@
 ﻿@using ProfiraClinicWeb.Utils
+@using System.Linq;
 
-<MudTable HeaderClass="bg-warning" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info">
+<MudTable HeaderClass="@GetHeaderClass()" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
     <HeaderContent>
         @foreach (TableColumn col in Config.GetColumn())
         {
@@ -34,7 +38,7 @@
         }
     </RowTemplate>
     <PagerContent>
-        <MudTablePager InfoFormat="@infoFormat" HideRowsPerPage="true" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" Class="justify-content-around d-flex w-100" />
+        <MudTablePager PageSizeOptions="new int[] { 5, 10, 15, 25, 50, 100, int.MaxValue }" InfoFormat="@infoFormat" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" />
     </PagerContent>
 </MudTable>
 
@@ -42,6 +46,35 @@
     private bool _loading;
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
+    private string searchString1 = "";
+
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+    [Parameter] public string? ClassOverride { get; set; }
+
+    private bool FilterFunc1(Dictionary<string, string> element) => FilterFunc(element, searchString1.ToLower().Trim());
+
+    string GetHeaderClass()
+    {
+        return ClassOverride ?? "bg-warning";
+    }
+
+    private bool FilterFunc(Dictionary<string, string> element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        System.Diagnostics.Debug.Print(element.Values.ToList()[2]);
+        return element.Values.ToList().Exists(x => x.ToLower().Contains(searchString));
+    }
 }
+
+
+<style>
+    .bg-blue {
+        background-color: rgba(1, 73, 191, 1);
+    }
+
+    .bg-lightblue {
+        background-color: rgba(192, 225, 255, 1);
+    }
+</style>
