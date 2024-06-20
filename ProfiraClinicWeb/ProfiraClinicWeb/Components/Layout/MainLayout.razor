@@ -120,24 +120,31 @@
         @if (!isDoctor) {
             <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent">
                 <div class="p-3 h-100">
-                    <div class="bg-white h-100 rounded-3">
+                    <div class="bg-white h-100 rounded-3 position-relative w-100">
                         <MudDrawerHeader>
                             <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
                         </MudDrawerHeader>
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-                            <MudNavGroup Icon="@Icons.Material.Filled.Settings" Title="Master" Expanded="true">
-                                <MudNavLink Href="/clinic">Klinik</MudNavLink>
-                                <MudNavLink Href="/package">Paket</MudNavLink>
-                                <MudNavLink Href="/treatment">Perawatan</MudNavLink>
-                                <MudNavLink Href="/product">Produk</MudNavLink>
-                                <MudNavLink Href="/doctor">Dokter</MudNavLink>
-                            </MudNavGroup>
+                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal">Master</MudNavLink>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
                         </MudNavMenu>
                     </div>
                 </div>
             </MudDrawer>
+            @if (MasterModalOpen) {
+                <div class="master-modal">
+                    <div class="master-modal-header">
+                        <p class="align-items-center d-flex justify-content-center text-center m-0">Master</p>
+                        <MudFab Size="MudBlazor.Size.Small" IconColor="MudBlazor.Color.Default" Color="MudBlazor.Color.Transparent" StartIcon="@Icons.Material.Filled.Close" DisableElevation="true" OnClick="@CloseModal"  />
+                    </div>
+                    <MudNavLink Href="/clinic">Klinik</MudNavLink>
+                    <MudNavLink Href="/package">Paket</MudNavLink>
+                    <MudNavLink Href="/treatment">Perawatan</MudNavLink>
+                    <MudNavLink Href="/product">Produk</MudNavLink>
+                    <MudNavLink Href="/doctor">Dokter</MudNavLink>
+                </div>
+            }
         } @* else
         {
             <MudDrawer @bind-Open="@_drawerOpen" Variant="@DrawerVariant.Temporary" Width="300px">
@@ -182,6 +189,18 @@
     public string Title { get; set; } = "";
 
     public string Route { get; set; } = "";
+
+    Boolean MasterModalOpen = false;
+
+    public void CloseModal()
+    {
+        MasterModalOpen = false;
+    }
+
+    public void ToggleModal()
+    {
+        MasterModalOpen = !MasterModalOpen;
+    }
 
     public void ChangeTitleAndRoute(string newTitle, string newRoute)
     {
@@ -245,5 +264,28 @@
 
     .mud-main-content {
         padding-top: 104px;
+    }
+
+    .master-modal {
+        position: absolute;
+        left: 250px;
+        top: 10vh;
+        z-index: 696969;
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 1);
+        border-radius: 15px;
+        overflow: hidden;
+        width: 20vw;
+        border: 1px solid black;
+    }
+
+    .master-modal-header {
+        background: rgba(255, 166, 34, 1);
+        padding: 8px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: white;
+        font-weight: 600;
     }
 </style>

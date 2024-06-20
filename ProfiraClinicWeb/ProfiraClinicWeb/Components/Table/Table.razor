@@ -1,4 +1,4 @@
-﻿@using ProfiraClinicWeb.Utils
+﻿@using ProfiraClinicWeb.Utils;
 @using System.Linq;
 
 <MudTable HeaderClass="@GetHeaderClass()" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)">
@@ -28,7 +28,7 @@
                     break;
                 case ColumnType.View:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.RemoveRedEye" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Transparent" Style="color: rgba(111, 74, 2, 1)" StartIcon="fa fa-hand-pointer" Href="@context.GetValueOrDefault(col.DataField)" />
                     </MudTd>
                     break;
                 case null:
