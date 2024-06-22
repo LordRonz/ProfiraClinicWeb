@@ -23,12 +23,12 @@
                     break;
                 case ColumnType.Edit:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab Size="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1)" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
                     </MudTd>
                     break;
                 case ColumnType.View:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Transparent" Style="color: rgba(111, 74, 2, 1)" StartIcon="fa fa-hand-pointer" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab Size="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1)" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
                     </MudTd>
                     break;
                 case null:

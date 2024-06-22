@@ -16,6 +16,8 @@ namespace ProfiraClinicWeb.Utils
         public string DataField { get; set; }
         public string Alignment { get; set; }
         public ColumnType? Type { get; set; } = ColumnType.Data;
+        public string? CustomIcon { get; set; }
+        public MudBlazor.Color? Color { get; set; }
     }
 
     public class TableConfig(List<TableColumn> column, List<object> dataSource)
