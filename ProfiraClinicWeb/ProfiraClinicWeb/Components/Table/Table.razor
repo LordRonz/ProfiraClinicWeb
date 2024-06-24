@@ -1,9 +1,20 @@
 ﻿@using ProfiraClinicWeb.Utils;
 @using System.Linq;
+@using static MudBlazor.CategoryTypes
 
-<MudTable HeaderClass="@GetHeaderClass()" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)">
+<MudTable HeaderClass="@GetHeaderClass()" Striped="true" Bordered="true" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
     <ToolBarContent>
-        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="MudBlazor.Size.Medium" Class="mt-0"></MudTextField>
+        <MudStack Spacing="1" Class="w-100 pb-4 table-header">
+            <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
+            <MudDivider />
+            <MudCollapse Expanded="_expanded" Class="px-4">
+                <MudTextField Style="border-radius: 20px; background-color: #F1F5F9; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-0"></MudTextField>
+                <div class="d-flex justify-content-between">
+                    <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
+                    <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Class="add-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Tambah</MudButton>
+                </div>
+            </MudCollapse>
+        </MudStack>
     </ToolBarContent>
     <HeaderContent>
         @foreach (TableColumn col in Config.GetColumn())
@@ -48,6 +59,16 @@
 
     private string searchString1 = "";
 
+    private MudTable<Dictionary<string, string>> table;
+    private MudTextField<string> tableFilterRef;
+
+    bool _expanded = true;
+
+    private void OnExpandCollapseClick()
+    {
+        _expanded = !_expanded;
+    }
+
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
     [Parameter] public string? ClassOverride { get; set; }
@@ -76,5 +97,55 @@
 
     .bg-lightblue {
         background-color: rgba(192, 225, 255, 1);
+    }
+
+    .mud-table-toolbar {
+        overflow: auto !important;
+        height: max-content;
+        padding: 0px;
+    }
+
+    .filter-btn {
+        background: rgba(255, 192, 98, 0.4);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .filter-btn > .mud-button-label {
+        text-align: left;
+        justify-content: start;
+        padding-left: 10px;
+    }
+
+    .search-btn {
+        background: rgba(59, 113, 251, 1);
+        color: white;
+        text-transform: none;
+    }
+
+    .add-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        margin-right: 5%;
+        text-transform: none;
+    }
+
+    .table-header .mud-input-root {
+        height: 40px !important;
+        padding: 0px 10px !important;
+        font-size: 14px !important;
+    }
+
+    .table-header .mud-input-label {
+        font-size: 16px !important;
+        line-height: 16px !important;
+    }
+
+    .table-header .mud-input-label-filled.mud-input-label-margin-dense {
+        transform: translate(12px, 20px) scale(1);
+    }
+
+    .table-header .mud-input-label-inputcontrol {
+        top: -10px;
     }
 </style>

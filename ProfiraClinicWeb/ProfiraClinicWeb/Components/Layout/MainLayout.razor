@@ -124,10 +124,11 @@
                         <MudDrawerHeader>
                             <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
                         </MudDrawerHeader>
+                        <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
-                            <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal">Master</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All">Pasien</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">Dashboard</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal" Class="fw-semibold">Master</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">Pasien</MudNavLink>
                         </MudNavMenu>
                     </div>
                 </div>
@@ -168,7 +169,7 @@
         } *@
         <MudMainContent Class="h-100">
             @* <MudSwitch Class="pl-4" @bind-Value="@isDoctor" /> *@
-            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-75">
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100 px-1 pb-4">
                 @Body
             </MudContainer>
         </MudMainContent>
@@ -253,6 +254,13 @@
         color: #0D24EC !important;
     }
 
+    .mud-nav-link {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        font-weight: 500;
+        font-size: 15px;
+    }
+
     .mud-nav-link-text {
         letter-spacing: 0.5px !important;
     }
@@ -266,9 +274,13 @@
         padding-top: 104px;
     }
 
+    .sidebar-divider {
+        border: 1px solid rgba(71, 71, 71, 1);
+    }
+
     .master-modal {
         position: absolute;
-        left: 250px;
+        left: 10vw;
         top: 10vh;
         z-index: 696969;
         white-space: nowrap;
@@ -276,7 +288,7 @@
         border-radius: 15px;
         overflow: hidden;
         width: 20vw;
-        border: 1px solid black;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
 
     .master-modal-header {
