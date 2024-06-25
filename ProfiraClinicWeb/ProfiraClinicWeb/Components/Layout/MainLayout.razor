@@ -120,16 +120,19 @@
         @if (!isDoctor) {
             <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent">
                 <div class="p-3 h-100">
-                    <div class="bg-white h-100 rounded-3 position-relative w-100">
+                    <div class="bg-white h-100 rounded-3 position-relative w-100 d-flex flex-column sidebar-container">
                         <MudDrawerHeader>
                             <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
                         </MudDrawerHeader>
-                        <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6" />
+                        <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">Dashboard</MudNavLink>
                             <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal" Class="fw-semibold">Master</MudNavLink>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">Pasien</MudNavLink>
                         </MudNavMenu>
+                        <MudSpacer />
+                        <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Backspace" Color="MudBlazor.Color.Transparent" Class="mb-4 bg-transparent" DisableElevation="true" OnClick="() => _drawerOpen = !_drawerOpen">Minimize Menu</MudButton>
                     </div>
                 </div>
             </MudDrawer>
@@ -252,6 +255,11 @@
 <style>
     .mud-nav-link-icon-default {
         color: #0D24EC !important;
+    }
+
+    .sidebar-container .mud-button-label {
+        color: #0D24EC !important;
+        text-transform: none;
     }
 
     .mud-nav-link {

@@ -17,11 +17,11 @@
         </MudStack>
     </ToolBarContent>
     <HeaderContent>
-        @foreach (TableColumn col in Config.GetColumn())
-        {
-            // Pass the Dto properties to the component
-            <MudTh Class="fw-bold">@col.Caption</MudTh>
-        }
+            @foreach (TableColumn col in Config.GetColumn())
+            {
+                // Pass the Dto properties to the component
+                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+            }
     </HeaderContent>
     <RowTemplate>
         @foreach (TableColumn col in Config.GetColumn())
@@ -77,7 +77,8 @@
 
     string GetHeaderClass()
     {
-        return ClassOverride ?? "bg-warning";
+        var defaultClass = "table-head-bordered bg-warning" + (ClassOverride ?? "");
+        return defaultClass;
     }
 
     private bool FilterFunc(Dictionary<string, string> element, string searchString)
