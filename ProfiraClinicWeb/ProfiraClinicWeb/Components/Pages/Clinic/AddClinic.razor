@@ -1,0 +1,98 @@
+﻿@page "/clinic/add"
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using Color = MudBlazor.Color
+
+<MudCard Class="p-5 h-100 rounded-3 overflow-scroll">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
+        <MudGrid Class="" Style="max-width: 85%;">
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Kode Klinik" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="6">
+                <MudTextField T="string" Label="Nama Klinik" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="10">
+                <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="6">
+                <MudSelect T="string" Label="Kota" Variant="Variant.Outlined">
+                    @foreach(var city in cities)
+                    {
+                        <MudSelectItem T="string" Value="@city" />
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="3">
+                <MudTextField T="string" Label="Telepon" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="6">
+                <MudSelect T="string" Label="Nama PT" Variant="Variant.Outlined">
+                    @foreach (var n in namaPT)
+                    {
+                        <MudSelectItem T="string" Value="@n" />
+                    }
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+        <MudDivider Style="border: 1px solid rgba(106, 106, 106, 1)" Class="my-5" />
+        <div class="d-flex">
+            <MudButton StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2">Simpan</MudButton>
+            <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2">Kembali</MudButton>
+        </div>
+    </MudForm>
+</MudCard>
+
+
+
+
+@code {
+    private List<DateTime> markedDates = new List<DateTime>();
+
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
+    string[] cities = ["Jakarta", "Surabaya", "Bandung", "Tangerang", "Yogyakarta"];
+    string[] namaPT = ["Profira Manyar", "Profira HR"];
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+}
+
+<style>
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+</style>

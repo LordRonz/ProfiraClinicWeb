@@ -20,10 +20,11 @@ namespace ProfiraClinicWeb.Utils
         public MudBlazor.Color? Color { get; set; }
     }
 
-    public class TableConfig(List<TableColumn> column, List<object> dataSource)
+    public class TableConfig(List<TableColumn> column, List<object> dataSource, string? addRoute = "")
     {
         private readonly List<TableColumn> _column = column;
         private readonly List<object> _dataSource = dataSource;
+        private readonly string _addRoute = addRoute;
 
         public List<Dictionary<string, string>> GetData()
         {
@@ -38,6 +39,11 @@ namespace ProfiraClinicWeb.Utils
         public List<TableColumn> GetColumn()
         {
             return _column;
+        }
+
+        public string GetAddRoute()
+        {
+            return _addRoute;
         }
 
         private static Dictionary<string, string> ToDict(object dataSource)

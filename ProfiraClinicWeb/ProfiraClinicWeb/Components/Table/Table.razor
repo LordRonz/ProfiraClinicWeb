@@ -2,8 +2,8 @@
 @using System.Linq;
 @using static MudBlazor.CategoryTypes
 
-<MudTable HeaderClass="@GetHeaderClass()" Striped="true" Bordered="true" Items="@Config.GetData()" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
-    <ToolBarContent>
+<div class="mb-5">
+    <MudCard Class="rounded-3">
         <MudStack Spacing="1" Class="w-100 pb-4 table-header">
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudDivider />
@@ -11,11 +11,13 @@
                 <MudTextField Style="border-radius: 20px; background-color: #F1F5F9; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-0"></MudTextField>
                 <div class="d-flex justify-content-between">
                     <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
-                    <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Class="add-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Tambah</MudButton>
+                    <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
                 </div>
             </MudCollapse>
         </MudStack>
-    </ToolBarContent>
+    </MudCard>
+</div>
+<MudTable HeaderClass="@GetHeaderClass()" Striped="true" Bordered="true" Items="@Config.GetData()" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
     <HeaderContent>
             @foreach (TableColumn col in Config.GetColumn())
             {
@@ -129,6 +131,10 @@
         color: white;
         margin-right: 5%;
         text-transform: none;
+    }
+
+    .mud-table {
+
     }
 
     .table-header .mud-input-root {

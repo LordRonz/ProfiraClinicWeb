@@ -142,11 +142,11 @@
                         <p class="align-items-center d-flex justify-content-center text-center m-0">Master</p>
                         <MudFab Size="MudBlazor.Size.Small" IconColor="MudBlazor.Color.Default" Color="MudBlazor.Color.Transparent" StartIcon="@Icons.Material.Filled.Close" DisableElevation="true" OnClick="@CloseModal"  />
                     </div>
-                    <MudNavLink Href="/clinic">Klinik</MudNavLink>
-                    <MudNavLink Href="/package">Paket</MudNavLink>
-                    <MudNavLink Href="/treatment">Perawatan</MudNavLink>
-                    <MudNavLink Href="/product">Produk</MudNavLink>
-                    <MudNavLink Href="/doctor">Dokter</MudNavLink>
+                    <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
+                    <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Paket</MudNavLink>
+                    <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Perawatan</MudNavLink>
+                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Produk</MudNavLink>
+                    <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
                 </div>
             }
         } @* else
@@ -233,6 +233,16 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    void OnClickMasterNav(string route)
+    {
+        if ("/" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "") == route)
+        {
+            return;
+        }
+        CloseModal();
+        NavigationManager.NavigateTo(route);
     }
 
     public bool _isProfilePopoverOpen = false;

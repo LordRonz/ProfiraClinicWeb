@@ -9,11 +9,7 @@
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <MudCard>
-    @* <MudButton Class="m-4">Add</MudButton> *@
-
-        <ProfiraClinicWeb.Components.Table.Table Config="ProductTableConfig" />
-    </MudCard>
+    <ProfiraClinicWeb.Components.Table.Table Config="ProductTableConfig" />
 </MudCard>
 
 @inject AppDbContext dbContext
@@ -42,7 +38,7 @@
                 new TableColumn { Caption="Harga", DataField="harga" },
                 new TableColumn { Caption="Disc Member", DataField="discMember" },
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
-        }, dataSource);
+        }, dataSource, "/clinic/add");
     }
 
     [CascadingParameter]

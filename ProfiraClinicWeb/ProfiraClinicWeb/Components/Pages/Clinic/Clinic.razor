@@ -9,11 +9,7 @@
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <MudCard>
-        @* <MudButton Class="m-4">Add</MudButton> *@
-
-        <ProfiraClinicWeb.Components.Table.Table Config="ClinicTableConfig" />
-    </MudCard>
+    <ProfiraClinicWeb.Components.Table.Table Config="ClinicTableConfig" />
 </MudCard>
 
 @inject AppDbContext dbContext
@@ -61,7 +57,7 @@
                 new TableColumn { Caption="Kota", DataField="kota" },
                 new TableColumn { Caption="Telepon", DataField="telepon" },
                 new TableColumn { Caption="Nama PT", DataField="namaPt" },
-        }, dataSource);
+        }, dataSource, "/clinic/add");
     }
 
 }
