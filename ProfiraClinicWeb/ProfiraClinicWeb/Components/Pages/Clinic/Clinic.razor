@@ -57,7 +57,7 @@
                 new TableColumn { Caption="Kota", DataField="kota" },
                 new TableColumn { Caption="Telepon", DataField="telepon" },
                 new TableColumn { Caption="Nama PT", DataField="namaPt" },
-        }, dataSource, "/clinic/add");
+        }, dataSource, "/clinic/add", new Utils.TableFilter{ FieldName = "Kode Klinik", Column="kode" });
     }
 
 }

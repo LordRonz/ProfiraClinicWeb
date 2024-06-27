@@ -40,7 +40,7 @@
                 new TableColumn { Caption="Disc Member", DataField="discMember" },
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
                 new TableColumn { Caption="Group", DataField="group" },
-        }, dataSource, "/clinic/add");
+        }, dataSource, "/clinic/add", new Utils.TableFilter { FieldName = "Kode Perawatan", Column = "kode" });
     }
 
     [CascadingParameter]

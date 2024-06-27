@@ -41,7 +41,7 @@
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
                 new TableColumn { Caption="Masa Aktif", DataField="masaAktif" },
                 new TableColumn { Caption="Group", DataField="group" },
-        }, dataSource, "/clinic/add");
+        }, dataSource, "/clinic/add", new Utils.TableFilter{ FieldName = "Kode Paket", Column = "kode" });
     }
 
     [CascadingParameter]

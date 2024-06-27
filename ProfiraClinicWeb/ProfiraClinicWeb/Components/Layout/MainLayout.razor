@@ -118,21 +118,21 @@
 
         @* Navbar *@
         @if (!isDoctor) {
-            <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent">
-                <div class="p-3 h-100">
+            <MudDrawer @bind-Open="@_drawerOpen" Class="bg-transparent" Variant="@DrawerVariant.Mini">
+                <div class="@(_drawerOpen ? "p-3 h-100" : "p-3 h-100")">
                     <div class="bg-white h-100 rounded-3 position-relative w-100 d-flex flex-column sidebar-container">
-                        <MudDrawerHeader>
-                            <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="85" />
+                        <MudDrawerHeader Class="overflow-hidden">
+                            <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="@(_drawerOpen ? 85 : 98)" Style="@(_drawerOpen ? "" : "margin-left: -32px;")" />
                         </MudDrawerHeader>
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
-                            <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">Dashboard</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal" Class="fw-semibold">Master</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">Pasien</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Dashboard" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>
                         </MudNavMenu>
                         <MudSpacer />
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Backspace" Color="MudBlazor.Color.Transparent" Class="mb-4 bg-transparent" DisableElevation="true" OnClick="() => _drawerOpen = !_drawerOpen">Minimize Menu</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@(_drawerOpen ? Icons.Material.Filled.Backspace : Icons.Material.Filled.ArrowCircleRight)" Color="MudBlazor.Color.Transparent" Class="mb-4 bg-transparent" DisableElevation="true" OnClick="() => _drawerOpen = !_drawerOpen">@(_drawerOpen ? "Minimize Menu" : "")</MudButton>
                     </div>
                 </div>
             </MudDrawer>
@@ -170,7 +170,7 @@
                 </MudNavMenu>
             </MudDrawer>
         } *@
-        <MudMainContent Class="h-100">
+        <MudMainContent Class="h-100" Style="@(_drawerOpen ? "" : "margin-left: 88px !important;")">
             @* <MudSwitch Class="pl-4" @bind-Value="@isDoctor" /> *@
             <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100 px-1 pb-4">
                 @Body
@@ -317,5 +317,10 @@
         justify-content: space-between;
         color: white;
         font-weight: 600;
+    }
+
+    .mud-drawer--closed.mud-drawer-mini{
+        width: 88px !important; /* 56 + 2 * 16 */
+        margin-right: 20px;
     }
 </style>

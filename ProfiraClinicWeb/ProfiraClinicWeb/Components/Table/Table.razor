@@ -7,8 +7,8 @@
         <MudStack Spacing="1" Class="w-100 pb-4 table-header">
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudDivider />
-            <MudCollapse Expanded="_expanded" Class="px-4">
-                <MudTextField Style="border-radius: 20px; background-color: #F1F5F9; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-0"></MudTextField>
+            <MudCollapse Expanded="_expanded" Class="px-4 pt-2">
+                <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #F1F5F9; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Label="@Config.GetFilter()?.FieldName" Variant="Variant.Filled" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-0"></MudTextField>
                 <div class="d-flex justify-content-between">
                     <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
                     <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
@@ -18,6 +18,25 @@
     </MudCard>
 </div>
 <MudTable HeaderClass="@GetHeaderClass()" Striped="true" Bordered="true" Items="@Config.GetData()" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
+    <ColGroup>
+        @foreach (TableColumn col in Config.GetColumn())
+        {
+            // Pass the Dto properties to the component
+            @switch (col.Type)
+            {
+                case ColumnType.Data:
+                    <col />
+                    break;
+                case ColumnType.Edit:
+                case ColumnType.View:
+                    <col style="width:50px;" />
+                    break;
+                case null:
+                    <col />
+                    break;
+            }
+        }
+    </ColGroup>
     <HeaderContent>
             @foreach (TableColumn col in Config.GetColumn())
             {
@@ -36,12 +55,12 @@
                     break;
                 case ColumnType.Edit:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab Size="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1)" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
                     </MudTd>
                     break;
                 case ColumnType.View:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab Size="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1)" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
                     </MudTd>
                     break;
                 case null:
@@ -88,7 +107,20 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         System.Diagnostics.Debug.Print(element.Values.ToList()[2]);
-        return element.Values.ToList().Exists(x => x.ToLower().Contains(searchString));
+        var filter = Config.GetFilter();
+        foreach (var item in element)
+        {
+            if (filter != null && filter.Column != item.Key)
+            {
+                continue;
+            }
+            if (item.Value.ToLower().Contains(searchString))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
@@ -138,14 +170,14 @@
     }
 
     .table-header .mud-input-root {
-        height: 40px !important;
+        height: 30px !important;
         padding: 0px 10px !important;
-        font-size: 14px !important;
+        font-size: 12px !important;
     }
 
     .table-header .mud-input-label {
-        font-size: 16px !important;
-        line-height: 16px !important;
+        font-size: 14px !important;
+        line-height: 14px !important;
     }
 
     .table-header .mud-input-label-filled.mud-input-label-margin-dense {
@@ -153,6 +185,6 @@
     }
 
     .table-header .mud-input-label-inputcontrol {
-        top: -10px;
+        top: -12px;
     }
 </style>

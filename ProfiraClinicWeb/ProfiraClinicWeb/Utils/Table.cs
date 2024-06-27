@@ -10,6 +10,12 @@ namespace ProfiraClinicWeb.Utils
         View,
     }
 
+    public class TableFilter
+    {
+        public string Column { get; set; }
+        public string FieldName { get; set; }
+    }
+
     public class TableColumn
     {
         public string Caption { get; set; }
@@ -20,11 +26,12 @@ namespace ProfiraClinicWeb.Utils
         public MudBlazor.Color? Color { get; set; }
     }
 
-    public class TableConfig(List<TableColumn> column, List<object> dataSource, string? addRoute = "")
+    public class TableConfig(List<TableColumn> column, List<object> dataSource, string? addRoute = "", TableFilter? filter = null)
     {
         private readonly List<TableColumn> _column = column;
         private readonly List<object> _dataSource = dataSource;
         private readonly string _addRoute = addRoute;
+        private readonly TableFilter? _filter = filter;
 
         public List<Dictionary<string, string>> GetData()
         {
@@ -44,6 +51,11 @@ namespace ProfiraClinicWeb.Utils
         public string GetAddRoute()
         {
             return _addRoute;
+        }
+
+        public TableFilter GetFilter()
+        {
+            return _filter;
         }
 
         private static Dictionary<string, string> ToDict(object dataSource)
