@@ -4,33 +4,33 @@
 @using Color = MudBlazor.Color
 
 <MudCard Class="p-5 h-100 rounded-3 overflow-scroll">
-    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 table-add-form">
         <MudGrid Class="" Style="max-width: 85%;">
             <MudItem xs="3">
-                <MudTextField T="string" Label="Kode Klinik" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Kode Klinik" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="6">
-                <MudTextField T="string" Label="Nama Klinik" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Nama Klinik" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="10">
-                <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="6">
-                <MudSelect T="string" Label="Kota" Variant="Variant.Outlined">
+                <MudSelect T="string" Label="Kota" Variant="Variant.Outlined" Margin="Margin.Dense">
                     @foreach(var city in cities)
                     {
-                        <MudSelectItem T="string" Value="@city" />
+                        <MudSelectItem T="string" Value="@city" Style="height: 30px" />
                     }
                 </MudSelect>
             </MudItem>
             <MudItem xs="3">
-                <MudTextField T="string" Label="Telepon" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Telepon" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="6">
-                <MudSelect T="string" Label="Nama PT" Variant="Variant.Outlined">
+                <MudSelect T="string" Label="Nama PT" Variant="Variant.Outlined" Margin="Margin.Dense">
                     @foreach (var n in namaPT)
                     {
-                        <MudSelectItem T="string" Value="@n" />
+                        <MudSelectItem T="string" Value="@n" Style="height: 30px" />
                     }
                 </MudSelect>
             </MudItem>
@@ -38,16 +38,22 @@
         <MudDivider Style="border: 1px solid rgba(106, 106, 106, 1)" Class="my-5" />
         <div class="d-flex">
             <MudButton StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2">Simpan</MudButton>
-            <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2">Kembali</MudButton>
+            <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
         </div>
     </MudForm>
 </MudCard>
 
 
 
-
+@inject IJSRuntime JSRuntime
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
+
+    // Go back in browser using Javascript on a Razor Page
+    private void GoBack()
+    {
+        JSRuntime.InvokeVoidAsync("history.back");
+    }
 
     bool success;
     string[] errors = { };
@@ -94,5 +100,24 @@
         color: white;
         margin-left: 20px;
         text-transform: none;
+    }
+
+    .table-add-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-add-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-add-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-add-form .mud-input-label-inputcontrol {
+        top: -3px;
     }
 </style>

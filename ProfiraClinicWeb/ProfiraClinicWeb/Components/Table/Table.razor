@@ -4,12 +4,11 @@
 
 <div class="mb-5">
     <MudCard Class="rounded-3">
-        <MudStack Spacing="1" Class="w-100 pb-4 table-header">
+        <MudStack Spacing="1" Class="w-100 table-header">
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
-            <MudDivider />
-            <MudCollapse Expanded="_expanded" Class="px-4 pt-2">
-                <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #F1F5F9; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Label="@Config.GetFilter()?.FieldName" Variant="Variant.Filled" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-0"></MudTextField>
-                <div class="d-flex justify-content-between">
+            <MudCollapse Expanded="_expanded" Class="px-4">
+                <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Label="@Config.GetFilter()?.FieldName" Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field"></MudTextField>
+                <div class="d-flex justify-content-between mb-4">
                     <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
                     <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
                 </div>
@@ -92,7 +91,8 @@
 
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-    [Parameter] public string? ClassOverride { get; set; }
+    [Parameter]
+    public string? ClassOverride { get; set; }
 
     private bool FilterFunc1(Dictionary<string, string> element) => FilterFunc(element, searchString1.ToLower().Trim());
 
@@ -185,6 +185,10 @@
     }
 
     .table-header .mud-input-label-inputcontrol {
-        top: -12px;
+        top: -3px;
+    }
+
+    .filter-field .mud-input-outlined-border {
+        border-radius: 20px !important;
     }
 </style>
