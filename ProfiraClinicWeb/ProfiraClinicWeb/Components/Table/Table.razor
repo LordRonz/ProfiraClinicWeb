@@ -2,6 +2,9 @@
 @using System.Linq;
 @using static MudBlazor.CategoryTypes
 
+<div class="d-flex justify-content-end mb-2">
+    <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
+</div>
 <div class="mb-5">
     <MudCard Class="rounded-3">
         <MudStack Spacing="1" Class="w-100 table-header">
@@ -10,7 +13,7 @@
                 <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Label="@Config.GetFilter()?.FieldName" Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field"></MudTextField>
                 <div class="d-flex justify-content-between mb-4">
                     <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
-                    <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
+                    @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
                 </div>
             </MudCollapse>
         </MudStack>
@@ -161,7 +164,7 @@
     .add-btn {
         background: rgba(47, 193, 71, 1);
         color: white;
-        margin-right: 5%;
+        margin-top: -12px !important;
         text-transform: none;
     }
 

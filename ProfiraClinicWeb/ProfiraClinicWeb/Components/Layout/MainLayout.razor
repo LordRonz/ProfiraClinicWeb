@@ -137,7 +137,7 @@
                 </div>
             </MudDrawer>
             @if (MasterModalOpen) {
-                <div class="master-modal">
+                <div class="master-modal" style="@(_drawerOpen ? "left: 0vw;" : "left: 1vw;")">
                     <div class="master-modal-header">
                         <p class="align-items-center d-flex justify-content-center text-center m-0">Master</p>
                         <MudFab Size="MudBlazor.Size.Small" IconColor="MudBlazor.Color.Default" Color="MudBlazor.Color.Transparent" StartIcon="@Icons.Material.Filled.Close" DisableElevation="true" OnClick="@CloseModal"  />
@@ -273,8 +273,6 @@
     }
 
     .mud-nav-link {
-        padding-top: 12px;
-        padding-bottom: 12px;
         font-weight: 500;
         font-size: 15px;
     }

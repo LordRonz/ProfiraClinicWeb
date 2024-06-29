@@ -6,28 +6,28 @@
 <MudCard Class="p-5 h-100 rounded-3 overflow-scroll">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 table-add-form">
         <MudGrid Class="" Style="max-width: 85%;">
-            <MudItem xs="3">
-                <MudTextField T="string" Label="Kode Klinik" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudItem xs="3" Class="p-1">
+                <MudTextField T="string" Label="Kode Klinik" Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel />
             </MudItem>
-            <MudItem xs="6">
-                <MudTextField T="string" Label="Nama Klinik" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudItem xs="6" Class="p-1">
+                <MudTextField T="string" Label="Nama Klinik" Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel />
             </MudItem>
-            <MudItem xs="10">
-                <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudItem xs="10" Class="p-1">
+                <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel />
             </MudItem>
-            <MudItem xs="6">
-                <MudSelect T="string" Label="Kota" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudItem xs="6" Class="p-1">
+                <MudSelect T="string" Label="Kota" Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel>
                     @foreach(var city in cities)
                     {
                         <MudSelectItem T="string" Value="@city" Style="height: 30px" />
                     }
                 </MudSelect>
             </MudItem>
-            <MudItem xs="3">
-                <MudTextField T="string" Label="Telepon" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudItem xs="3" Class="p-1">
+                <MudTextField T="string" Label="Telepon" Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel />
             </MudItem>
-            <MudItem xs="6">
-                <MudSelect T="string" Label="Nama PT" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <MudItem xs="6" Class="p-1">
+                <MudSelect T="string" Label="Nama PT" Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel>
                     @foreach (var n in namaPT)
                     {
                         <MudSelectItem T="string" Value="@n" Style="height: 30px" />
