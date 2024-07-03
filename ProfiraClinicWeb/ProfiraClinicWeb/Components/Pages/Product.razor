@@ -38,7 +38,7 @@
                 new TableColumn { Caption="Harga", DataField="harga" },
                 new TableColumn { Caption="Disc Member", DataField="discMember" },
                 new TableColumn { Caption="Disc Non Member", DataField="discNonMember" },
-        }, dataSource, "/clinic/add", new Utils.TableFilter { FieldName = "Kode Produk", Column = "kode" });
+        }, dataSource, "/clinic/add");
     }
 
     [CascadingParameter]

@@ -31,7 +31,7 @@
                 new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
                 new TableColumn { Caption="Kode", DataField="kode" },
                 new TableColumn { Caption="Nama Dokter", DataField="namaDokter" },
-        }, doctors, "/clinic/add", new Utils.TableFilter { FieldName = "Kode", Column = "kode" });
+        }, doctors, "/clinic/add");
     }
 
     [CascadingParameter]

@@ -10,7 +10,17 @@
         <MudStack Spacing="1" Class="w-100 table-header">
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudCollapse Expanded="_expanded" Class="px-4">
-                <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 300px;" Margin="Margin.Dense" DisableUnderLine="true" Label="@Config.GetFilter()?.FieldName" Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field"></MudTextField>
+                <div class="d-flex justify-content-start align-items-start gap-4">
+                    <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
+                        @foreach (TableColumn col in Config.GetColumn())
+                        {
+                            @if(col.Type == ColumnType.Data) {
+                                <MudSelectItem Style="height: 30px" T="string" Value="@col.DataField">@col.Caption</MudSelectItem>
+                            }
+                        }
+                    </MudSelect>
+                    <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0"></MudTextField>
+                </div>
                 <div class="d-flex justify-content-between mb-4">
                     <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
                     @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
@@ -105,21 +115,35 @@
         return defaultClass;
     }
 
+    private string GetMultiSelectionText(List<string> selectedValues)
+    {
+        Config.ReplaceFilter(selectedValues);
+
+        var count = selectedValues.Count;
+
+        return $"{string.Join(", ", selectedValues.Select(x => x))}" + (count <= 1 ? "   " : "");
+    }
+
     private bool FilterFunc(Dictionary<string, string> element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         System.Diagnostics.Debug.Print(element.Values.ToList()[2]);
-        var filter = Config.GetFilter();
-        foreach (var item in element)
+        
+        var filters = Config.GetFilters();
+        System.Diagnostics.Debug.Print(filters[0].Column);
+        foreach (var filter in filters)
         {
-            if (filter != null && filter.Column != item.Key)
+            foreach (var item in element)
             {
-                continue;
-            }
-            if (item.Value.ToLower().Contains(searchString))
-            {
-                return true;
+                if (filter != null && filter.Column != item.Key)
+                {
+                    continue;
+                }
+                if (item.Value.ToLower().Contains(searchString))
+                {
+                    return true;
+                }
             }
         }
 
@@ -161,11 +185,19 @@
         text-transform: none;
     }
 
+    .search-btn:hover {
+        background: rgba(39, 83, 201, 1);
+    }
+
     .add-btn {
         background: rgba(47, 193, 71, 1);
         color: white;
         margin-top: -12px !important;
         text-transform: none;
+    }
+
+    .add-btn:hover {
+        background: rgba(27, 153, 41, 1);
     }
 
     .mud-table {

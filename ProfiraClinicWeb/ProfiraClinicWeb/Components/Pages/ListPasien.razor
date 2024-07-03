@@ -49,7 +49,7 @@
                 new TableColumn { Caption="Alamat", DataField="alamat" },
                 new TableColumn { Caption="No. HP", DataField="noHp" },
                 new TableColumn { Caption="Tgl Lahir", DataField="tglLahir" },
-        }, dataSource, "/clinic/add", new Utils.TableFilter { FieldName = "Member ID", Column = "memberId" });
+        }, dataSource, "/clinic/add");
     }
 
     private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.
