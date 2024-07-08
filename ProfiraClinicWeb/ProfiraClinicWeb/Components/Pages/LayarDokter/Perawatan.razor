@@ -10,14 +10,33 @@
 
 <MudCard Class="p-4 h-100 rounded-3">
     @if (customer != null) {
-        <MudCard>
-            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="customer.NMCUS" />
-            <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="customer.ALAMAT" />
-            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="age" />
-            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="tgTrx" />
-            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="tgTrx" />
-            <ProfiraClinicWeb.Components.Table.Table Config="PatientTableConfig" ClassOverride="bg-lightblue" />
-        </MudCard>
+        <div>
+            <div class="d-flex w-100 gap-x-8">
+                <div class="border-1 justify-content-center align-items-center d-flex item-shadow" style="width: 150px; height: 150px;">
+                    <MudImage Src="/images/avatar4.jpeg" Class="w-100" />
+                </div>
+                <div class="w-100  table-add-form">
+                    <MudGrid Class="" Style="max-width: 85%;">
+                        <MudItem xs="7" Class="p-1">
+                            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="customer.NMCUS" />
+                        </MudItem>
+                        <MudItem xs="5" Class="p-1">
+                            <MudTextField T="string" Label="Alamat" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="customer.ALAMAT" />
+                        </MudItem>
+                        <MudItem xs="7" Class="p-1">
+                            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="age" />
+                        </MudItem>
+                        <MudItem xs="5" Class="p-1">
+                            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="tgTrx" />
+                        </MudItem>
+                        <MudItem xs="3" Class="p-1">
+                            <MudTextField T="string" Label="Nama Pasien" Variant="Variant.Outlined" ReadOnly="true" @bind-Value="tgTrx" />
+                        </MudItem>
+                    </MudGrid>
+                </div>
+            </div>
+            <ProfiraClinicWeb.Components.Menu.Menu></ProfiraClinicWeb.Components.Menu.Menu>
+        </div>
     }
 </MudCard>
 
@@ -91,3 +110,24 @@
 
 }
 
+
+<style>
+    .table-add-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-add-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-add-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-add-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>
