@@ -6,11 +6,49 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudText Typo="Typo.h4" Style="padding: 20px 0px;">Pemeriksaan Pasien</MudText>
-<MudCard>
+<MudCard Class="p-4 h-100 rounded-3">
     @* <MudButton Class="m-4">Add</MudButton> *@
 
-    <ProfiraClinicWeb.Components.Table.Table Config="DoctorTableConfig" />
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Umum">
+            <MudGrid Class="" Style="max-width: 85%;">
+                <MudItem xs="7" Class="p-1">
+                    <MudTextField T="string" Label="Keadaan Umum" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="5" Class="p-1">
+                    <MudTextField T="string" Label="Tingkat Kesadaran" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="7" Class="p-1">
+                    <MudTextField T="string" Label="Kesadaran" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="5" Class="p-1">
+                    <MudTextField T="string" Label="Tekanan Darah (Sistolik/Diastolik) mm/hg" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="3" Class="p-1">
+                    <MudTextField T="string" Label="Frekuensi Napas (X/Menit)" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="3" Class="p-1">
+                    <MudTextField T="string" Label="Frekuensi Nadi (X/Menit)" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="3" Class="p-1">
+                    <MudTextField T="string" Label="Suhu (C)" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+                <MudItem xs="3" Class="p-1">
+                    <MudTextField T="string" Label="Saturasi O2" Variant="Variant.Outlined" ReadOnly="true" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+        <MudTabPanel Text="Fisik">
+            <div style="max-width: 35%;">
+                <MudTextField T="string" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
+                <MudTextField T="string" Label="Lingkar Kepala (cm)" Variant="Variant.Outlined" />
+            </div>
+        </MudTabPanel>
+    </MudTabs>
+
+    <MudCard></MudCard>
 </MudCard>
 
 @code {
