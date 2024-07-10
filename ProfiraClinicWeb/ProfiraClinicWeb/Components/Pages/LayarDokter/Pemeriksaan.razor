@@ -6,40 +6,40 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudCard Class="p-4 h-100 rounded-3">
+<MudCard Class="p-4 h-100 rounded-3 pemeriksaan-input">
     @* <MudButton Class="m-4">Add</MudButton> *@
 
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
         <MudTabPanel Text="Umum">
-            <MudGrid Class="" Style="max-width: 85%;">
+            <MudGrid Class="gap-y-2" Style="max-width: 85%;">
                 <MudItem xs="7" Class="p-1">
-                    <MudTextField T="string" Label="Keadaan Umum" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Keadaan Umum" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="5" Class="p-1">
-                    <MudTextField T="string" Label="Tingkat Kesadaran" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Tingkat Kesadaran" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="7" Class="p-1">
-                    <MudTextField T="string" Label="Kesadaran" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Kesadaran" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="5" Class="p-1">
-                    <MudTextField T="string" Label="Tekanan Darah (Sistolik/Diastolik) mm/hg" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Tekanan Darah (Sistolik/Diastolik) mm/hg" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Frekuensi Napas (X/Menit)" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Frekuensi Napas (X/Menit)" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Frekuensi Nadi (X/Menit)" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Frekuensi Nadi (X/Menit)" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Suhu (C)" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Suhu (C)" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Saturasi O2" Variant="Variant.Outlined" ReadOnly="true" />
+                    <MudTextField T="string" Label="Saturasi O2" Variant="Variant.Outlined" />
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Fisik">
-            <div style="max-width: 35%;">
+            <div style="max-width: 35%;" class="d-flex flex-column gap-y-2">
                 <MudTextField T="string" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
                 <MudTextField T="string" Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
                 <MudTextField T="string" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
@@ -75,3 +75,24 @@
         }, patients);
     }
 }
+
+<style>
+    .pemeriksaan-input .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label-outlined {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .pemeriksaan-input .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>

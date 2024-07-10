@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="NewFolder1\**" />
+    <Content Remove="NewFolder1\**" />
+    <EmbeddedResource Remove="NewFolder1\**" />
+    <None Remove="NewFolder1\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProfiraClinicWeb.Client\ProfiraClinicWeb.Client.csproj" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="BlazorCalendar" Version="2.6.8" />
+    <PackageReference Include="BlazorReports" Version="0.20.0" />
+    <PackageReference Include="BootstrapBlazor" Version="8.3.0" />
+    <PackageReference Include="BootstrapBlazor.FontAwesome" Version="8.0.1" />
+    <PackageReference Include="Excubo.Blazor.Canvas" Version="3.2.48" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.5" />
+    <PackageReference Include="MudBlazor" Version="6.17.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Layout\NewFolder1\" />
+    <Folder Include="Components\Layout\NewFolder\" />
+  </ItemGroup>
+
+</Project>

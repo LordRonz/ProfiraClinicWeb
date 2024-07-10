@@ -86,32 +86,39 @@
                     <MudText Typo="Typo.h4" Color="MudBlazor.Color.Surface">@Title</MudText>
                 </div>
                 <MudSpacer></MudSpacer>
-                <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
-                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
-                </MudBadge>
-                <div class="d-flex align-items-center gap-1 mr-2">
-                    <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-                    @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
-                </div>
-                @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
-            <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
-            </MudBadge> *@
-                <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                    <MudText Typo="Typo.body2">Valerie Luna</MudText>
-                    <MudAvatar>
-                        <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
-                    </MudAvatar>
-                    <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-                        <div class="d-flex flex-column pa-1">
-                            <MudList Clickable="true">
-                                <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
-                                <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
-                                <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
-                                <MudDivider />
-                                <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
-                            </MudList>
+                <div class="d-flex flex-column align-items-end">
+                    <div class="d-flex justify-content-center align-items-center">
+                    <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
+                        <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+                    </MudBadge>
+                    <div class="d-flex align-items-center gap-1 mr-2">
+                        <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
+                        @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
+                    </div>
+                    @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+                <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
+                </MudBadge> *@
+                    <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
+                        <MudText Typo="Typo.body2">Valerie Luna</MudText>
+                        <MudAvatar>
+                            <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+                        </MudAvatar>
+                        <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                            <div class="d-flex flex-column pa-1">
+                                <MudList Clickable="true">
+                                    <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
+                                    <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
+                                    <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
+                                    <MudDivider />
+                                    <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
+                                </MudList>
+                            </div>
+                        </MudPopover>
                         </div>
-                    </MudPopover>
+                    </div>
+                    @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "dokter/dashboard") {
+                        <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
+                    }
                 </div>
             </MudAppBar>
         }
@@ -181,6 +188,7 @@
 
 @inject NavigationManager NavigationManager;
 @inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
 @code {
     bool _drawerOpen = true;
 
@@ -193,6 +201,14 @@
     public string Title { get; set; } = "";
 
     public string Route { get; set; } = "";
+
+    public string BackRoute { get; set; } = "#";
+
+    // Go back in browser using Javascript on a Razor Page
+    private void GoBack()
+    {
+        JSRuntime.InvokeVoidAsync("history.back");
+    }
 
     Boolean MasterModalOpen = false;
 
@@ -210,6 +226,12 @@
     {
         Title = newTitle;
         Route = newRoute;
+        StateHasChanged();
+    }
+
+    public void ChangeBackRoute(string newRoute)
+    {
+        BackRoute = newRoute;
         StateHasChanged();
     }
 
@@ -253,6 +275,7 @@
     }
 
     protected override void OnInitialized() {
+        isDoctor = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("dokter");
         path = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
     }
 
@@ -321,4 +344,15 @@
         width: 88px !important; /* 56 + 2 * 16 */
         margin-right: 20px;
     }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
 </style>
