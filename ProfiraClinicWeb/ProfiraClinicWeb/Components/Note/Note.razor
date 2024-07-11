@@ -1,11 +1,47 @@
 ﻿<div>
-    <div class="d-flex header-note">
-        <MudIcon Icon="@Icons.Material.Filled.Note" Color="MudBlazor.Color.Default" />
-        <h2>Catatan Medis</h2>
-        <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2">Sebelumnya</MudButton>
+    <div class="d-flex header-note justify-content-between px-4 py-2">
+        <div class="d-flex align-items-center justify-content-center gap-3">
+            <MudIcon Icon="@Icons.Material.Filled.Note" Color="MudBlazor.Color.Default" />
+            <h2 class="m-0" style="font-size: 16px;">Catatan Medis</h2>
+        </div>
+        <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2 align-items-center flex-shrink-1 flex-grow-0" Style="margin: 0px !important;">Sebelumnya</MudButton>
     </div>
-    <div>
+    <div style="background-color: rgba(250, 242, 242, 1);" class="p-4">
+        <ul style="list-style-type: circle;" class="pl-4 mb-4">
+            <li style="color: black;">
+                Kunjungan : 10000101001
+            </li>
 
+            <li>
+                Keadaan Umum : baik
+            </li>
+            <li>
+                Tingkat Kesadaran : Sadar baik / alert
+            </li>
+            <li>
+                Kesadaran : baik
+            </li>
+            <li>
+                Sistolik : 100 mmHg
+
+            </li>
+            <li>
+                Diastolik : 80 mmHg
+            </li>
+            <li>
+                Suhu : 37 C
+            </li>
+            <li>
+                Saturasi O2 : 95
+            </li>
+            <li>
+                Frekuensi Nafas : 30x/Menit
+            </li>
+            <li>
+                Frekuensi Nadi :  60x/Menit
+            </li>
+        </ul>
+        <p>18/05/2024 - 10.00.03</p>
     </div>
 </div>
 
@@ -18,7 +54,6 @@
     .back-btn {
         background: rgba(156, 99, 5, 1);
         color: white;
-        margin-left: 20px;
         text-transform: none;
     }
 

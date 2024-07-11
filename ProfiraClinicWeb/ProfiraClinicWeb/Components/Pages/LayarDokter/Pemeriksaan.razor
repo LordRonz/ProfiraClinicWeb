@@ -48,7 +48,9 @@
         </MudTabPanel>
     </MudTabs>
 
-    <MudCard></MudCard>
+    <MudCard Class="mt-8">
+        <ProfiraClinicWeb.Components.Note.Note></ProfiraClinicWeb.Components.Note.Note>
+    </MudCard>
 </MudCard>
 
 @code {
@@ -58,6 +60,9 @@
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
     public TableConfig DoctorTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,6 +78,8 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
+
+        Layout.ChangeShowSave(true);
     }
 }
 

@@ -117,7 +117,12 @@
                         </div>
                     </div>
                     @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "dokter/dashboard") {
-                        <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
+                        <div class="d-flex gap-3">
+                            @if (ShowSave) {
+                                <MudButton StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2">Simpan</MudButton>
+                            }
+                            <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
+                        </div>
                     }
                 </div>
             </MudAppBar>
@@ -204,6 +209,8 @@
 
     public string BackRoute { get; set; } = "#";
 
+    public bool ShowSave { get; set; } = false;
+
     // Go back in browser using Javascript on a Razor Page
     private void GoBack()
     {
@@ -232,6 +239,12 @@
     public void ChangeBackRoute(string newRoute)
     {
         BackRoute = newRoute;
+        StateHasChanged();
+    }
+
+    public void ChangeShowSave(bool showSave)
+    {
+        ShowSave = showSave;
         StateHasChanged();
     }
 
@@ -277,7 +290,16 @@
     protected override void OnInitialized() {
         isDoctor = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("dokter");
         path = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
+        NavigationManager.LocationChanged += OnLocationChanged;
     }
+
+    // Reset some variables on route change
+    private void OnLocationChanged(object? sender, EventArgs e)
+    {
+        ShowSave = false;
+    }
+
+    public void Dispose() => NavigationManager.LocationChanged -= OnLocationChanged;
 
     private void OpenDialog()
     {
@@ -345,10 +367,19 @@
         margin-right: 20px;
     }
 
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
+
     .back-btn {
         background: rgba(156, 99, 5, 1);
         color: white;
-        margin-left: 20px;
         text-transform: none;
     }
 
