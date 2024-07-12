@@ -22,6 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddBlazorReports();
 builder.Services.AddScoped<AppDbContext>();
+builder.Services.AddScoped<BrowserService>();
 
 var app = builder.Build();
 
