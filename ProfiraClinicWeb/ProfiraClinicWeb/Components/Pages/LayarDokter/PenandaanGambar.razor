@@ -73,6 +73,9 @@
 
     public TableConfig PenandaanGambarTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         var patients = new List<object>()
@@ -87,6 +90,8 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
+
+        Layout.ChangeShowSave(true);
     }
 
     string[] headings = { "No", "Keterangan" };
