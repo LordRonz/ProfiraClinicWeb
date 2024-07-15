@@ -1,5 +1,5 @@
 ﻿<a href="@Href" class="d-flex justify-content-center align-items-center flex-column gap-2">
-    <div class="border-1 justify-content-center align-items-center d-flex item-shadow" style="width: 150px; height: 150px;">
+    <div class="@("border-1 justify-content-center align-items-center d-flex item-shadow rounded-circle " + Class)" style="width: 150px; height: 150px; background-color: rgba(0, 0, 0, 0.25);">
         <MudImage Src="@Src" Class="w-100" />
     </div>
     <p class="m-0">@Title</p>
@@ -8,6 +8,9 @@
 @code {
     [Parameter]
     public string Src { get; set; } = "/images/menu/treatment.png";
+
+    [Parameter]
+    public string Class { get; set; } = "p-4";
 
     [Parameter]
     public string Href { get; set; } = "/produk";
