@@ -7,24 +7,26 @@
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
 <MudCard Class="p-4 h-100 rounded-3 pemeriksaan-input">
-    <MudGrid Class="gap-y-2" Style="max-width: 85%;">
-        <MudItem xs="4" Class="p-1">
-            <MudTextField ShrinkLabel T="string" Label="Kode ICD" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
-        </MudItem>
-        <MudItem xs="8" Class="p-1">
-            <MudTextField ShrinkLabel T="string" Label="Deskripsi" Variant="Variant.Outlined" />
-        </MudItem>
-        <MudItem xs="5" Class="p-1">
-            <MudSelect T="string" Label="Kategori" AnchorOrigin="Origin.BottomCenter" ShrinkLabel Variant="Variant.Outlined">
-                <MudSelectItem Value="@("Cappuccino")" />
-                <MudSelectItem Value="@("Cafe Latte")" />
-                <MudSelectItem Value="@("Espresso")" />
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" Class="p-1">
-            <MudTextField ShrinkLabel T="string" Label="Diagnosa" Variant="Variant.Outlined" Lines="10" />
-        </MudItem>
-    </MudGrid>
+    <MudCard Class="px-4 py-8">
+        <MudGrid Class="gap-y-2" Style="max-width: 85%;">
+            <MudItem xs="4" Class="p-1">
+                <MudTextField ShrinkLabel T="string" Label="Kode ICD" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
+            </MudItem>
+            <MudItem xs="8" Class="p-1">
+                <MudTextField ShrinkLabel T="string" Label="Deskripsi" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="5" Class="p-1">
+                <MudSelect T="string" Label="Kategori" AnchorOrigin="Origin.BottomCenter" ShrinkLabel Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("Cappuccino")" />
+                    <MudSelectItem Value="@("Cafe Latte")" />
+                    <MudSelectItem Value="@("Espresso")" />
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" Class="p-1">
+                <MudTextField ShrinkLabel T="string" Label="Diagnosa" Variant="Variant.Outlined" Lines="10" />
+            </MudItem>
+        </MudGrid>
+    </MudCard>
     <MudCard Class="mt-8">
         <ProfiraClinicWeb.Components.Note.Note></ProfiraClinicWeb.Components.Note.Note>
     </MudCard>

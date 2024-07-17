@@ -28,7 +28,7 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/> *@
 
-<MudThemeProvider @rendermode="InteractiveServer" />
+<MudThemeProvider @rendermode="InteractiveServer" Theme="MyCustomTheme" />
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 
@@ -37,7 +37,7 @@
         @* Top navbar *@
 
         @if (!isDoctor) {
-            <MudAppBar Style="background: transparent;" Elevation="0">
+            <MudAppBar Style="background: rgba(255, 192, 98, 1); z-index: 1000;" Elevation="0" Fixed="true">
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
                 <div class="pa-4">
                     <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
@@ -74,10 +74,10 @@
             </MudAppBar>
         } else
         {
-            <MudAppBar Style="background: transparent;" Elevation="0">
+            <MudAppBar Style="background: rgba(1, 73, 191, 1); z-index: 1000;" Elevation="0" Fixed="true">
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
                 <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
-                    <MudImage Src="images/logo-white.png" Alt="Profira" Class="" Height="85" />
+                    <MudImage Src="images/logo-white.png" Alt="Profira" Class="" Height="85" Style="filter: brightness(0) invert(1);" />
                 </MudLink>
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" /> *@
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
@@ -210,6 +210,17 @@
     public string BackRoute { get; set; } = "#";
 
     public bool ShowSave { get; set; } = false;
+
+    MudTheme MyCustomTheme = new MudTheme()
+        {
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontFamily = new[] { "Poppins", "Helvetica", "Arial", "sans-serif" }
+                }
+            }
+        };
 
     // Go back in browser using Javascript on a Razor Page
     private void GoBack()
