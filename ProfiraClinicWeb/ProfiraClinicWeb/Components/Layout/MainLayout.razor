@@ -119,9 +119,9 @@
                     @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "dokter/dashboard") {
                         <div class="d-flex gap-3">
                             @if (ShowSave) {
-                                <MudButton StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2">Simpan</MudButton>
+                                <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2">Simpan</MudButton>
                             }
-                            <MudButton StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
+                            <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
                         </div>
                     }
                 </div>
@@ -144,7 +144,7 @@
                         </MudNavMenu>
                         <MudSpacer />
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
-                        <MudButton Variant="Variant.Filled" StartIcon="@(_drawerOpen ? Icons.Material.Filled.Backspace : Icons.Material.Filled.ArrowCircleRight)" Color="MudBlazor.Color.Transparent" Class="mb-4 bg-transparent" DisableElevation="true" OnClick="() => _drawerOpen = !_drawerOpen">@(_drawerOpen ? "Minimize Menu" : "")</MudButton>
+                        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" StartIcon="@(_drawerOpen ? Icons.Material.Filled.Backspace : Icons.Material.Filled.ArrowCircleRight)" Color="MudBlazor.Color.Transparent" Class="mb-4 bg-transparent" DisableElevation="true" OnClick="() => _drawerOpen = !_drawerOpen">@(_drawerOpen ? "Minimize Menu" : "")</MudButton>
                     </div>
                 </div>
             </MudDrawer>

@@ -4,7 +4,7 @@
 
 @if (WithAdd == true) {
     <div class="d-flex justify-content-end mb-2">
-        <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
+        <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
     </div>
 }
 <div class="mb-5">
@@ -24,7 +24,7 @@
                     <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
                 </div>
                 <div class="d-flex justify-content-between mb-4">
-                    <MudButton StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
+                    <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
                     @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
                 </div>
             </MudCollapse>
