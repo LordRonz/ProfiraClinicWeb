@@ -18,7 +18,7 @@
 
 <img id="right_face" width="100" height="100" style="display:none" src="images/penandaan_gambar/right_face.jpg" alt="Right Face" />
 
-<MudCard Class="p-4 h-100 rounded-3">
+<MudCard Class="p-4 minh-100 rounded-3">
     <div class="d-flex">
         <MudCard Class="d-flex flex-column align-items-start flex-grow-1 position-relative">
             <div @ref="container">
@@ -50,10 +50,6 @@
             </MudSimpleTable>
         </MudCard>
     </div>
-    <a id="link"></a>
-    <Button OnClick="Save">
-        Save
-    </Button>
     <script>
         window.canvas2Image = () => {
             const canvas = document.getElementById('penandaan-gambar');

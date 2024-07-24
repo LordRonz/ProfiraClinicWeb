@@ -6,7 +6,7 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudCard Class="p-4 h-100 rounded-3 pemeriksaan-input">
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
     <MudGrid Class="gap-y-2" Style="max-width: 85%;">
         <MudItem xs="4" Class="p-1">
             <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
@@ -14,8 +14,8 @@
         <MudItem xs="8" Class="p-1">
             <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel />
         </MudItem>
-        <MudItem xs="5" Class="p-1">
-            <MudField Label="Hasil Pemeriksaan" Variant="Variant.Outlined" ShrinkLabel><img id="front_face" width="100" height="100" style="display:none" src="images/penandaan_gambar/front_face.jpg" alt="Front Face" /></MudField>
+        <MudItem xs="5" Class="p-1" id="hasil-pemeriksaan-field">
+            <MudField Label="Hasil Pemeriksaan" Variant="Variant.Outlined" ShrinkLabel><img id="front_face" height="150" src="images/penandaan_gambar/front_face.jpg" alt="Front Face" /></MudField>
         </MudItem>
         <MudItem xs="12" Class="p-1">
             <MudTextField ShrinkLabel T="string" Label="Diagnosis" Variant="Variant.Outlined" />
@@ -55,7 +55,7 @@
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
 
-        Layout.ChangeTitleAndRoute("DIAGNOSA / ICD", "Perawatan Pasien / Diagnosa ");
+        Layout.ChangeTitleAndRoute("Tindakan Perawatan", "Perawatan Pasien / Tindakan Perawatan ");
 
         Layout.ChangeShowSave(true);
     }
@@ -66,6 +66,10 @@
         height: 30px !important;
         padding: 0px 10px !important;
         font-size: 12px !important;
+    }
+
+    #hasil-pemeriksaan-field .mud-input-root {
+        height: 150px !important;
     }
 
     .pemeriksaan-input .mud-input-label {

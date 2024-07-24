@@ -6,44 +6,44 @@
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
-<MudCard Class="p-4 h-100 rounded-3 pemeriksaan-input">
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
     @* <MudButton Class="m-4">Add</MudButton> *@
 
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
         <MudTabPanel Text="Umum">
             <MudGrid Class="gap-y-2" Style="max-width: 85%;">
                 <MudItem xs="7" Class="p-1">
-                    <MudTextField T="string" Label="Keadaan Umum" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Keadaan Umum" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="5" Class="p-1">
-                    <MudTextField T="string" Label="Tingkat Kesadaran" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Tingkat Kesadaran" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="7" Class="p-1">
-                    <MudTextField T="string" Label="Kesadaran" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Kesadaran" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="5" Class="p-1">
-                    <MudTextField T="string" Label="Tekanan Darah (Sistolik/Diastolik) mm/hg" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Tekanan Darah (Sistolik/Diastolik) mm/hg" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Frekuensi Napas (X/Menit)" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Frekuensi Napas (X/Menit)" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Frekuensi Nadi (X/Menit)" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Frekuensi Nadi (X/Menit)" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Suhu (C)" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Suhu (C)" Variant="Variant.Outlined" />
                 </MudItem>
                 <MudItem xs="3" Class="p-1">
-                    <MudTextField T="string" Label="Saturasi O2" Variant="Variant.Outlined" />
+                    <MudTextField ShrinkLabel T="string" Label="Saturasi O2" Variant="Variant.Outlined" />
                 </MudItem>
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Fisik">
             <div style="max-width: 35%;" class="d-flex flex-column gap-y-2">
-                <MudTextField T="string" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
-                <MudTextField T="string" Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
-                <MudTextField T="string" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
-                <MudTextField T="string" Label="Lingkar Kepala (cm)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="string" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="string" Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="string" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="string" Label="Lingkar Kepala (cm)" Variant="Variant.Outlined" />
             </div>
         </MudTabPanel>
     </MudTabs>
@@ -78,6 +78,8 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
+
+        Layout.ChangeTitleAndRoute("PEMERIKSAAN", "Perawatan Pasien / Pemeriksaan");
 
         Layout.ChangeShowSave(true);
     }
