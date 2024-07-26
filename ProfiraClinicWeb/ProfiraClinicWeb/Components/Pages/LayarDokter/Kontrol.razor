@@ -1,0 +1,87 @@
+﻿@page "/dokter/kontrol"
+@using System.Net.Http.Json
+@using ProfiraClinicWeb.Models
+@using ProfiraClinicWeb.Utils;
+@inject HttpClient httpClient
+
+@using PatientModel = ProfiraClinicWeb.Models.Patient
+
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
+    <MudGrid Class="gap-y-2" Style="max-width: 85%;">
+        <MudItem xs="4" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
+        </MudItem>
+        <MudItem xs="3" Class="p-1">
+            <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel />
+        </MudItem>
+        <MudItem xs="4" Class="p-1">
+            <MudDatePicker Label="Jam" Variant="Variant.Outlined" ShrinkLabel />
+        </MudItem>
+        <MudItem xs="12" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Tujuan Kontrol" Variant="Variant.Outlined" Lines="10" />
+        </MudItem>
+        <MudItem xs="4" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Nama Dokter" Variant="Variant.Outlined" />
+        </MudItem>
+        <MudItem xs="12" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Assesment" Variant="Variant.Outlined" />
+        </MudItem>
+    </MudGrid>
+</MudCard>
+
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private IEnumerable<Element> Elements = new List<Element>();
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    public TableConfig DoctorTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = new List<object>()
+        {
+            (object) new { view="/pasien/1", tanggalKunjungan = "DR01", noKunjungan = "dr. Fifin" },
+            (object) new { view="/pasien/2", tanggalKunjungan = "DR02", noKunjungan = "dr. Agnes" },
+            (object) new { view="/pasien/3", tanggalKunjungan = "DR03", noKunjungan = "dr. Ruth" },
+        };
+
+        DoctorTableConfig = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
+                new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
+                new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
+        }, patients);
+
+        Layout.ChangeTitleAndRoute("Kontrol", "Perawatan Pasien / Kontrol");
+
+        Layout.ChangeShowSave(true);
+    }
+}
+
+<style>
+    .pemeriksaan-input .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    #hasil-pemeriksaan-field .mud-input-root {
+        height: 150px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label-outlined {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .pemeriksaan-input .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>
