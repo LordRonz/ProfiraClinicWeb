@@ -9,13 +9,13 @@
 <MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
     <MudGrid Class="gap-y-2" Style="max-width: 85%;">
         <MudItem xs="4" Class="p-1">
-            <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
+            <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" />
         </MudItem>
         <MudItem xs="3" Class="p-1">
             <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel />
         </MudItem>
         <MudItem xs="4" Class="p-1">
-            <MudDatePicker Label="Jam" Variant="Variant.Outlined" ShrinkLabel />
+            <MudDatePicker Label="Jam" Variant="Variant.Outlined" ShrinkLabel Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.CheckCircleOutline" />
         </MudItem>
         <MudItem xs="12" Class="p-1">
             <MudTextField ShrinkLabel T="string" Label="Tujuan Kontrol" Variant="Variant.Outlined" Lines="10" />
