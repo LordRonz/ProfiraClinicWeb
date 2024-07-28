@@ -26,7 +26,7 @@
                 </Excubo.Blazor.Canvas.Canvas>
             </div>
         </MudCard>
-        <MudCard Class="d-flex flex-column align-items-start flex-grow-1">
+        <MudCard Class="d-flex flex-column align-items-start flex-grow-1 w-50">
             <MudSimpleTable Style="overflow-x: auto; width: 100%;">
                 <thead>
                     <tr>
@@ -40,14 +40,13 @@
                     @foreach (var row in rows)
                     {
                         <tr>
-                            @foreach (var x in row.Split())
-                            {
-                                <td>@x</td>
-                            }
+                            <td>@row</td>
+                            <td><MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" /></td>
                         </tr>
                     }
                 </tbody>
             </MudSimpleTable>
+            <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" OnClick="AddRows"  Class="add-btn mt-2">Tambah</MudButton>
         </MudCard>
     </div>
     <script>
@@ -91,10 +90,7 @@
     }
 
     string[] headings = { "No", "Keterangan" };
-    string[] rows = {
-        @"1 keterangan 1",
-        @"2 Keterangan 2",
-    };
+    List<int> rows = new List<int> { 1 };
 
     private ElementReference container;
     private Excubo.Blazor.Canvas.Canvas _context;
@@ -122,6 +118,11 @@
 
         canvasWidth = Width * 47 / 100;
         canvasHeight = Height * 4 / 5;
+    }
+
+    void AddRows()
+    {
+        rows.Add(rows.Count + 1);
     }
 
     private class Position
@@ -233,3 +234,15 @@
         return base.ShouldRender();
     }
 }
+
+<style>
+    .add-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+    .add-btn:hover {
+        background: rgba(27, 153, 41, 1);
+    }
+</style>
