@@ -8,10 +8,10 @@
 
 <MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
     <MudGrid Class="gap-y-2" Style="max-width: 85%;">
-        <MudItem xs="6" Class="p-1">
-            <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
-        </MudItem>
         <MudItem xs="4" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Nama Dokter" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
+        </MudItem>
+        <MudItem xs="2" Class="p-1">
             <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel />
         </MudItem>
         <MudItem xs="12" Class="p-1">
@@ -32,6 +32,8 @@
     </MudGrid>
 </MudCard>
 
+
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -61,6 +63,14 @@
         Layout.ChangeTitleAndRoute("Catatan Perkembangan Pasien Terintegrasi (CPPT)", "Perawatan Pasien / CPPT");
 
         Layout.ChangeShowSave(true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        var age = await LocalStore.GetAsync<string>("age");
+        var name = await LocalStore.GetAsync<string>("name");
+
+        Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
     }
 }
 

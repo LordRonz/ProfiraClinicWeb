@@ -24,11 +24,12 @@
             <MudTextField ShrinkLabel T="string" Label="Nama Dokter" Variant="Variant.Outlined" />
         </MudItem>
         <MudItem xs="12" Class="p-1">
-            <MudTextField ShrinkLabel T="string" Label="Assesment" Variant="Variant.Outlined" />
+            <MudTextField ShrinkLabel T="string" Label="Keterangan" Variant="Variant.Outlined" Lines="10" />
         </MudItem>
     </MudGrid>
 </MudCard>
 
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -58,6 +59,14 @@
         Layout.ChangeTitleAndRoute("Kontrol", "Perawatan Pasien / Kontrol");
 
         Layout.ChangeShowSave(true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        var age = await LocalStore.GetAsync<string>("age");
+        var name = await LocalStore.GetAsync<string>("name");
+
+        Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
     }
 }
 

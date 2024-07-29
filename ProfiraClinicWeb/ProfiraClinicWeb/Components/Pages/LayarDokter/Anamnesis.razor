@@ -12,11 +12,64 @@
             <MudTextField ShrinkLabel T="string" Placeholder="Silakan ketik anamnesis pasien disini" Variant="Variant.Outlined" Lines="15" MaxLines="15" AutoGrow />
         </MudTabPanel>
         <MudTabPanel Text="Riwayat">
-            <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Disabled Lines="15" MaxLines="15" AutoGrow />
+            <MudGrid Class="gap-y-2 riwayat" Style="max-width: 70%;">
+                <MudItem xs="12" Class="p-1">
+                    <MudTextField ShrinkLabel T="string" Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Riwayat Penyakit Sekarang</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox T="bool" Label="DM" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Hipertensi" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="TBC" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Asthma" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Hepatitis" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Kelainan Darah" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Lain-lain, sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Riwayat Alergi Obat</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox T="bool" Label="Tidak" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Ya, Sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Riwayat Alergi Makanan</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox T="bool" Label="Tidak" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Ya, Sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Faktor Resiko</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox T="bool" Label="Merokok" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Obesitas" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Displidemia" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox T="bool" Label="Lain-lain, sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+            </MudGrid>
         </MudTabPanel>
     </MudTabs>
 </MudCard>
 
+
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -47,6 +100,14 @@
 
         Layout.ChangeShowSave(true);
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        var age = await LocalStore.GetAsync<string>("age");
+        var name = await LocalStore.GetAsync<string>("name");
+
+        Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
+    }
 }
 
 <style>
@@ -57,6 +118,14 @@
 
     .pemeriksaan-input .tabcontainer {
        height: 100% !important;
+    }
+
+    .pemeriksaan-input .riwayat .mud-input-root {
+        height: 40px !important;
+    }
+
+    .riwayat .mud-typography {
+        font-size: 12px !important;
     }
 
     .pemeriksaan-input .mud-input-label {

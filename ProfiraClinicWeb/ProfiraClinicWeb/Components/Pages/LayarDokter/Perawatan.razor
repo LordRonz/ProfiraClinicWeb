@@ -43,6 +43,7 @@
 </MudCard>
 
 @inject AppDbContext dbContext
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -101,6 +102,15 @@
                 new TableColumn { Caption="No. HP", DataField="noHp" },
                 new TableColumn { Caption="Tgl Lahir", DataField="tglLahir" },
         }, dataSource);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        if (firstrender && customer != null) {
+            await LocalStore.SetAsync("age", age);
+            await LocalStore.SetAsync("name", customer.NMCUS);
+        }
+        Layout.ChangePasien("", "");
     }
 
     private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.

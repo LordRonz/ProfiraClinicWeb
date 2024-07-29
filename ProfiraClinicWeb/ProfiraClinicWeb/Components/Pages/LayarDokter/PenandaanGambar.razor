@@ -27,7 +27,7 @@
             </div>
         </MudCard>
         <MudCard Class="d-flex flex-column align-items-start flex-grow-1 w-50">
-            <MudSimpleTable Style="overflow-x: auto; width: 100%;">
+            <MudSimpleTable Class="keterangan-input" Style="overflow-x: auto; width: 100%;">
                 <thead>
                     <tr>
                         @foreach (var h in headings)
@@ -60,6 +60,7 @@
     </script>
 </MudCard>
 
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -85,6 +86,8 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
+
+        Layout.ChangeTitleAndRoute("PENANDAAN GAMBAR", "Perawatan Pasien / Penandaan Gambar");
 
         Layout.ChangeShowSave(true);
     }
@@ -160,6 +163,11 @@
             await UpdateCanvasAsync();
             await UpdateCanvasAsync();
             await UpdateCanvasAsync();
+
+            var age = await LocalStore.GetAsync<string>("age");
+            var name = await LocalStore.GetAsync<string>("name");
+
+            Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
         }
         await base.OnAfterRenderAsync(firstRender);
     }
@@ -244,5 +252,11 @@
 
     .add-btn:hover {
         background: rgba(27, 153, 41, 1);
+    }
+
+    .keterangan-input .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
     }
 </style>

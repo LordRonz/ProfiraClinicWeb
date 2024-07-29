@@ -83,7 +83,16 @@
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
                 <div class="pa-4">
                     <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
-                    <MudText Typo="Typo.h4" Color="MudBlazor.Color.Surface">@Title</MudText>
+                    <MudText Typo="Typo.h5" Color="MudBlazor.Color.Surface">@Title</MudText>
+                    @if (PasienName != "")
+                    {
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">Pasien: @PasienName</MudText>
+                    }
+
+                    @if (PasienUsia != "")
+                    {
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">Usia: @PasienUsia</MudText>
+                    }
                 </div>
                 <MudSpacer></MudSpacer>
                 <div class="d-flex flex-column align-items-end">
@@ -211,6 +220,10 @@
 
     public bool ShowSave { get; set; } = false;
 
+    public string PasienName { get; set; } = "";
+
+    public string PasienUsia { get; set; } = "";
+
     MudTheme MyCustomTheme = new MudTheme()
         {
             Typography = new Typography()
@@ -256,6 +269,13 @@
     public void ChangeShowSave(bool showSave)
     {
         ShowSave = showSave;
+        StateHasChanged();
+    }
+
+    public void ChangePasien(string name, string usia)
+    {
+        PasienName = name;
+        PasienUsia = usia;
         StateHasChanged();
     }
 
@@ -308,6 +328,9 @@
     private void OnLocationChanged(object? sender, EventArgs e)
     {
         ShowSave = false;
+        PasienName = "";
+        PasienUsia = "";
+        StateHasChanged();
     }
 
     public void Dispose() => NavigationManager.LocationChanged -= OnLocationChanged;

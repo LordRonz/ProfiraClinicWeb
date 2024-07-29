@@ -39,7 +39,7 @@
             </MudGrid>
         </MudTabPanel>
         <MudTabPanel Text="Fisik">
-            <div style="max-width: 35%;" class="d-flex flex-column gap-y-2">
+            <div style="max-width: 15%;" class="d-flex flex-column gap-y-2">
                 <MudTextField ShrinkLabel T="string" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
                 <MudTextField ShrinkLabel T="string" Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
                 <MudTextField ShrinkLabel T="string" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
@@ -53,6 +53,7 @@
     </MudCard>
 </MudCard>
 
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -83,6 +84,16 @@
 
         Layout.ChangeShowSave(true);
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        var age = await LocalStore.GetAsync<string>("age");
+        var name = await LocalStore.GetAsync<string>("name");
+
+        Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
+    }
+
+
 }
 
 <style>

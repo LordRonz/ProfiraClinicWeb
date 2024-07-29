@@ -10,7 +10,11 @@
     <MudCard Class="px-4 py-8">
         <MudGrid Class="gap-y-2" Style="max-width: 85%;">
             <MudItem xs="4" Class="p-1">
-                <MudTextField ShrinkLabel T="string" Label="Kode ICD" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End" />
+                <MudSelect T="string" Label="Kode ICD" AnchorOrigin="Origin.BottomCenter" ShrinkLabel Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End">
+                    <MudSelectItem Value="@("A00 - Cholera")" />
+                    <MudSelectItem Value="@("A01 - Typhoid and paratyphoid fevers")" />
+                    <MudSelectItem Value="@("A02 - Other salmonella infections")" />
+                </MudSelect>
             </MudItem>
             <MudItem xs="8" Class="p-1">
                 <MudTextField ShrinkLabel T="string" Label="Deskripsi" Variant="Variant.Outlined" />
@@ -31,6 +35,8 @@
     </MudCard>
 </MudCard>
 
+
+@inject ProtectedLocalStorage LocalStore
 @code {
     private bool _hidePosition;
     private bool _loading;
@@ -60,6 +66,14 @@
         Layout.ChangeTitleAndRoute("DIAGNOSA / ICD", "Perawatan Pasien / Diagnosa ");
 
         Layout.ChangeShowSave(true);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstrender)
+    {
+        var age = await LocalStore.GetAsync<string>("age");
+        var name = await LocalStore.GetAsync<string>("name");
+
+        Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
     }
 }
 
