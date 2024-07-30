@@ -111,6 +111,8 @@
             await LocalStore.SetAsync("name", customer.NMCUS);
         }
         Layout.ChangePasien("", "");
+        Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
+        Layout.ChangeShowSave(false);
     }
 
     private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.

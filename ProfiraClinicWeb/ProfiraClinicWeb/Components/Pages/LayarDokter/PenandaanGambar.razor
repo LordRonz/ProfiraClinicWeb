@@ -86,10 +86,6 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
-
-        Layout.ChangeTitleAndRoute("PENANDAAN GAMBAR", "Perawatan Pasien / Penandaan Gambar");
-
-        Layout.ChangeShowSave(true);
     }
 
     string[] headings = { "No", "Keterangan" };
@@ -168,6 +164,10 @@
             var name = await LocalStore.GetAsync<string>("name");
 
             Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
+
+            Layout.ChangeTitleAndRoute("PENANDAAN GAMBAR", "Perawatan Pasien / Penandaan Gambar");
+
+            Layout.ChangeShowSave(true);
         }
         await base.OnAfterRenderAsync(firstRender);
     }

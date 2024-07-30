@@ -57,10 +57,6 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
-
-        Layout.ChangeTitleAndRoute("Tindakan Perawatan", "Perawatan Pasien / Tindakan Perawatan ");
-
-        Layout.ChangeShowSave(true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstrender)
@@ -69,6 +65,10 @@
         var name = await LocalStore.GetAsync<string>("name");
 
         Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
+
+        Layout.ChangeTitleAndRoute("Tindakan Perawatan", "Perawatan Pasien / Tindakan Perawatan ");
+
+        Layout.ChangeShowSave(true);
     }
 }
 

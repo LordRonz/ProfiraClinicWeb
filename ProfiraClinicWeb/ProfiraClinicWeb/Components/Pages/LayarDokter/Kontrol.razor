@@ -12,10 +12,10 @@
             <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" />
         </MudItem>
         <MudItem xs="3" Class="p-1">
-            <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel />
+            <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel DateFormat="dd/MM/yyyy" />
         </MudItem>
         <MudItem xs="4" Class="p-1">
-            <MudDatePicker Label="Jam" Variant="Variant.Outlined" ShrinkLabel Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.CheckCircleOutline" />
+            <MudTimePicker Label="Jam" Variant="Variant.Outlined" ShrinkLabel Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.CheckCircleOutline" />
         </MudItem>
         <MudItem xs="12" Class="p-1">
             <MudTextField ShrinkLabel T="string" Label="Tujuan Kontrol" Variant="Variant.Outlined" Lines="10" />
@@ -55,10 +55,6 @@
                 new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
                 new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
         }, patients);
-
-        Layout.ChangeTitleAndRoute("Kontrol", "Perawatan Pasien / Kontrol");
-
-        Layout.ChangeShowSave(true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstrender)
@@ -67,6 +63,10 @@
         var name = await LocalStore.GetAsync<string>("name");
 
         Layout.ChangePasien(name.Success ? name.Value : "", age.Success ? age.Value : "");
+
+        Layout.ChangeTitleAndRoute("Kontrol", "Perawatan Pasien / Kontrol");
+
+        Layout.ChangeShowSave(true);
     }
 }
 
