@@ -133,6 +133,8 @@
 
         await ProtectedSessionStore.SetAsync("token", token);
 
+        await ProtectedSessionStore.SetAsync("user", customer);
+
         addSnackbar("Logged In", Severity.Success);
 
         NavManager.NavigateTo("/dokter/dashboard");

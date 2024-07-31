@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using ProfiraClinicWeb.Data
+@using ProfiraClinicWeb.Models
+@using Microsoft.EntityFrameworkCore;
 
 @* <div class="page">
     <div class="sidebar">
@@ -98,17 +101,21 @@
                 <div class="d-flex flex-column align-items-end">
                     <div class="d-flex justify-content-center align-items-center">
                     <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
-                        <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+                            <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #fff;" />
                     </MudBadge>
-                    <div class="d-flex align-items-center gap-1 mr-2">
+                        <div class="mr-8">
+                            <MudIcon Icon="@Icons.Material.Filled.Search" Style="color: #fff;" />
+                        </div>
+                    @* <div class="d-flex align-items-center gap-1 mr-2">
                         <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-                        @* <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Medium" aria-label="search"></MudIconButton> *@
-                    </div>
+                        
+                    </div> *@
+
                     @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                     <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                        <MudText Typo="Typo.body2">Valerie Luna</MudText>
+                        <MudText Typo="Typo.body2">@Kary?.NMKAR</MudText>
                         <MudAvatar>
                             <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
                         </MudAvatar>
@@ -203,12 +210,16 @@
 @inject NavigationManager NavigationManager;
 @inject IDialogService DialogService
 @inject IJSRuntime JSRuntime
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject AppDbContext dbContext
 @code {
     bool _drawerOpen = true;
 
     bool isDoctor = false;
 
     string path = "";
+
+    Models.MKARY Kary;
 
     public string Search { get; set; }
 
@@ -322,6 +333,17 @@
         isDoctor = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("dokter");
         path = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
         NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var kary = await ProtectedSessionStore.GetAsync<Models.MKARY>("user");
+
+            Kary = kary.Value;
+            StateHasChanged();
+        }
     }
 
     // Reset some variables on route change
