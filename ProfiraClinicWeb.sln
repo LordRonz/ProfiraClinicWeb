@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProfiraClinicWeb", "Profira
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProfiraClinicWeb.Client", "ProfiraClinicWeb\ProfiraClinicWeb.Client\ProfiraClinicWeb.Client.csproj", "{3BB1D243-DE33-4CF0-ABE5-E3CB23D7732F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfiraClinicWebAPI", "ProfiraClinicWebAPI\ProfiraClinicWebAPI.csproj", "{7B9DC6AE-C3EA-43CF-9BB5-D41DFD9E255B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3BB1D243-DE33-4CF0-ABE5-E3CB23D7732F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BB1D243-DE33-4CF0-ABE5-E3CB23D7732F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BB1D243-DE33-4CF0-ABE5-E3CB23D7732F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B9DC6AE-C3EA-43CF-9BB5-D41DFD9E255B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B9DC6AE-C3EA-43CF-9BB5-D41DFD9E255B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B9DC6AE-C3EA-43CF-9BB5-D41DFD9E255B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B9DC6AE-C3EA-43CF-9BB5-D41DFD9E255B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
