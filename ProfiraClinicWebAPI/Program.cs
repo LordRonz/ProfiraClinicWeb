@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProfiraClinicWebAPI.Config;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
 using System.Text;
@@ -50,6 +51,8 @@ builder.Services.AddScoped<AppDbContext>();
 
 builder.Services.AddDbContextFactory<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clients"));
 
 ConfigurationHelper.Configuration = builder.Configuration;
 

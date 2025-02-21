@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using ProfiraClinicWebAPI.Config;
 using ProfiraClinicWebAPI.Model;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -8,22 +10,27 @@ namespace ProfiraClinicWebAPI.Services
 {
     public interface IAuthService
     {
-        LoginModel? Authenticate(string username, string password);
+        LoginModel? Authenticate(string password);
         string GenerateToken(LoginModel user);
     }
 
-    public class AuthService : IAuthService
+    public class AuthService(IConfiguration config, IOptions<List<Client>> clientsOptions) : IAuthService
     {
-        private readonly IConfiguration _config;
+        private readonly IConfiguration _config = config;
+        private readonly List<Client> _clients = clientsOptions.Value;
 
-        public AuthService(IConfiguration config) => _config = config;
-
-        public LoginModel? Authenticate(string username, string password)
+        public LoginModel? Authenticate(string password)
         {
-            // Replace with actual database check
-            if (username == "admin" && password == "admin")
-                return new LoginModel { Username = username };
-            return null;
+            var client = _clients.FirstOrDefault(c => c.ClientSecret == password);
+
+            if (client == null)
+                return null;
+
+            return new LoginModel
+            {
+                Username = client.ClientId,
+                Password = client.ClientSecret,
+            };
         }
 
         public string GenerateToken(LoginModel user)
@@ -33,9 +40,9 @@ namespace ProfiraClinicWebAPI.Services
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, "Admin") // Add roles as needed
-        };
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, "Client"),
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
