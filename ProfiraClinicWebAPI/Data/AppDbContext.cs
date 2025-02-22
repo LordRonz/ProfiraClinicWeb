@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProfiraClinicWebApi.Model;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 
@@ -14,7 +15,9 @@ namespace ProfiraClinicWebAPI.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
+            optionsBuilder.UseSqlServer(_config.GetConnectionString("DatabaseConnection"));
         }
+
+        public DbSet<MCustomer> MCustomer { get; set; }
     }
 }

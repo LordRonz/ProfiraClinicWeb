@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinicWeb.Models;
 using System.Collections.Generic;
 
+// Pasien
+
 namespace ProfiraClinicWeb.Data
 {
     public class AppDbContext : DbContext
