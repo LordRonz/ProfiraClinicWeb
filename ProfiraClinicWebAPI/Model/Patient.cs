@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ProfiraClinicWebApi.Model
+namespace ProfiraClinicWebAPI.Model
 {
     public class MCustomer
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ProfiraClinicWebApi.Model;
+using ProfiraClinicWebAPI.Model;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 
@@ -19,5 +19,8 @@ namespace ProfiraClinicWebAPI.Data
         }
 
         public DbSet<MCustomer> MCustomer { get; set; }
+        public DbSet<MKARY> MKARY { get; set; }
+        public DbSet<MKlinik> MKlinik { get; set; }
+        public DbSet<Appointment> Appointment { get; set; }
     }
 }
