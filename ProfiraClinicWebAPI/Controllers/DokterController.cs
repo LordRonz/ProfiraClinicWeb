@@ -8,27 +8,27 @@ namespace ProfiraClinicWebAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class PatientController : ControllerBase
+    public class DokterController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public PatientController(AppDbContext context)
+        public DokterController(AppDbContext context)
         {
             _context = context;
         }
 
         // GET: api/items
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MCustomer>>> GetItems()
+        public async Task<ActionResult<IEnumerable<MKARY>>> GetItems()
         {
-            return _context.MCustomer.ToList();
+            return _context.MKARY.ToList();
         }
 
         // GET: api/items/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<MCustomer>> GetItem(int id)
+        public async Task<ActionResult<MKARY>> GetItem(int id)
         {
-            var item = await _context.MCustomer.FindAsync(id);
+            var item = await _context.MKARY.FindAsync(id);
 
             if (item == null)
                 return NotFound();
