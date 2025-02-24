@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProfiraClinicWebAPI.Model;
 using ProfiraClinicWebAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -34,6 +35,24 @@ namespace ProfiraClinicWebAPI.Controllers
                 return NotFound();
 
             return item;
+        }
+
+        public class BodyListOr
+        {
+            public string param { get; set; } = "%";
+            public string getParam { get => this.param.Equals("%") ? this.param : $"%{this.param}%"; }
+        }
+
+        [HttpPost]
+        public List<MCustomer> GetDivisiListOr([FromBody] BodyListOr body)
+        {
+            return _context.MCustomer
+                .Where(d => (EF.Functions.Like(d.KDCUS, body.getParam) ||
+                             EF.Functions.Like(d.ALAMAT, body.getParam) || 
+                             EF.Functions.Like(d.KDCUS, body.getParam) ||
+                             EF.Functions.Like(d.NOMHP, body.getParam)))
+                .OrderBy(d => d.KDCUS)
+                .ToList();
         }
     }
 }
