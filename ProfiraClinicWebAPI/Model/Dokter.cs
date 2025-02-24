@@ -2,6 +2,7 @@
 
 namespace ProfiraClinicWebAPI.Model
 {
+    // DOKTER
     public class MKARY
     {
         [Key]

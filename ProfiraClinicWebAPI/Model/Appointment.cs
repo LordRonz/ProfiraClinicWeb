@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinicWebAPI.Model
 {
+    // APPOINTMENT
     public class Appointment
     {
         [Column(TypeName = "nchar(10)")]
@@ -21,6 +23,7 @@ namespace ProfiraClinicWebAPI.Model
         public DateTime? TgApp { get; set; }
         public DateTime? JmApp { get; set; }
 
+        [Key]
         [Column(TypeName = "nchar(10)")]
         public string? KdTer { get; set; }
 

@@ -22,5 +22,6 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<MKARY> MKARY { get; set; }
         public DbSet<MKlinik> MKlinik { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
+        public DbSet<PPERH> PPERH { get; set; }
     }
 }
