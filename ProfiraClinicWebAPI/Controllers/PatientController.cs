@@ -9,14 +9,9 @@ namespace ProfiraClinicWebAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class PatientController : ControllerBase
+    public class PatientController(AppDbContext context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public PatientController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         // GET: api/items
         [HttpGet]
@@ -27,7 +22,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // GET: api/items/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<MCustomer>> GetItem(int id)
+        public async Task<ActionResult<MCustomer>> GetItem(string id)
         {
             var item = await _context.MCustomer.FindAsync(id);
 
@@ -37,20 +32,20 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class BodyListOr
+        public class PatientBodyListOr
         {
-            public string param { get; set; } = "%";
-            public string getParam { get => this.param.Equals("%") ? this.param : $"%{this.param}%"; }
+            public string Param { get; set; } = "%";
+            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
         }
 
         [HttpPost]
-        public List<MCustomer> GetDivisiListOr([FromBody] BodyListOr body)
+        public List<MCustomer> GetCustomerListOr([FromBody] PatientBodyListOr body)
         {
             return _context.MCustomer
-                .Where(d => (EF.Functions.Like(d.KDCUS, body.getParam) ||
-                             EF.Functions.Like(d.ALAMAT, body.getParam) || 
-                             EF.Functions.Like(d.KDCUS, body.getParam) ||
-                             EF.Functions.Like(d.NOMHP, body.getParam)))
+                .Where(d => (EF.Functions.Like(d.KDCUS, body.GetParam) ||
+                             EF.Functions.Like(d.ALAMAT, body.GetParam) ||
+                             EF.Functions.Like(d.KDCUS, body.GetParam) ||
+                             EF.Functions.Like(d.NOMHP, body.GetParam)))
                 .OrderBy(d => d.KDCUS)
                 .ToList();
         }
