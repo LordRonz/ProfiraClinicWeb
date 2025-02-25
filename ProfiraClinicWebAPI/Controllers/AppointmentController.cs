@@ -8,14 +8,9 @@ namespace ProfiraClinicWebAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class AppointmentController : ControllerBase
+    public class AppointmentController(AppDbContext context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public AppointmentController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         // GET: api/items
         [HttpGet]
@@ -26,7 +21,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // GET: api/items/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Appointment>> GetItem(int id)
+        public async Task<ActionResult<Appointment>> GetItem(string id)
         {
             var item = await _context.Appointment.FindAsync(id);
 

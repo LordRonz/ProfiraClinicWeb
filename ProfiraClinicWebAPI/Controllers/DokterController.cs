@@ -9,14 +9,9 @@ namespace ProfiraClinicWebAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class DokterController : ControllerBase
+    public class DokterController(AppDbContext context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public DokterController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         // GET: api/items
         [HttpGet]
@@ -27,7 +22,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // GET: api/items/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<MKARY>> GetItem(int id)
+        public async Task<ActionResult<MKARY>> GetItem(string id)
         {
             var item = await _context.MKARY.FindAsync(id);
 
