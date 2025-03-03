@@ -42,11 +42,11 @@ namespace ProfiraClinicWebAPI.Controllers
         public List<MCustomer> GetCustomerListOr([FromBody] PatientBodyListOr body)
         {
             return _context.MCustomer
-                .Where(d => (EF.Functions.Like(d.KDCUS, body.GetParam) ||
+                .Where(d => (EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
                              EF.Functions.Like(d.ALAMAT, body.GetParam) ||
-                             EF.Functions.Like(d.KDCUS, body.GetParam) ||
-                             EF.Functions.Like(d.NOMHP, body.GetParam)))
-                .OrderBy(d => d.KDCUS)
+                             EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
+                             EF.Functions.Like(d.NomorHP, body.GetParam)))
+                .OrderBy(d => d.KodeCustomer)
                 .ToList();
         }
     }

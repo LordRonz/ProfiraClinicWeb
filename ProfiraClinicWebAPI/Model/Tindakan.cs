@@ -4,20 +4,20 @@ using System.ComponentModel.DataAnnotations;
 namespace ProfiraClinicWebAPI.Model
 {
     // TINDAKAN
-    public class PPERH
+    public class PPerawatanH
     {
         [Column(TypeName = "char(10)")]
-        public string KdJns { get; set; }
+        public string KodeJenis { get; set; }
 
         [Column(TypeName = "char(10)")]
-        public string KdGrp { get; set; }
+        public string KodeGroup { get; set; }
 
         [Key]
         [Column(TypeName = "char(10)")]
-        public string KdPer { get; set; }
+        public string KodePerawatan { get; set; }
 
         [Column(TypeName = "varchar(50)")]
-        public string? NmPer { get; set; }
+        public string? NamaPerawatan { get; set; }
 
         [Column(TypeName = "numeric(12,2)")]
         [Required]
@@ -25,11 +25,11 @@ namespace ProfiraClinicWebAPI.Model
 
         [Column(TypeName = "numeric(11,3)")]
         [Required]
-        public decimal Dismb { get; set; } = 0;
+        public decimal DiscMember { get; set; } = 0;
 
         [Column(TypeName = "numeric(11,3)")]
         [Required]
-        public decimal Disnm { get; set; } = 0;
+        public decimal DiscNonMember { get; set; } = 0;
 
         [Required]
         public int Point { get; set; } = 0;

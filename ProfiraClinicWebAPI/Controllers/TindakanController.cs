@@ -15,16 +15,16 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // GET: api/items
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PPERH>>> GetItems()
+        public async Task<ActionResult<IEnumerable<PPerawatanH>>> GetItems()
         {
-            return _context.PPERH.ToList();
+            return _context.PPerawatanH.ToList();
         }
 
         // GET: api/items/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<PPERH>> GetItem(string id)
+        public async Task<ActionResult<PPerawatanH>> GetItem(string id)
         {
-            var item = await _context.PPERH.FindAsync(id);
+            var item = await _context.PPerawatanH.FindAsync(id);
 
             if (item == null)
                 return NotFound();
@@ -39,14 +39,14 @@ namespace ProfiraClinicWebAPI.Controllers
         }
 
         [HttpPost]
-        public List<PPERH> GetDivisiListOr([FromBody] TindakanBodyListOr body)
+        public List<PPerawatanH> GetDivisiListOr([FromBody] TindakanBodyListOr body)
         {
-            return _context.PPERH
-                .Where(d => (EF.Functions.Like(d.KdJns, body.GetParam) ||
-                             EF.Functions.Like(d.KdGrp, body.GetParam) ||
-                             EF.Functions.Like(d.KdPer, body.GetParam) ||
-                             EF.Functions.Like(d.NmPer, body.GetParam)))
-                .OrderBy(d => d.KdPer)
+            return _context.PPerawatanH
+                .Where(d => (EF.Functions.Like(d.KodeJenis, body.GetParam) ||
+                             EF.Functions.Like(d.KodeGroup, body.GetParam) ||
+                             EF.Functions.Like(d.KodePerawatan, body.GetParam) ||
+                             EF.Functions.Like(d.NamaPerawatan, body.GetParam)))
+                .OrderBy(d => d.KodePerawatan)
                 .ToList();
         }
     }
