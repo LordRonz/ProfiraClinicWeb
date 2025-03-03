@@ -10,7 +10,7 @@ namespace ProfiraClinicWebAPI.Services
 {
     public interface IAuthService
     {
-        LoginModel? Authenticate(string password);
+        LoginModel? Authenticate(string username, string password);
         string GenerateToken(LoginModel user);
     }
 
@@ -19,11 +19,13 @@ namespace ProfiraClinicWebAPI.Services
         private readonly IConfiguration _config = config;
         private readonly List<Client> _clients = clientsOptions.Value;
 
-        public LoginModel? Authenticate(string password)
+        public LoginModel? Authenticate(string username, string password)
         {
-            var client = _clients.FirstOrDefault(c => c.ClientSecret == password);
+            var client = _clients.FirstOrDefault(c => c.ClientId == username);
 
             if (client == null)
+                return null;
+            if (client.ClientSecret != password)
                 return null;
 
             return new LoginModel

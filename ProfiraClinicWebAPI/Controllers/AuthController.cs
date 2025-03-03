@@ -18,8 +18,8 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel model)
         {
-            var authenticatedUser = _authService.Authenticate(model.Password);
-            if (authenticatedUser.Equals(null))
+            var authenticatedUser = _authService.Authenticate(model.Username, model.Password);
+            if (authenticatedUser == null || authenticatedUser.Equals(null))
                 return Unauthorized();
 
             var token = _authService.GenerateToken(authenticatedUser);

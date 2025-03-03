@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProfiraClinicWebAPI.Config;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Filters;
 using ProfiraClinicWebAPI.Helper;
 using ProfiraClinicWebAPI.Services;
 using System.Text;
@@ -32,7 +33,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(new ApiResponseWrapperAttribute());
+    options.Filters.Add(new ApiExceptionFilter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
