@@ -100,7 +100,7 @@ else
             }
 
             userName = ProfiraClinicWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-            var customer = await dbContext.MKARY.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+            var customer = await dbContext.MKaryawan.Where(c => c.UserName == userName).FirstOrDefaultAsync();
 
             loaded = true;
 

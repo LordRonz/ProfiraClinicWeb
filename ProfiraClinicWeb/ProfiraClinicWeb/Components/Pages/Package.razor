@@ -24,7 +24,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var packages = await dbContext.PPKTH.OrderBy(c => c.NMPKT).Take(5).ToArrayAsync();
+        var packages = await dbContext.PPaketH.OrderBy(c => c.NMPKT).Take(5).ToArrayAsync();
 
         var dataSource = packages.Select(el =>
         {

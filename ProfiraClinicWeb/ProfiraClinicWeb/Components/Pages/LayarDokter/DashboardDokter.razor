@@ -36,11 +36,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var patients = await dbContext.MCustomer.OrderBy(c => c.NMCUS).Take(5).ToArrayAsync();
+        var patients = await dbContext.MCustomer.OrderBy(c => c.NamaCustomer).Take(5).ToArrayAsync();
 
         var dataSource = patients.Select(el =>
         {
-            return (object)new { view = "/dokter/perawatan/" + el.KDCUS, edit = "/patient/" + el.KDCUS, memberId = el.KDCUS, namaPasien = el.NMCUS, alamat = el.ALAMAT, noHp = el.NOMHP, tglLahir = el.TGLHR };
+            return (object)new { view = "/dokter/perawatan/" + el.KodeCustomer, edit = "/patient/" + el.KodeCustomer, memberId = el.KodeCustomer, namaPasien = el.NamaCustomer, alamat = el.ALAMAT, noHp = el.NomorHP, tglLahir = el.TanggalLahir };
         }
         ).ToList();
 

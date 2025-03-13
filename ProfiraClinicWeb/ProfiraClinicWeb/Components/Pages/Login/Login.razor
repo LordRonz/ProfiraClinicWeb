@@ -3,7 +3,7 @@
 @using System.Text.RegularExpressions;
 @using System.ComponentModel.DataAnnotations;
 @using ProfiraClinicWeb.Data;
-@using ProfiraClinicWeb.Models;
+@using ProfiraClinic.Models;
 @using Microsoft.EntityFrameworkCore;
 @using Color = MudBlazor.Color;
 @using BC = BCrypt.Net.BCrypt;
@@ -43,7 +43,7 @@
 @inject NavigationManager NavManager
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
-    List<MKARY> customers = new List<MKARY>();
+    List<MKaryawan> customers = new List<MKaryawan>();
 
     bool success;
     bool rememberMe = false;
@@ -105,7 +105,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        customers = await dbContext.MKARY.ToListAsync();
+        customers = await dbContext.MKaryawan.ToListAsync();
     }
 
     private void addSnackbar(string message, Severity severity = Severity.Error)
@@ -117,7 +117,7 @@
 
     public async Task OnSubmit()
     {
-        var customer = await dbContext.MKARY.Where(c => c.UserName == userName).FirstOrDefaultAsync();
+        var customer = await dbContext.MKaryawan.Where(c => c.UserName == userName).FirstOrDefaultAsync();
         if (customer == null)
         {
             addSnackbar("User not found");

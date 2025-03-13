@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @using ProfiraClinicWeb.Data
-@using ProfiraClinicWeb.Models
+@using ProfiraClinic.Models
 @using Microsoft.EntityFrameworkCore;
 
 @* <div class="page">
@@ -115,7 +115,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                     <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                        <MudText Typo="Typo.body2">@Kary?.NMKAR</MudText>
+                        <MudText Typo="Typo.body2">@Kary?.NamaKaryawan</MudText>
                         <MudAvatar>
                             <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
                         </MudAvatar>
@@ -219,7 +219,7 @@
 
     string path = "";
 
-    Models.MKARY Kary;
+    MKaryawan Kary;
 
     public string Search { get; set; }
 
@@ -339,7 +339,7 @@
     {
         if (firstRender)
         {
-            var kary = await ProtectedSessionStore.GetAsync<Models.MKARY>("user");
+            var kary = await ProtectedSessionStore.GetAsync<MKaryawan>("user");
 
             Kary = kary.Value;
             StateHasChanged();
