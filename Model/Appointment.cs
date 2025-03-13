@@ -1,9 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace ProfiraClinicWebAPI.Model
+namespace ProfiraClinic.Models
 {
-    // APPOINTMENT
     public class Appointment
     {
         [Column(TypeName = "nchar(10)")]

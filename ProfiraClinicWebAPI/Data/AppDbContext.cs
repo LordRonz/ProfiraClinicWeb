@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using ProfiraClinicWebAPI.Data.Converters;
-using ProfiraClinicWebAPI.Model;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
+using ProfiraClinic.Models;
 
 namespace ProfiraClinicWebAPI.Data
 {

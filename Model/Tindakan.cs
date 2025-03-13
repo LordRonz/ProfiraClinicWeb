@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProfiraClinicWebAPI.Model
+namespace ProfiraClinic.Models
 {
-    // TINDAKAN
     public class PPerawatanH
     {
         [Column(TypeName = "char(10)")]

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProfiraClinicWebAPI.Model;
+using ProfiraClinic.Models;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 

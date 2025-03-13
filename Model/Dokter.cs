@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ProfiraClinicWebAPI.Model
+namespace ProfiraClinic.Models
 {
-    // DOKTER
     public class MKaryawan
     {
         [Key]
