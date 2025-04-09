@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProfiraClinic.Models;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,7 +43,7 @@ namespace ProfiraClinicWebAPI.Controllers
         {
             return _context.MCustomer
                 .Where(d => (EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.ALAMAT, body.GetParam) ||
+                             EF.Functions.Like(d.AlamatDomisili, body.GetParam) ||
                              EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
                              EF.Functions.Like(d.NomorHP, body.GetParam)))
                 .OrderBy(d => d.KodeCustomer)
