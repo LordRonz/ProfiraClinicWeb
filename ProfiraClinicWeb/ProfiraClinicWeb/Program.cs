@@ -4,6 +4,7 @@ using ProfiraClinicWeb.Client.Pages;
 using ProfiraClinicWeb.Components;
 using ProfiraClinicWeb.Data;
 using ProfiraClinicWeb.Properties.Report;
+using ProfiraClinicWeb.Services;
 using ProfiraClinicWeb.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddBlazorReports();
 builder.Services.AddScoped<AppDbContext>();
 builder.Services.AddScoped<BrowserService>();
+
+var apiBaseAddress = builder.Configuration["ApiSettings:BaseAddress"];
+
+builder.Services.AddHttpClient<CustomerApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+});
+
 
 var app = builder.Build();
 

@@ -1,63 +1,93 @@
 ﻿@page "/list-pasien"
 @using System.Net.Http.Json
-@using ProfiraClinicWeb.Models
-@using ProfiraClinicWeb.Utils;
-@using ProfiraClinicWeb.Data;
-@using Microsoft.EntityFrameworkCore;
-@inject HttpClient httpClient
-
-@using PatientModel = ProfiraClinicWeb.Models.Patient
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Utils
+@using ProfiraClinicWeb.Services
+@inject CustomerApiService ApiService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <ProfiraClinicWeb.Components.Table.Table Config="PatientTableConfig" />
 </MudCard>
 
-@inject AppDbContext dbContext
 @code {
-    private bool _hidePosition;
-    private bool _loading;
-    private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
+    // Configuration for the table. It will be set once the data is loaded.
+    public TableConfig PatientTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    // Holds the list of patients
+    private List<MCustomer> Patients = new List<MCustomer>();
+
+    // This method sets up the page title.
     protected override void OnInitialized()
     {
         Layout.ChangeTitleAndRoute("Pasien", "List Pasien");
     }
 
-    private IEnumerable<PatientModel> Patients = new List<PatientModel>();
-
-    public TableConfig PatientTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
+    // When the component is initialized, call the API service to retrieve patients.
     protected override async Task OnInitializedAsync()
     {
-        var patients = await dbContext.MCustomer.OrderBy(c => c.NamaCustomer).Take(5).ToArrayAsync();
-
-        var dataSource = patients.Select(el =>
+        try
         {
-            return (object)new { view = "pasien/" + el.KodeCustomer, edit = "/patient/" + el.KodeCustomer, memberId = el.KodeCustomer, namaPasien = el.NamaCustomer, alamat = el.ALAMAT, noHp = el.NomorHP, tglLahir = el.TanggalLahir };
-        }
-        ).ToList();
+            System.Diagnostics.Debug.WriteLine("Loading patients...");
+            // Get the API response
+            var apiResponse = await ApiService.GetPatientsAsync();
+            // Check if status code indicates success
+            System.Diagnostics.Debug.WriteLine("Done");
+            if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+            {
+                Patients = apiResponse.Data;
+            }
+            else
+            {
+                // Handle API error case appropriately (e.g., display an error message)
+                // For example: show a notification, log the error etc.
+            }
 
-        PatientTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
-                new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
-                new TableColumn { Caption="Member ID", DataField="memberId" },
-                new TableColumn { Caption="Nama Pasien", DataField="namaPasien" },
-                new TableColumn { Caption="Alamat", DataField="alamat" },
-                new TableColumn { Caption="No. HP", DataField="noHp" },
-                new TableColumn { Caption="Tgl Lahir", DataField="tglLahir" },
-        }, dataSource, "/clinic/add");
+            // Prepare the table data source using the patient data retrieved from the API.
+            var dataSource = Patients.Select(el =>
+                (object)new
+                {
+                    view = $"pasien/{el.KodeCustomer}",
+                    edit = $"/patient/{el.KodeCustomer}",
+                    memberId = el.KodeCustomer,
+                    namaPasien = el.NamaCustomer,
+                    // Assuming that PatientModel has properties that map to these columns.
+                    alamat = "", // You can map the address property if available.
+                    noHp = el.NomorHP,
+                    tglLahir = el.TanggalLahir,
+                }
+            ).ToList();
+
+            PatientTableConfig = new TableConfig(
+                new List<TableColumn> {
+                    new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
+                    new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
+                    new TableColumn { Caption = "Member ID", DataField = "memberId" },
+                    new TableColumn { Caption = "Nama Pasien", DataField = "namaPasien" },
+                    new TableColumn { Caption = "Alamat", DataField = "alamat" },
+                    new TableColumn { Caption = "No. HP", DataField = "noHp" },
+                    new TableColumn { Caption = "Tgl Lahir", DataField = "tglLahir" },
+                    },
+                dataSource,
+                "/clinic/add"
+            );
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions (e.g., network errors, deserialization issues, etc.)
+            System.Console.Error.WriteLine($"Error loading patients: {ex.Message}");
+        }
     }
 
-    private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.
+    private int ChartIndex = -1; // default value cannot be 0 -> first selected index is 0.
 
     public List<ChartSeries> Series = new List<ChartSeries>()
     {
         new ChartSeries() { Name = "Sales", Data = new double[] { 4500, 5300, 6250, 7800, 9800, 15000 } },
     };
     public string[] XAxisLabels = { "January", "February", "March", "April", "May", "June" };
-
 }
