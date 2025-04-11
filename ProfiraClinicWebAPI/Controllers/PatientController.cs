@@ -8,7 +8,7 @@ namespace ProfiraClinicWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class PatientController(AppDbContext context) : ControllerBase
     {
         private readonly AppDbContext _context = context;
@@ -24,7 +24,18 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MCustomer>> GetItem(string id)
         {
-            var item = await _context.MCustomer.FindAsync(id);
+            var item = await _context.MCustomer.FindAsync(Int64.Parse(id));
+
+            if (item == null)
+                return NotFound();
+
+            return item;
+        }
+
+        [HttpGet("code/{code}")]
+        public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
+        {
+            var item = await _context.MCustomer.FirstOrDefaultAsync(c => c.KodeCustomer == code);
 
             if (item == null)
                 return NotFound();
