@@ -194,8 +194,8 @@ namespace ProfiraClinic.Models.Core
 
         public DateTime? TanggalRegistrasi { get; set; }
 
-        [Column(TypeName = "char(5)")]
-        [MaxLength(5)]
+        [Column(TypeName = "char(10)")]
+        [MaxLength(10)]
         public string? KodeLokasi { get; set; }
     }
 

@@ -8,7 +8,7 @@ namespace ProfiraClinicWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class KlinikController(AppDbContext context) : ControllerBase
     {
         private readonly AppDbContext _context = context;
