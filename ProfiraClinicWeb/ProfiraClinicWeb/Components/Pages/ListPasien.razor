@@ -47,6 +47,8 @@
                 // For example: show a notification, log the error etc.
             }
 
+            System.Diagnostics.Debug.WriteLine("Parsing to table data");
+
             // Prepare the table data source using the patient data retrieved from the API.
             var dataSource = Patients.Select(el =>
                 (object)new
@@ -79,7 +81,7 @@
         catch (Exception ex)
         {
             // Handle exceptions (e.g., network errors, deserialization issues, etc.)
-            System.Console.Error.WriteLine($"Error loading patients: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error loading patients: {ex.Message}");
         }
     }
 

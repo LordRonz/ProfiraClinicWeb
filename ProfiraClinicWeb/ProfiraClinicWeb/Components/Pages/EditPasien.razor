@@ -1,88 +1,105 @@
 ﻿@page "/pasien/{Id}/edit"
 
 @using System.Net.Http.Json
-@using ProfiraClinicWeb.Models
-@using ProfiraClinicWeb.Utils;
-@using System.Text.RegularExpressions
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Helpers
 @using System.ComponentModel.DataAnnotations
+@using ProfiraClinicWeb.Services
+@using MudBlazor
 @inject HttpClient httpClient
-@using Color = MudBlazor.Color
-
-@using PatientModel = ProfiraClinicWeb.Models.Patient
+@inject CustomerApiService CustomerApiService
+@inject NavigationManager NavigationManager
 
 <MudContainer>
     <MudText Typo="Typo.h4" Style="padding: 20px 0px;">Informasi Pasien</MudText>
     <MudCard>
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
             <MudTabPanel Text="Data Pasien">
-                <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3">
-                    <MudTextField T="string" Label="Nama Pasien" />
-                    <MudRadioGroup @bind-Value="@SelectedOption">
-                        <MudRadio Value="@("Laki-Laki")" Color="Color.Primary">Laki-Laki</MudRadio>
-                        <MudRadio Value="@("Perempuan")">Perempuan</MudRadio>
+                <MudForm @ref="form" Class="d-flex flex-column gap-3">
+                    <MudTextField T="string" Label="Nama Pasien" @bind-Value="patient.NamaCustomer" />
+
+                    <!-- Gender selection -->
+                    <MudRadioGroup T="string" Label="Jenis Kelamin" @bind-Value="selectedGender">
+                        <MudRadio T="string" Value="@("L")" Color="MudBlazor.Color.Primary">Laki-Laki</MudRadio>
+                        <MudRadio T="string" Value="@("P")">Perempuan</MudRadio>
                     </MudRadioGroup>
+
                     <MudGrid>
                         <MudItem xs="6">
                             <MudDatePicker Label="Tanggal Lahir" @bind-Date="date" />
                         </MudItem>
                         <MudItem xs="6">
-                            <MudSelect T="string" Label="Gol. Darah" AnchorOrigin="Origin.BottomCenter">
-                                <MudSelectItem Value="@("A")" />
-                                <MudSelectItem Value="@("B")" />
-                                <MudSelectItem Value="@("AB")" />
-                                <MudSelectItem Value="@("O")" />
+                            <MudSelect T="string" Label="Gol. Darah" @bind-Value="selectedBloodType" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@("A")">A</MudSelectItem>
+                                <MudSelectItem Value="@("B")">B</MudSelectItem>
+                                <MudSelectItem Value="@("AB")">AB</MudSelectItem>
+                                <MudSelectItem Value="@("O")">O</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                     </MudGrid>
+
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudSelect T="string" Label="Warga Negara" AnchorOrigin="Origin.BottomCenter">
-                                <MudSelectItem Value="@("WNI")" />
-                                <MudSelectItem Value="@("WNA")" />
+                            <MudSelect T="string" Label="Warga Negara" @bind-Value="selectedNationality" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@("WNI")">WNI</MudSelectItem>
+                                <MudSelectItem Value="@("WNA")">WNA</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudRadioGroup @bind-Value="@SelectedOption">
-                                <MudRadio Value="@("Laki-Laki")" Color="Color.Primary">Menikah</MudRadio>
-                                <MudRadio Value="@("Perempuan")">Belum Menikah</MudRadio>
+                            <MudRadioGroup T="string" Label="Status Menikah" @bind-Value="selectedMaritalStatus">
+                                <MudRadio T="string" Value="@("M")" Color="MudBlazor.Color.Primary">Menikah</MudRadio>
+                                <MudRadio T="string" Value="@("BM")">Belum Menikah</MudRadio>
                             </MudRadioGroup>
                         </MudItem>
                     </MudGrid>
-                    <MudTextField T="string" Label="Alamat" Lines="3" />
-                    <MudTextField T="string" Label="Kota" />
-                    <MudTextField T="string" Label="No. HP/WA" />
-                    <MudSelect T="string" Label="Agama" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@("Kristen")" />
-                        <MudSelectItem Value="@("Katolik")" />
-                        <MudSelectItem Value="@("Islam")" />
-                        <MudSelectItem Value="@("Buddha")" />
-                        <MudSelectItem Value="@("Hindu")" />
-                        <MudSelectItem Value="@("Lain-lain")" />
+
+                    <MudTextField T="string" Label="Alamat" Lines="3" @bind-Value="patient.AlamatDomisili" />
+                    <MudTextField T="string" Label="Kota" @bind-Value="patient.KotaDomisili" />
+                    <MudTextField T="string" Label="No. HP/WA" @bind-Value="patient.NomorHP" />
+
+                    <MudSelect T="string" Label="Agama" @bind-Value="selectedReligion" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@("Kristen")">Kristen</MudSelectItem>
+                        <MudSelectItem Value="@("Katolik")">Katolik</MudSelectItem>
+                        <MudSelectItem Value="@("Islam")">Islam</MudSelectItem>
+                        <MudSelectItem Value="@("Buddha")">Buddha</MudSelectItem>
+                        <MudSelectItem Value="@("Hindu")">Hindu</MudSelectItem>
+                        <MudSelectItem Value="@("Lain-lain")">Lain-lain</MudSelectItem>
                     </MudSelect>
-                    <MudTextField T="string" Label="No. KTP/Passport" />
-                    <MudTextField T="string" Label="Email" RequiredError="Email is required!"
-                                  Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
-                    <MudTextField T="string" Label="Profesi" />
-                    <MudSelect T="string" Label="Referensi" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Value="@("Surat Kabar")" />
-                        <MudSelectItem Value="@("Media Sosial")" />
-                        <MudSelectItem Value="@("Iklan")" />
-                        <MudSelectItem Value="@("Kenalan")" />
+
+                    <MudTextField T="string" Label="No. KTP/Passport" @bind-Value="patient.NIK" />
+                    <MudTextField T="string" Label="Email" @bind-Value="patient.Email"
+                                  Required="true" RequiredError="Email is required!"
+                                  Validation="@(new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" })" />
+                    <MudTextField T="string" Label="Profesi" @bind-Value="patient.Profesi" />
+
+                    <MudSelect T="string" Label="Referensi" @bind-Value="patient.Referensi" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem Value="@("Surat Kabar")">Surat Kabar</MudSelectItem>
+                        <MudSelectItem Value="@("Media Sosial")">Media Sosial</MudSelectItem>
+                        <MudSelectItem Value="@("Iklan")">Iklan</MudSelectItem>
+                        <MudSelectItem Value="@("Kenalan")">Kenalan</MudSelectItem>
                     </MudSelect>
-                    <MudTextField T="string" Label="Note" Lines="3" />
+
+                    <MudTextField T="string" Label="Note" Lines="3" @bind-Value="patient.Note" />
+
                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label"
                                        Variant="Variant.Filled"
-                                       Color="Color.Primary"
+                                       Color="MudBlazor.Color.Primary"
                                        StartIcon="@Icons.Material.Filled.CloudUpload"
-                                       for="@context.Id">
+                                       For="@context.Id">
                                 Upload Foto
                             </MudButton>
                         </ButtonTemplate>
                     </MudFileUpload>
-                    <MudCheckBox @bind-Value="@IsActive" Dense="true" Color="Color.Success">Active</MudCheckBox>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true">Simpan</MudButton>
+
+                    <MudCheckBox @bind-Value="patient.AKTIF" Dense="true" Color="MudBlazor.Color.Success">
+                        Active
+                    </MudCheckBox>
+
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="SubmitAsync">
+                        Simpan
+                    </MudButton>
                 </MudForm>
             </MudTabPanel>
             <MudTabPanel Text="Riwayat Awal Pasien">
@@ -98,28 +115,69 @@
     [Parameter]
     public string Id { get; set; }
 
-    public string SelectedOption { get; set; }
-    DateTime? date = DateTime.Today;
-
-    public bool IsActive { get; set; } = true;
-
+    // The patient model used for data binding.
+    private MCustomer patient = new MCustomer();
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
-    protected override void OnInitialized()
-    {
-        Layout.ChangeTitleAndRoute("Pasien", "Edit Pasien");
-    }
+    // Local UI-bound properties.
+    private DateTime? date = DateTime.Today;
+    private string selectedGender = "L"; // "L" for Laki-Laki, "P" for Perempuan.
+    private string selectedBloodType = "O";
+    private string selectedNationality = "WNI";
+    private string selectedMaritalStatus = "BM"; // "M" for Menikah, "BM" for Belum Menikah.
+    private string selectedReligion = "Islam";
 
-    bool success;
-    string[] errors = { };
-    MudTextField<string> pwField1;
     MudForm form;
 
+    // File upload handling.
     IList<IBrowserFile> files = new List<IBrowserFile>();
     private void UploadFiles(IBrowserFile file)
     {
         files.Add(file);
-        //TODO upload the files to the server
+        // TODO: Implement file upload logic as needed.
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.ChangeTitleAndRoute("Pasien", "Edit Pasien");
+
+        // Load patient data using the API.
+        var response = await CustomerApiService.GetPatientByCodeAsync(Id);
+        if (response != null && response.StatusCode == 200)
+        {
+            patient = response.Data;
+            // Map fields from the loaded patient to UI-bound properties.
+            date = patient.TanggalLahir;
+            selectedGender = patient.JenisKelamin ?? "L";
+            selectedBloodType = patient.GolonganDarah ?? "O";
+            selectedNationality = patient.WargaNegara ?? "WNI";
+            // Optionally, map additional fields.
+            selectedReligion = patient.Agama ?? "Islam";
+        }
+    }
+
+    // Called when the "Simpan" button is clicked.
+    private async Task SubmitAsync()
+    {
+        // Update patient model with UI-bound values.
+        patient.TanggalLahir = date;
+        patient.JenisKelamin = selectedGender;
+        patient.GolonganDarah = selectedBloodType;
+        patient.WargaNegara = selectedNationality;
+        patient.Agama = selectedReligion;
+        patient.StatusMember = selectedMaritalStatus; // or use another field/property if needed
+
+        // Call the API service update method.
+        var result = await CustomerApiService.UpdatePatientAsync(patient.KodeCustomer, patient);
+        if (result.StatusCode == 200)
+        {
+            NavigationManager.NavigateTo("/pasien");
+        }
+        else
+        {
+            // Here you can display a snackbar or alert message with result.Message.
+            System.Diagnostics.Debug.WriteLine(result.Message);
+        }
     }
 }

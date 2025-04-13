@@ -32,6 +32,19 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
+        public async Task<ApiResponse<MCustomer>> GetPatientByCodeAsync(String id)
+        {
+            // Replace the URL with your actual endpoint, e.g., "api/Patient"
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<MCustomer>>($"api/Patient/code/{id}");
+
+            if (response == null)
+            {
+                throw new HttpRequestException("Failed to retrieve response from API.");
+            }
+
+            return response;
+        }
+
         // Calls the create endpoint (POST: api/Patient) to create a new patient.
         public async Task<ApiResponse<MCustomer>> CreatePatientAsync(MCustomer patient)
         {
