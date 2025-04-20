@@ -32,8 +32,9 @@
 <MudSnackbarProvider/> *@
 
 <MudThemeProvider @rendermode="InteractiveServer" Theme="MyCustomTheme" />
-<MudSnackbarProvider @rendermode="InteractiveServer" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider @rendermode="InteractiveServer" />
 
 <CascadingValue Value="this">
     <MudLayout Class="bg-dark bg-opacity-25" Style='@GetBgClass()'>
@@ -64,7 +65,7 @@
                     </MudAvatar>
                     <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
 		                <div class="d-flex flex-column pa-1">
-                            <MudList Clickable="true">
+                            <MudList T="string" Clickable="true">
                                 <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                 <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
                                 <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
@@ -121,7 +122,7 @@
                         </MudAvatar>
                         <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
                             <div class="d-flex flex-column pa-1">
-                                <MudList Clickable="true">
+                                <MudList T="string" Clickable="true">
                                     <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                     <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
                                     <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
@@ -155,7 +156,7 @@
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Dashboard" : "")</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleMaster" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Description" OnClick="@ToggleMaster" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
 
                             <MudCollapse Expanded="@masterMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
@@ -165,6 +166,14 @@
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
                             </MudCollapse>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>
+
+                            <MudNavLink Icon="@Icons.Material.Filled.Build" OnClick="@ToggleSystem" Class="fw-semibold">@(_drawerOpen ? "System" : "")</MudNavLink>
+                            <MudCollapse Expanded="@systemMenuExpanded">
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/group-login"))">Setup Group Login</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/login-user"))">Setup Login User</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/password"))">Perubahan Password</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/group-auth"))">Setup Otorisasi Group</MudNavLink>
+                            </MudCollapse>
                         </MudNavMenu>
                         <MudSpacer />
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
@@ -241,12 +250,20 @@
             }
         };
 
-    bool masterMenuExpanded = true ;
+    bool masterMenuExpanded = false;
 
     // Toggle the master sub-menu in the sidebar
     void ToggleMaster()
     {
         masterMenuExpanded = !masterMenuExpanded;
+    }
+
+    bool systemMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void ToggleSystem()
+    {
+        systemMenuExpanded = !systemMenuExpanded;
     }
 
     // Existing methods...

@@ -10,13 +10,40 @@
 @inject CustomerApiService CustomerApiService
 @inject NavigationManager NavigationManager
 
-<MudContainer>
-    <MudText Typo="Typo.h4" Style="padding: 20px 0px;">Informasi Pasien</MudText>
-    <MudCard>
-        <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+<MudCard Class="p-4">
+    <MudCard Class="tab-header">
+        <MudTabs Elevation="1" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" ActiveTabClass="active-tab" TabPanelClass="tab-panel">
             <MudTabPanel Text="Data Pasien">
-                <MudForm @ref="form" Class="d-flex flex-column gap-3">
-                    <MudTextField T="string" Label="Nama Pasien" @bind-Value="patient.NamaCustomer" />
+                <MudForm @ref="form" Class="d-flex flex-column gap-3 table-form">
+                    <MudPaper Elevation="1" Class="section">
+                        <div class="section-header">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                            <span>Data Identitas</span>
+                            <small class="ml-auto">No. Rekam Medis</small>
+                        </div>
+                        <div class="section-body d-flex flex-column gap-3">
+                            <MudTextField T="string" Label="Nama Pasien" @bind-Value="patient.NamaCustomer" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudRadioGroup T="string" Label="Jenis Kelamin" @bind-Value="selectedGender">
+                                …
+                            </MudRadioGroup>
+                            <MudGrid>…</MudGrid>
+                            <!-- all your “identity” inputs -->
+                        </div>
+                    </MudPaper>
+
+                    @* ───────── Section: Alamat Sekarang ───────── *@
+                    <MudPaper Elevation="1" Class="section">
+                        <div class="section-header">
+                            <MudIcon Icon="@Icons.Material.Filled.Home" />
+                            <span>Alamat Sekarang</span>
+                        </div>
+                        <div class="section-body d-flex flex-column gap-3">
+                            <MudTextField T="string" Label="Alamat" Lines="3" @bind-Value="patient.AlamatDomisili" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                            <MudGrid>…</MudGrid>
+                            <!-- your address inputs -->
+                        </div>
+                    </MudPaper>
+                    <MudTextField T="string" Label="Nama Pasien" @bind-Value="patient.NamaCustomer" Variant="Variant.Outlined" Margin="Margin.Dense" />
 
                     <!-- Gender selection -->
                     <MudRadioGroup T="string" Label="Jenis Kelamin" @bind-Value="selectedGender">
@@ -26,10 +53,10 @@
 
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudDatePicker Label="Tanggal Lahir" @bind-Date="date" />
+                            <MudDatePicker Label="Tanggal Lahir" @bind-Date="date" Variant="Variant.Outlined" Margin="Margin.Dense" />
                         </MudItem>
                         <MudItem xs="6">
-                            <MudSelect T="string" Label="Gol. Darah" @bind-Value="selectedBloodType" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelect T="string" Label="Gol. Darah" @bind-Value="selectedBloodType" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense">
                                 <MudSelectItem Value="@("A")">A</MudSelectItem>
                                 <MudSelectItem Value="@("B")">B</MudSelectItem>
                                 <MudSelectItem Value="@("AB")">AB</MudSelectItem>
@@ -40,24 +67,24 @@
 
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudSelect T="string" Label="Warga Negara" @bind-Value="selectedNationality" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelect T="string" Label="Warga Negara" @bind-Value="selectedNationality" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense">
                                 <MudSelectItem Value="@("WNI")">WNI</MudSelectItem>
                                 <MudSelectItem Value="@("WNA")">WNA</MudSelectItem>
                             </MudSelect>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudRadioGroup T="string" Label="Status Menikah" @bind-Value="selectedMaritalStatus">
+                            <MudRadioGroup T="string" Label="Status Menikah" @bind-Value="selectedMaritalStatus" Variant="Variant.Outlined" Margin="Margin.Dense">
                                 <MudRadio T="string" Value="@("M")" Color="MudBlazor.Color.Primary">Menikah</MudRadio>
                                 <MudRadio T="string" Value="@("BM")">Belum Menikah</MudRadio>
                             </MudRadioGroup>
                         </MudItem>
                     </MudGrid>
 
-                    <MudTextField T="string" Label="Alamat" Lines="3" @bind-Value="patient.AlamatDomisili" />
-                    <MudTextField T="string" Label="Kota" @bind-Value="patient.KotaDomisili" />
-                    <MudTextField T="string" Label="No. HP/WA" @bind-Value="patient.NomorHP" />
+                    <MudTextField T="string" Label="Alamat" Lines="3" @bind-Value="patient.AlamatDomisili" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField T="string" Label="Kota" @bind-Value="patient.KotaDomisili" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField T="string" Label="No. HP/WA" @bind-Value="patient.NomorHP" Variant="Variant.Outlined" Margin="Margin.Dense" />
 
-                    <MudSelect T="string" Label="Agama" @bind-Value="selectedReligion" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelect T="string" Label="Agama" @bind-Value="selectedReligion" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense">
                         <MudSelectItem Value="@("Kristen")">Kristen</MudSelectItem>
                         <MudSelectItem Value="@("Katolik")">Katolik</MudSelectItem>
                         <MudSelectItem Value="@("Islam")">Islam</MudSelectItem>
@@ -66,32 +93,20 @@
                         <MudSelectItem Value="@("Lain-lain")">Lain-lain</MudSelectItem>
                     </MudSelect>
 
-                    <MudTextField T="string" Label="No. KTP/Passport" @bind-Value="patient.NIK" />
+                    <MudTextField T="string" Label="No. KTP/Passport" @bind-Value="patient.NIK" Variant="Variant.Outlined" Margin="Margin.Dense" />
                     <MudTextField T="string" Label="Email" @bind-Value="patient.Email"
                                   Required="true" RequiredError="Email is required!"
-                                  Validation="@(new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" })" />
-                    <MudTextField T="string" Label="Profesi" @bind-Value="patient.Profesi" />
+                                  Validation="@(new EmailAddressAttribute() { ErrorMessage = "The email address is invalid" })" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <MudTextField T="string" Label="Profesi" @bind-Value="patient.Profesi" Variant="Variant.Outlined" Margin="Margin.Dense" />
 
-                    <MudSelect T="string" Label="Referensi" @bind-Value="patient.Referensi" AnchorOrigin="Origin.BottomCenter">
+                    <MudSelect T="string" Label="Referensi" @bind-Value="patient.Referensi" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense">
                         <MudSelectItem Value="@("Surat Kabar")">Surat Kabar</MudSelectItem>
                         <MudSelectItem Value="@("Media Sosial")">Media Sosial</MudSelectItem>
                         <MudSelectItem Value="@("Iklan")">Iklan</MudSelectItem>
                         <MudSelectItem Value="@("Kenalan")">Kenalan</MudSelectItem>
                     </MudSelect>
 
-                    <MudTextField T="string" Label="Note" Lines="3" @bind-Value="patient.Note" />
-
-                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
-                        <ButtonTemplate>
-                            <MudButton HtmlTag="label"
-                                       Variant="Variant.Filled"
-                                       Color="MudBlazor.Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.CloudUpload"
-                                       For="@context.Id">
-                                Upload Foto
-                            </MudButton>
-                        </ButtonTemplate>
-                    </MudFileUpload>
+                    <MudTextField T="string" Label="Note" Lines="3" @bind-Value="patient.Note" Variant="Variant.Outlined" Margin="Margin.Dense" />
 
                     <MudCheckBox @bind-Value="patient.AKTIF" Dense="true" Color="MudBlazor.Color.Success">
                         Active
@@ -109,7 +124,7 @@
             </MudTabPanel>
         </MudTabs>
     </MudCard>
-</MudContainer>
+</MudCard>
 
 @code {
     [Parameter]
@@ -181,3 +196,79 @@
         }
     }
 }
+
+<style>
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
+
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .active-tab {
+        background-color: rgba(162, 238, 240, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-panel {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-header {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top: none;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .section {
+        width: 100%;
+        overflow: hidden; /* clip rounded corners */
+        border-radius: 8px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        background-color: #a2eef0; /* your blue */
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+    }
+
+        .section-header .mud-icon-root {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+    .section-body {
+        padding: 1rem;
+    }
+</style>
