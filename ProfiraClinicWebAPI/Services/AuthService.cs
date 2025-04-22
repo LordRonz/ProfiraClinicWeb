@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ProfiraClinicWebAPI.Config;
+using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Model;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BCrypt.Net;
 
 namespace ProfiraClinicWebAPI.Services
 {
@@ -14,24 +17,24 @@ namespace ProfiraClinicWebAPI.Services
         string GenerateToken(LoginModel user);
     }
 
-    public class AuthService(IConfiguration config, IOptions<List<Client>> clientsOptions) : IAuthService
+    public class AuthService(IConfiguration config, IOptions<List<Client>> clientsOptions, AppDbContext context) : IAuthService
     {
         private readonly IConfiguration _config = config;
         private readonly List<Client> _clients = clientsOptions.Value;
+        private readonly AppDbContext _context = context;
 
         public LoginModel? Authenticate(string username, string password)
         {
-            var client = _clients.FirstOrDefault(c => c.ClientId == username);
-
-            if (client == null)
+            var user = _context.MUser.FirstOrDefault(x => x.UserName == username);
+            if (user == null)
                 return null;
-            if (client.ClientSecret != password)
+            var isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.Password);
+            if (!isPasswordValid)
                 return null;
 
             return new LoginModel
             {
-                Username = client.ClientId,
-                Password = client.ClientSecret,
+                Username = user.UserName,
             };
         }
 
