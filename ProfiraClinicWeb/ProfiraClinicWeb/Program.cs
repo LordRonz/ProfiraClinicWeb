@@ -36,6 +36,10 @@ builder.Services.AddHttpClient<GroupUserApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
 });
+builder.Services.AddHttpClient<UserApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+});
 
 
 var app = builder.Build();
