@@ -4,6 +4,7 @@ using ProfiraClinicWebAPI.Data.Converters;
 using ProfiraClinic.Models;
 using MCustomer = ProfiraClinic.Models.Core.MCustomer;
 using MKaryawan = ProfiraClinic.Models.Core.MKaryawan;
+using ProfiraClinic.Models.Core;
 
 namespace ProfiraClinicWebAPI.Data
 {
@@ -44,5 +45,6 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<MKlinik> MKlinik { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
         public DbSet<PPerawatanH> PPerawatanH { get; set; }
+        public DbSet<UserGroup> MUserGroup { get; set; }
     }
 }

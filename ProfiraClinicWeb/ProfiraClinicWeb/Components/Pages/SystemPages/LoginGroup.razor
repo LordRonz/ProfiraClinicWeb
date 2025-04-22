@@ -3,10 +3,10 @@
 @using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
-@inject CustomerApiService ApiService
+@inject GroupUserApiService ApiService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <ProfiraClinicWeb.Components.Table.Table Config="PatientTableConfig" />
+    <ProfiraClinicWeb.Components.Table.Table Config="UserGroupTableConfig" />
 </MudCard>
 
 @code {
@@ -16,10 +16,10 @@
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
     // Configuration for the table. It will be set once the data is loaded.
-    public TableConfig PatientTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+    public TableConfig UserGroupTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
     // Holds the list of patients
-    private List<MCustomer> Patients = new List<MCustomer>();
+    private List<UserGroup> UserGroups = new List<UserGroup>();
 
     // This method sets up the page title.
     protected override void OnInitialized()
@@ -34,12 +34,12 @@
         {
             System.Diagnostics.Debug.WriteLine("Loading patients...");
             // Get the API response
-            var apiResponse = await ApiService.GetPatientsAsync();
+            var apiResponse = await ApiService.GetUserGroupsAsync();
             // Check if status code indicates success
             System.Diagnostics.Debug.WriteLine("Done");
             if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
             {
-                Patients = apiResponse.Data;
+                UserGroups = apiResponse.Data;
             }
             else
             {
@@ -49,30 +49,22 @@
 
             System.Diagnostics.Debug.WriteLine("Parsing to table data");
 
-            // Prepare the table data source using the patient data retrieved from the API.
-            var dataSource = Patients.Select(el =>
+            var dataSource = UserGroups.Select(el =>
                 (object)new
                 {
-                    view = $"pasien/{el.KodeCustomer}",
-                    edit = $"pasien/{el.KodeCustomer}/edit",
-                    memberId = el.KodeCustomer,
-                    namaPasien = el.NamaCustomer,
-                    // Assuming that PatientModel has properties that map to these columns.
-                    alamat = "", // You can map the address property if available.
-                    noHp = el.NomorHP,
-                    tglLahir = el.TanggalLahir,
+                    view = $"group-login",
+                    edit = $"group-login/edit",
+                    memberId = el.KodeUserGroup,
+                    namaPasien = el.NamaUserGroup,
                 }
             ).ToList();
 
-            PatientTableConfig = new TableConfig(
+            UserGroupTableConfig = new TableConfig(
                 new List<TableColumn> {
                     new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
                     new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
-                    new TableColumn { Caption = "Member ID", DataField = "memberId" },
-                    new TableColumn { Caption = "Nama Pasien", DataField = "namaPasien" },
-                    new TableColumn { Caption = "Alamat", DataField = "alamat" },
-                    new TableColumn { Caption = "No. HP", DataField = "noHp" },
-                    new TableColumn { Caption = "Tgl Lahir", DataField = "tglLahir" },
+                    new TableColumn { Caption = "Kode User Group", DataField = "memberId" },
+                    new TableColumn { Caption = "Nama User Group", DataField = "namaPasien" },
 
                     new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
                             },

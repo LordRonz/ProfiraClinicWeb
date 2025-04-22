@@ -1,9 +1,11 @@
 ﻿
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProfiraClinic.Models.Core
 {
+    [Keyless]
     public class UserGroup
     {
 
