@@ -25,6 +25,7 @@ namespace ProfiraClinicWebAPI.Services
 
         public LoginModel? Authenticate(string username, string password)
         {
+            System.Diagnostics.Debug.WriteLine(username);
             var user = _context.MUser.FirstOrDefault(x => x.UserName == username);
             if (user == null)
                 return null;

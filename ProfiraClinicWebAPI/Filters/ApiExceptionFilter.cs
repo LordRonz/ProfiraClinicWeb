@@ -9,6 +9,7 @@ namespace ProfiraClinicWebAPI.Filters
         public void OnException(ExceptionContext context)
         {
             // Optionally log the exception here
+            System.Diagnostics.Debug.WriteLine(context.Exception, "An unhandled exception occurred.");
 
             var apiResponse = new ApiResponse<object>(
                 500,

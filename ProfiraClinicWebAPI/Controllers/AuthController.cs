@@ -36,10 +36,16 @@ namespace ProfiraClinicWebAPI.Controllers
             if (existingUser != null)
                 return BadRequest("User already exists");
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            string shortId = Guid
+                .NewGuid()
+                .ToString("N")[..10];
+            System.Diagnostics.Debug.WriteLine(shortId);
+            System.Diagnostics.Debug.WriteLine(hashedPassword);
             var newUser = new User
             {
                 UserName = model.Username,
                 Password = hashedPassword,
+                UserID = shortId,
             };
             await _context.MUser.AddAsync(newUser);
             await _context.SaveChangesAsync();

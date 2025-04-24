@@ -16,7 +16,7 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(50)]
         public string UserName { get; set; }
 
-        [Column(TypeName = "varchar(50)")]
+        [Column(TypeName = "varchar(100)")]
         [MaxLength(50)]
         public string Password { get; set; }
 
@@ -24,7 +24,7 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string KodeUserGroup { get; set; }
+        public string? KodeUserGroup { get; set; }
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]

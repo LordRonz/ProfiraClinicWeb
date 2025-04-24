@@ -1,4 +1,4 @@
-﻿@page "/pasien/{Id}/edit"
+﻿@page "/pasien/add"
 
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
@@ -78,8 +78,8 @@
                                                @bind-Value="selectedMaritalStatus"
                                                Variant="Variant.Outlined"
                                                Margin="Margin.Dense">
-                                        <MudSelectItem Value='@("0")'>Belum Menikah</MudSelectItem>
-                                        <MudSelectItem Value='@("1")'>Menikah</MudSelectItem>
+                                        <MudSelectItem Value='@("BM")'>Belum Menikah</MudSelectItem>
+                                        <MudSelectItem Value='@("M")'>Menikah</MudSelectItem>
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="3">
@@ -450,7 +450,7 @@
     private string selectedGender = "L"; // "L" for Laki-Laki, "P" for Perempuan.
     private string selectedBloodType = "O";
     private string selectedNationality = "WNI";
-    private string selectedMaritalStatus = "0"; // "M" for Menikah, "BM" for Belum Menikah.
+    private string selectedMaritalStatus = "BM"; // "M" for Menikah, "BM" for Belum Menikah.
     private string selectedReligion = "Islam";
 
     private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
@@ -493,11 +493,11 @@
         patient.GolonganDarah = selectedBloodType;
         patient.WargaNegara = selectedNationality;
         patient.Agama = selectedReligion;
-        patient.StatusMenikah = selectedMaritalStatus; // or use another field/property if needed
+        patient.StatusMember = selectedMaritalStatus; // or use another field/property if needed
 
         // Call the API service update method.
         var result = await CustomerApiService.UpdatePatientAsync(patient.KodeCustomer, patient);
-        if (result.StatusCode < 300)
+        if (result.StatusCode == 200)
         {
             NavigationManager.NavigateTo("/pasien");
         }
