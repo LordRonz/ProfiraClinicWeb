@@ -54,8 +54,8 @@
                                                    Label="Jenis Kelamin"
                                                    @bind-Value="selectedGender"
                                                    Row="true">
-                                        <MudRadio T="string" Value="@("0")">Laki-Laki</MudRadio>
-                                        <MudRadio T="string" Value="@("1")">Perempuan</MudRadio>
+                                        <MudRadio T="string" Value="@("0")">Perempuan</MudRadio>
+                                        <MudRadio T="string" Value="@("1")">Laki-laki</MudRadio>
                                     </MudRadioGroup>
                                 </MudItem>
                                 <MudItem xs="3">
@@ -118,6 +118,7 @@
                                         <MudSelectItem Value='@("SD")'>SD</MudSelectItem>
                                         <MudSelectItem Value='@("SMP")'>SMP</MudSelectItem>
                                         <MudSelectItem Value='@("SMA")'>SMA</MudSelectItem>
+                                        <MudSelectItem Value='@("SMK")'>SMK</MudSelectItem>
                                         <MudSelectItem Value='@("Diploma")'>Diploma</MudSelectItem>
                                         <MudSelectItem Value='@("Sarjana")'>Sarjana</MudSelectItem>
                                         <MudSelectItem Value='@("PascaSarjana")'>PascaSarjana</MudSelectItem>
@@ -230,17 +231,6 @@
                         </div>
                         <div class="section-body d-flex flex-column gap-3">
                             <MudGrid GutterSize="2">
-                                <MudItem xs="6">
-                                    <MudSelect T="string"
-                                               Label="Dokumen Identitas"
-                                               @bind-Value="patient.NamaCustomer"
-                                               Variant="Variant.Outlined"
-                                               Margin="Margin.Dense">
-                                        <MudSelectItem Value='@("KTP")'>Kartu Tanda Penduduk (KTP)</MudSelectItem>
-                                        <MudSelectItem Value='@("SIM")'>Surat Izin Mengemudi (SIM)</MudSelectItem>
-                                        <MudSelectItem Value='@("Paspor")'>Paspor</MudSelectItem>
-                                    </MudSelect>
-                                </MudItem>
                                 <MudItem xs="6">
                                     <MudTextField T="string"
                                                   Label="Nomor Kartu"
@@ -400,10 +390,6 @@
                     </MudPaper>
 
 
-                    <MudCheckBox @bind-Value="patient.AKTIF" Dense="true" Color="MudBlazor.Color.Success">
-                        Aktif
-                    </MudCheckBox>
-
                     <MudButton Variant="Variant.Filled"
                                Color="MudBlazor.Color.Primary"
                                Class="ml-auto rounded-3"
@@ -447,10 +433,10 @@
 
     // Local UI-bound properties.
     private DateTime? date = DateTime.Today;
-    private string selectedGender = "L"; // "L" for Laki-Laki, "P" for Perempuan.
+    private string selectedGender = "0"; // "0" for Perempuan, "1" for Laki Laki.
     private string selectedBloodType = "O";
     private string selectedNationality = "WNI";
-    private string selectedMaritalStatus = "0"; // "M" for Menikah, "BM" for Belum Menikah.
+    private string selectedMaritalStatus = "0"; // "0" for Belum Menikah, "1" for Menikah.
     private string selectedReligion = "Islam";
 
     private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
@@ -476,7 +462,7 @@
             patient = response.Data;
             // Map fields from the loaded patient to UI-bound properties.
             date = patient.TanggalLahir;
-            selectedGender = patient.JenisKelamin ?? "L";
+            selectedGender = patient.JenisKelamin ?? "0";
             selectedBloodType = patient.GolonganDarah ?? "O";
             selectedNationality = patient.WargaNegara ?? "WNI";
             // Optionally, map additional fields.
