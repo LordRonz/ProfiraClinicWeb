@@ -47,5 +47,8 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<PPerawatanH> PPerawatanH { get; set; }
         public DbSet<UserGroup> MUserGroup { get; set; }
         public DbSet<User> MUser { get; set; }
+        public DbSet<Referensi> MRefferensi { get; set; }
+        public DbSet<GroupPaket> GroupPaket { get; set; }
+        public DbSet<GroupPerawatan> GroupPerawatan { get; set; }
     }
 }
