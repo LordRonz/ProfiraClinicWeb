@@ -36,26 +36,26 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
-        public async Task<ApiResponse<MCustomer>> CreateUserGroupAsync(MCustomer patient)
+        public async Task<ApiResponse<UserGroup>> CreateUserGroupAsync(UserGroup userGroup)
         {
-            // POST the patient object as JSON to the API.
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/UserGroup", patient);
+            // POST the userGroup object as JSON to the API.
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/UserGroup", userGroup);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
                 // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<MCustomer>((int)responseMessage.StatusCode, $"Error creating patient: {errorMsg}");
+                return new ApiResponse<UserGroup>((int)responseMessage.StatusCode, $"Error creating user group: {errorMsg}");
             }
 
-            // Deserialize the created patient.
-            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<MCustomer>>();
+            // Deserialize the created userGroup.
+            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<UserGroup>>();
             return createdUserGroupResponse;
         }
 
         public async Task<ApiResponse<object>> UpdateUserGroupAsync(string kodeCustomer, MCustomer patient)
         {
-            // The endpoint expects a PUT request with the patient identifier in the URL.
+            // The endpoint expects a PUT request with the userGroup identifier in the URL.
             var responseMessage = await _httpClient.PutAsJsonAsync($"api/UserGroup/{kodeCustomer}", patient);
 
             if (!responseMessage.IsSuccessStatusCode)
