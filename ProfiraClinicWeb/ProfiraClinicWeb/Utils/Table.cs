@@ -8,6 +8,7 @@ namespace ProfiraClinicWeb.Utils
         Data,
         Edit,
         View,
+        Delete,
     }
 
     public class TableFilter
@@ -24,6 +25,7 @@ namespace ProfiraClinicWeb.Utils
         public ColumnType? Type { get; set; } = ColumnType.Data;
         public string? CustomIcon { get; set; }
         public MudBlazor.Color? Color { get; set; }
+        public Func<object, Task>? Action { get; set; }
     }
 
     public class TableConfig(List<TableColumn> column, List<object> dataSource, string? addRoute = "", List<TableFilter>? filters = null)

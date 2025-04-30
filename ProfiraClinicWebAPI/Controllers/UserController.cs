@@ -1,33 +1,30 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
-using System.Text.RegularExpressions;
 using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
-    public partial class PatientController(AppDbContext context) : ControllerBase
+    public class UserController(AppDbContext context) : ControllerBase
     {
         private readonly AppDbContext _context = context;
 
         // GET: api/items
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MCustomer>>> GetItems()
+        public async Task<ActionResult<IEnumerable<User>>> GetItems()
         {
-            return _context.MCustomer.ToList();
+            return _context.MUser.ToList();
         }
 
         // GET: api/items/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<MCustomer>> GetItem(string id)
+        public async Task<ActionResult<User>> GetItem(string id)
         {
-            var item = await _context.MCustomer.FindAsync(Int64.Parse(id));
+            var item = await _context.MUser.FindAsync(Int64.Parse(id));
 
             if (item == null)
                 return NotFound();
@@ -36,9 +33,9 @@ namespace ProfiraClinicWebAPI.Controllers
         }
 
         [HttpGet("code/{code}")]
-        public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
+        public async Task<ActionResult<User>> GetItemByCode(string code)
         {
-            var item = await _context.MCustomer.FirstOrDefaultAsync(c => c.KodeCustomer == code);
+            var item = await _context.MUser.FirstOrDefaultAsync(c => c.KodeUserGroup == code);
 
             if (item == null)
                 return NotFound();
@@ -46,23 +43,19 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public partial class PatientBodyListOr : BaseBodyListOr
+        public class UserListOr : BaseBodyListOr
         {
         }
 
         // POST: api/Patient/search
         // Returns a list of patients matching the search parameters.
         [HttpPost("search")]
-        public List<MCustomer> GetCustomerListOr([FromBody] PatientBodyListOr body)
+        public List<User> GetUserGroupListOr([FromBody] UserListOr body)
         {
-            System.Diagnostics.Debug.WriteLine(body.GetParam);
-            return _context.MCustomer
-                .Where(d => (EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.AlamatDomisili, body.GetParam) ||
-                             EF.Functions.Like(d.NamaCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.NomorHP, body.GetParam)))
-                .OrderBy(d => d.KodeCustomer)
+            return _context.MUser
+                .Where(d => (EF.Functions.Like(d.KodeUserGroup, body.GetParam) ||
+                             EF.Functions.Like(d.UserName, body.GetParam)))
+                .OrderBy(d => d.UPDDT)
                 .ToList();
         }
 

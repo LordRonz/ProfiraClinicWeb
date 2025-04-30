@@ -32,15 +32,16 @@
 <MudSnackbarProvider/> *@
 
 <MudThemeProvider @rendermode="InteractiveServer" Theme="MyCustomTheme" />
-<MudSnackbarProvider @rendermode="InteractiveServer" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider @rendermode="InteractiveServer" />
 
 <CascadingValue Value="this">
     <MudLayout Class="bg-dark bg-opacity-25" Style='@GetBgClass()'>
         @* Top navbar *@
 
         @if (!isDoctor) {
-            <MudAppBar Style="background: rgba(255, 192, 98, 1); z-index: 1000;" Elevation="0" Fixed="true">
+            <MudAppBar Style="background: #A2EEF0; z-index: 1000;" Elevation="0" Fixed="true">
                 @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
                 <div class="pa-4">
                     <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
@@ -64,7 +65,7 @@
                     </MudAvatar>
                     <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
 		                <div class="d-flex flex-column pa-1">
-                            <MudList Clickable="true">
+                            <MudList T="string" Clickable="true">
                                 <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                 <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
                                 <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
@@ -121,7 +122,7 @@
                         </MudAvatar>
                         <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
                             <div class="d-flex flex-column pa-1">
-                                <MudList Clickable="true">
+                                <MudList T="string" Clickable="true">
                                     <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                     <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
                                     <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
@@ -155,8 +156,24 @@
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Dashboard" : "")</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Settings" OnClick="@ToggleModal" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Description" OnClick="@ToggleMaster" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
+
+                            <MudCollapse Expanded="@masterMenuExpanded">
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Paket</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Perawatan</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Produk</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
+                            </MudCollapse>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>
+
+                            <MudNavLink Icon="@Icons.Material.Filled.Build" OnClick="@ToggleSystem" Class="fw-semibold">@(_drawerOpen ? "System" : "")</MudNavLink>
+                            <MudCollapse Expanded="@systemMenuExpanded">
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/group-login"))">Setup Group Login</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/login-user"))">Setup Login User</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/password"))">Perubahan Password</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/group-auth"))">Setup Otorisasi Group</MudNavLink>
+                            </MudCollapse>
                         </MudNavMenu>
                         <MudSpacer />
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
@@ -164,19 +181,6 @@
                     </div>
                 </div>
             </MudDrawer>
-            @if (MasterModalOpen) {
-                <div class="master-modal" style="@(_drawerOpen ? "left: 0vw;" : "left: 1vw;")">
-                    <div class="master-modal-header">
-                        <p class="align-items-center d-flex justify-content-center text-center m-0">Master</p>
-                        <MudFab Size="MudBlazor.Size.Small" IconColor="MudBlazor.Color.Default" Color="MudBlazor.Color.Transparent" StartIcon="@Icons.Material.Filled.Close" DisableElevation="true" OnClick="@CloseModal"  />
-                    </div>
-                    <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
-                    <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Paket</MudNavLink>
-                    <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Perawatan</MudNavLink>
-                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Produk</MudNavLink>
-                    <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
-                </div>
-            }
         } @* else
         {
             <MudDrawer @bind-Open="@_drawerOpen" Variant="@DrawerVariant.Temporary" Width="300px">
@@ -246,6 +250,34 @@
             }
         };
 
+    bool masterMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void ToggleMaster()
+    {
+        masterMenuExpanded = !masterMenuExpanded;
+    }
+
+    bool systemMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void ToggleSystem()
+    {
+        systemMenuExpanded = !systemMenuExpanded;
+    }
+
+    // Existing methods...
+    void OnClickMasterNav(string route)
+    {
+        if ("/" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "") == route)
+        {
+            return;
+        }
+        // Optionally collapse the menu after navigation
+        masterMenuExpanded = false;
+        NavigationManager.NavigateTo(route);
+    }
+
     // Go back in browser using Javascript on a Razor Page
     private void GoBack()
     {
@@ -312,15 +344,15 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    void OnClickMasterNav(string route)
-    {
-        if ("/" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "") == route)
-        {
-            return;
-        }
-        CloseModal();
-        NavigationManager.NavigateTo(route);
-    }
+    // void OnClickMasterNav(string route)
+    // {
+    //     if ("/" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "") == route)
+    //     {
+    //         return;
+    //     }
+    //     CloseModal();
+    //     NavigationManager.NavigateTo(route);
+    // }
 
     public bool _isProfilePopoverOpen = false;
 

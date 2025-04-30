@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
 using ProfiraClinicWebAPI.Model;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,9 +13,10 @@ namespace ProfiraClinicWebAPI.Controllers
 {
     [ApiController]
     [Route("api/auth")]
-    public class AuthController(IAuthService authService) : ControllerBase
+    public class AuthController(IAuthService authService, AppDbContext context) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
+        private readonly AppDbContext _context = context;
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel model)
@@ -23,6 +26,34 @@ namespace ProfiraClinicWebAPI.Controllers
                 return Unauthorized();
 
             var token = _authService.GenerateToken(authenticatedUser);
+            return Ok(new { Token = token });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterAsync([FromBody] LoginModel model)
+        {
+            var existingUser = _context.MUser.FirstOrDefault(x => x.UserName == model.Username);
+            if (existingUser != null)
+                return BadRequest("User already exists");
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            string shortId = Guid
+                .NewGuid()
+                .ToString("N")[..10];
+            System.Diagnostics.Debug.WriteLine(shortId);
+            System.Diagnostics.Debug.WriteLine(hashedPassword);
+            var newUser = new User
+            {
+                UserName = model.Username,
+                Password = hashedPassword,
+                UserID = shortId,
+            };
+            await _context.MUser.AddAsync(newUser);
+            await _context.SaveChangesAsync();
+
+            var loginModel = new LoginModel();
+            loginModel.Username = model.Username;
+
+            var token = _authService.GenerateToken(loginModel);
             return Ok(new { Token = token });
         }
 

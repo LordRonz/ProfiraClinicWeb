@@ -43,6 +43,7 @@
                     break;
                 case ColumnType.Edit:
                 case ColumnType.View:
+                case ColumnType.Delete:
                     <col style="width:50px;" />
                     break;
                 case null:
@@ -69,12 +70,17 @@
                     break;
                 case ColumnType.Edit:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
                     </MudTd>
                     break;
                 case ColumnType.View:
                     <MudTd DataLabel="@col.Caption">
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                    </MudTd>
+                    break;
+                case ColumnType.Delete:
+                    <MudTd DataLabel="@col.Caption">
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
                     </MudTd>
                     break;
                 case null:
@@ -116,7 +122,7 @@
 
     string GetHeaderClass()
     {
-        var defaultClass = "table-head-bordered bg-warning" + (ClassOverride ?? "");
+        var defaultClass = "table-head-bordered bg-pastel-sky" + (ClassOverride ?? "");
         return defaultClass;
     }
 
@@ -172,7 +178,7 @@
     }
 
     .filter-btn {
-        background: rgba(255, 192, 98, 0.4);
+        background: rgba(162, 238, 240, 0.4);
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
     }

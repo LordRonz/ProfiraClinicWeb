@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using ProfiraClinic.Models;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class KlinikController(AppDbContext context) : ControllerBase
     {
         private readonly AppDbContext _context = context;
@@ -32,10 +33,8 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class KlinikBodyListOr
+        public class KlinikBodyListOr : BaseBodyListOr
         {
-            public string Param { get; set; } = "%";
-            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
         }
 
         [HttpPost]

@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProfiraClinic.Models;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -32,20 +33,18 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class BodyListOr
+        public class BodyListOr: BaseBodyListOr
         {
-            public string param { get; set; } = "%";
-            public string getParam { get => this.param.Equals("%") ? this.param : $"%{this.param}%"; }
         }
 
         [HttpPost]
         public List<MKaryawan> GetDivisiListOr([FromBody] BodyListOr body)
         {
             return _context.MKaryawan
-                .Where(d => (EF.Functions.Like(d.KodeKaryawan, body.getParam) ||
-                             EF.Functions.Like(d.NamaKaryawan, body.getParam) ||
-                             EF.Functions.Like(d.Alamat1, body.getParam) ||
-                             EF.Functions.Like(d.TELP1, body.getParam)))
+                .Where(d => (EF.Functions.Like(d.KodeKaryawan, body.GetParam) ||
+                             EF.Functions.Like(d.NamaKaryawan, body.GetParam) ||
+                             EF.Functions.Like(d.Alamat, body.GetParam) ||
+                             EF.Functions.Like(d.NomorHP, body.GetParam)))
                 .OrderBy(d => d.KodeKaryawan)
                 .ToList();
         }
