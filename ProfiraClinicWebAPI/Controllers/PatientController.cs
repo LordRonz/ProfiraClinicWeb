@@ -4,66 +4,34 @@ using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using System.Text.RegularExpressions;
-using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    //[Authorize]
-    public partial class PatientController(AppDbContext context) : ControllerBase
+    public class PatientController
+    : BaseCrudController<MCustomer>
     {
-        private readonly AppDbContext _context = context;
+        public PatientController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MCustomer>>> GetItems()
-        {
-            return _context.MCustomer.ToList();
-        }
+        protected override DbSet<MCustomer> DbSet
+            => _context.MCustomer;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MCustomer>> GetItem(string id)
-        {
-            var item = await _context.MCustomer.FindAsync(Int64.Parse(id));
+        protected override IQueryable<MCustomer> ApplySearch(
+            IQueryable<MCustomer> q,
+            string likeParam)
+            => q.Where(d => (EF.Functions.Like(d.KodeCustomer, likeParam) ||
+                             EF.Functions.Like(d.AlamatDomisili, likeParam) ||
+                             EF.Functions.Like(d.NamaCustomer, likeParam) ||
+                             EF.Functions.Like(d.KodeCustomer, likeParam) ||
+                             EF.Functions.Like(d.NomorHP, likeParam)));
 
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
+        protected override IOrderedQueryable<MCustomer> ApplyOrder(
+            IQueryable<MCustomer> q)
+            => q.OrderBy(d => d.KodeCustomer);
 
         [HttpGet("code/{code}")]
         public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
         {
-            var item = await _context.MCustomer.FirstOrDefaultAsync(c => c.KodeCustomer == code);
-
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public partial class PatientBodyListOr : BaseBodyListOr
-        {
-        }
-
-        // POST: api/Patient/search
-        // Returns a list of patients matching the search parameters.
-        [HttpPost("search")]
-        public List<MCustomer> GetCustomerListOr([FromBody] PatientBodyListOr body)
-        {
-            System.Diagnostics.Debug.WriteLine(body.GetParam);
-            return _context.MCustomer
-                .Where(d => (EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.AlamatDomisili, body.GetParam) ||
-                             EF.Functions.Like(d.NamaCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.NomorHP, body.GetParam)))
-                .OrderBy(d => d.KodeCustomer)
-                .ToList();
+            return await FindOne(c => c.KodeCustomer == code);
         }
 
         // POST: api/Patient

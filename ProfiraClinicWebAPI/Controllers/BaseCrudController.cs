@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
+using System.Linq.Expressions;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -53,6 +54,17 @@ namespace ProfiraClinicWebAPI.Controllers
             var q = ApplySearch(DbSet, body.GetParam);
             q = ApplyOrder(q);
             return await q.ToListAsync();
+        }
+
+
+        /// <summary>
+        /// Core “find one by arbitrary predicate” helper.
+        /// </summary>
+        protected async Task<ActionResult<TEntity>> FindOne(
+            Expression<Func<TEntity, bool>> predicate)
+        {
+            var item = await DbSet.FirstOrDefaultAsync(predicate);
+            return item == null ? NotFound() : item;
         }
     }
 }
