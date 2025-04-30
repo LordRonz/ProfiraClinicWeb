@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -30,17 +31,15 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class GroupGroupPerawatanBodyListOr
+        public class GroupGroupPerawatanBodyListOr : BaseBodyListOr
         {
-            public string Param { get; set; } = "%";
-            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
         }
 
         [HttpPost]
         public List<GroupPerawatan> GetCustomerListOr([FromBody] GroupGroupPerawatanBodyListOr body)
         {
             return _context.GroupPerawatan
-                .Where(d => (EF.Functions.Like(d.NamaGroupPerawatan, body.GetParam)))
+                .Where(d => (EF.Functions.Like(d.NamaGroupPerawatan, body.GetParam) || EF.Functions.Like(d.KodeGroupPerawatan, body.GetParam)))
                 .OrderBy(d => d.KodeGroupPerawatan)
                 .ToList();
         }

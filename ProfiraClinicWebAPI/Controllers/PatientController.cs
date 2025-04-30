@@ -4,13 +4,15 @@ using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize]
-    public class PatientController(AppDbContext context) : ControllerBase
+    public partial class PatientController(AppDbContext context) : ControllerBase
     {
         private readonly AppDbContext _context = context;
 
@@ -44,10 +46,8 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class PatientBodyListOr
+        public partial class PatientBodyListOr : BaseBodyListOr
         {
-            public string Param { get; set; } = "%";
-            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
         }
 
         // POST: api/Patient/search
@@ -55,9 +55,11 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpPost("search")]
         public List<MCustomer> GetCustomerListOr([FromBody] PatientBodyListOr body)
         {
+            System.Diagnostics.Debug.WriteLine(body.GetParam);
             return _context.MCustomer
                 .Where(d => (EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
                              EF.Functions.Like(d.AlamatDomisili, body.GetParam) ||
+                             EF.Functions.Like(d.NamaCustomer, body.GetParam) ||
                              EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
                              EF.Functions.Like(d.NomorHP, body.GetParam)))
                 .OrderBy(d => d.KodeCustomer)

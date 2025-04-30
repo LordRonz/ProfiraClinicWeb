@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -42,10 +43,8 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class UserGroupBodyListOr
+        public class UserGroupBodyListOr : BaseBodyListOr
         {
-            public string Param { get; set; } = "%";
-            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
         }
 
         // POST: api/Patient/search

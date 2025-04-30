@@ -40,7 +40,7 @@ namespace ProfiraClinicWebAPI.Controllers
         public List<GroupPaket> GetCustomerListOr([FromBody] GroupPaketBodyListOr body)
         {
             return _context.GroupPaket
-                .Where(d => (EF.Functions.Like(d.NamaGroupPaket, body.GetParam)))
+                .Where(d => (EF.Functions.Like(d.NamaGroupPaket, body.GetParam) || EF.Functions.Like(d.KodeGroupPaket, body.GetParam)))
                 .OrderBy(d => d.KodeGroupPaket)
                 .ToList();
         }

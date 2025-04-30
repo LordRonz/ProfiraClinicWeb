@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProfiraClinic.Models;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -32,10 +33,8 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class TindakanBodyListOr
+        public class TindakanBodyListOr : BaseBodyListOr
         {
-            public string Param { get; set; } = "%";
-            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
         }
 
         [HttpPost]
