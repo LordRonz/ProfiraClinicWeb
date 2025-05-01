@@ -22,7 +22,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<List<MCustomer>>> GetPatientsAsync()
         {
             // Replace the URL with your actual endpoint, e.g., "api/Patient"
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<MCustomer>>>("api/Patient");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<MCustomer>>>("api/Patient/GetList");
 
             if (response == null)
             {
@@ -32,10 +32,10 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
-        public async Task<ApiResponse<MCustomer>> GetPatientByCodeAsync(String id)
+        public async Task<ApiResponse<MCustomer>> GetPatientByCodeAsync(String code)
         {
             // Replace the URL with your actual endpoint, e.g., "api/Patient"
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<MCustomer>>($"api/Patient/code/{id}");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<MCustomer>>($"api/Patient/GetByCode/{code}");
 
             if (response == null)
             {
@@ -49,7 +49,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<MCustomer>> CreatePatientAsync(MCustomer patient)
         {
             // POST the patient object as JSON to the API.
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/Patient", patient);
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/Patient/add", patient);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -67,7 +67,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<object>> UpdatePatientAsync(string kodeCustomer, MCustomer patient)
         {
             // The endpoint expects a PUT request with the patient identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/Patient/{kodeCustomer}", patient);
+            var responseMessage = await _httpClient.PutAsJsonAsync($"api/Patient/edit/{kodeCustomer}", patient);
 
             if (!responseMessage.IsSuccessStatusCode)
             {

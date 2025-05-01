@@ -36,18 +36,18 @@ namespace ProfiraClinicWebAPI.Controllers
         protected abstract IOrderedQueryable<TEntity> ApplyOrder(
             IQueryable<TEntity> query);
 
-        [HttpGet]
+        [HttpGet("GetList")]
         public virtual async Task<ActionResult<IEnumerable<TEntity>>> GetItems()
             => await DbSet.ToListAsync();
 
-        [HttpGet("{id}")]
-        public virtual async Task<ActionResult<TEntity>> GetItem(string id)
+        [HttpGet("GetById/{id}")]
+        public virtual async Task<ActionResult<TEntity>> GetItem(long id)
         {
             var item = await DbSet.FindAsync(id);
             return item == null ? NotFound() : item;
         }
 
-        [HttpPost("search")]
+        [HttpPost("GetListByString")]
         public virtual async Task<ActionResult<List<TEntity>>> Search(
             [FromBody] BaseBodyListOr body)
         {

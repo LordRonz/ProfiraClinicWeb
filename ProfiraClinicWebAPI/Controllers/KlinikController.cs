@@ -7,48 +7,32 @@ using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    //[Authorize]
-    public class KlinikController(AppDbContext context) : ControllerBase
+    public class KlinikController
+    : BaseCrudController<MKlinik>
     {
-        private readonly AppDbContext _context = context;
+        public KlinikController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MKlinik>>> GetItems()
+        protected override DbSet<MKlinik> DbSet
+            => _context.MKlinik;
+
+        protected override IQueryable<MKlinik> ApplySearch(
+            IQueryable<MKlinik> q,
+            string likeParam)
+            => q.Where(d => (EF.Functions.Like(d.KDLOK, likeParam) ||
+                             EF.Functions.Like(d.ALAMAT, likeParam) ||
+                             EF.Functions.Like(d.NAMAPT, likeParam) ||
+                             EF.Functions.Like(d.ALAMATPT, likeParam) ||
+                             EF.Functions.Like(d.TELP, likeParam) ||
+                             EF.Functions.Like(d.KOTAPT, likeParam)));
+
+        protected override IOrderedQueryable<MKlinik> ApplyOrder(
+            IQueryable<MKlinik> q)
+            => q.OrderBy(d => d.KDLOK);
+
+        [HttpGet("GetByCode/{code}")]
+        public async Task<ActionResult<MKlinik>> GetItemByCode(string code)
         {
-            return _context.MKlinik.ToList();
-        }
-
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MKlinik>> GetItem(string id)
-        {
-            var item = await _context.MKlinik.FindAsync(id);
-
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public class KlinikBodyListOr : BaseBodyListOr
-        {
-        }
-
-        [HttpPost]
-        public List<MKlinik> GetCustomerListOr([FromBody] KlinikBodyListOr body)
-        {
-            return _context.MKlinik
-                .Where(d => (EF.Functions.Like(d.KDLOK, body.GetParam) ||
-                             EF.Functions.Like(d.ALAMAT, body.GetParam) ||
-                             EF.Functions.Like(d.NAMAPT, body.GetParam) ||
-                             EF.Functions.Like(d.ALAMATPT, body.GetParam) ||
-                             EF.Functions.Like(d.TELP, body.GetParam) ||
-                             EF.Functions.Like(d.KOTAPT, body.GetParam)))
-                .OrderBy(d => d.KDLOK)
-                .ToList();
+            return await FindOne(c => c.KDLOK == code);
         }
     }
 }

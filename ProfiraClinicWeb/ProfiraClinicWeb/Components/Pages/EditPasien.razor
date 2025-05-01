@@ -485,7 +485,7 @@
         var result = await CustomerApiService.UpdatePatientAsync(patient.KodeCustomer, patient);
         if (result.StatusCode < 300)
         {
-            NavigationManager.NavigateTo("/pasien");
+            NavigationManager.NavigateTo("/list-pasien");
         }
         else
         {

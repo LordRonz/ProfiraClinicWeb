@@ -28,7 +28,7 @@ namespace ProfiraClinicWebAPI.Controllers
             IQueryable<MCustomer> q)
             => q.OrderBy(d => d.KodeCustomer);
 
-        [HttpGet("code/{code}")]
+        [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
         {
             return await FindOne(c => c.KodeCustomer == code);
@@ -36,7 +36,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // POST: api/Patient
         // Create a new patient record by executing a stored procedure with error handling.
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<MCustomer>> CreatePatient([FromBody] MCustomer newPatient)
         {
             if (newPatient == null)
@@ -138,7 +138,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         // PUT: api/Patient/{kode}
-        [HttpPut("{kode}")]
+        [HttpPut("edit/{kode}")]
         public async Task<IActionResult> UpdatePatient(string kode, [FromBody] MCustomer updatedPatient)
         {
             if (updatedPatient == null)
@@ -230,7 +230,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // DELETE: api/Patient/{id}
         // Delete a patient record.
-        [HttpDelete("{id}")]
+        [HttpDelete("del/{id}")]
         public async Task<IActionResult> DeletePatient(long id)
         {
             var patient = await _context.MCustomer.FindAsync(id);
