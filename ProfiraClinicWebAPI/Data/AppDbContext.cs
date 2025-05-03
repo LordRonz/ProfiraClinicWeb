@@ -51,5 +51,6 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<GroupPaket> GroupPaket { get; set; }
         public DbSet<GroupPerawatan> GroupPerawatan { get; set; }
         public DbSet<GroupBarang> GroupBarang { get; set; }
+        public DbSet<CustomerRiwayatAsal> CustomerRiwayatAsal { get; set; }
     }
 }

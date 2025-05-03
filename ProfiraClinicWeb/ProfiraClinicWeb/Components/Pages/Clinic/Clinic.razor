@@ -1,10 +1,13 @@
 ﻿@page "/clinic"
 @using System.Net.Http.Json
+@using ProfiraClinic.Models
 @using ProfiraClinicWeb.Models
 @using ProfiraClinicWeb.Data
+@using ProfiraClinicWeb.Services
 @using ProfiraClinicWeb.Utils;
 @using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
+@inject ClinicApiService ApiService
 
 @using PatientModel = ProfiraClinicWeb.Models.Patient
 
@@ -20,6 +23,8 @@
     private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
+    private List<MKlinik> clinics = new List<MKlinik>();
+
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
@@ -32,16 +37,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var patients = new List<object>()
+        var apiResponse = await ApiService.GetClinicsAsync();
+        // Check if status code indicates success
+        System.Diagnostics.Debug.WriteLine("Done");
+        if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
         {
-            (object) new { edit="/pasien/1", kode = "LOK1", namaKlinik = "Profira Manyar", alamat="Manyar Kertoarjo 72",  kota="Surabaya", telepon = "031.299292", namaPt="PT Puri Ayu Abadi" },
-            (object) new { edit="/pasien/2", kode = "LOK2", namaKlinik = "Profira Malang", alamat="Retawu 8",  kota="Malang", telepon = "081111111", namaPt="PT Cipta Ayu Abadi" },
-            (object) new { edit="/pasien/3", kode = "LOK3", namaKlinik = "Profira HR", alamat="HR Muhammad 39",  kota="Surabaya", telepon = "08283843743", namaPt="PT Sejahtera Ayu Abadi" },
-            (object) new { edit="/pasien/4", kode = "LOK4", namaKlinik = "Profira Central", alamat="Trunojoyo 39",  kota="Surabaya", telepon = "0818282822", namaPt="PT Ayu Abadi Sejahtera" },
-            (object) new { edit="/pasien/5", kode = "LOK5", namaKlinik = "Profira Makasar", alamat="Sultan Alaudin 126",  kota="Makasar", telepon = "0821299393", namaPt="PT Makmur Ayu Abadi" },
-        };
-
-        var clinics = await dbContext.MKlinik.OrderBy(c => c.KETLK).Take(5).ToArrayAsync();
+            clinics = apiResponse.Data;
+        }
+        else
+        {
+            // Handle API error case appropriately (e.g., display an error message)
+            // For example: show a notification, log the error etc.
+        }
 
         var dataSource = clinics.Select(el =>
         {

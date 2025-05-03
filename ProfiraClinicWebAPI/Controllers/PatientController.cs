@@ -21,7 +21,6 @@ namespace ProfiraClinicWebAPI.Controllers
             => q.Where(d => (EF.Functions.Like(d.KodeCustomer, likeParam) ||
                              EF.Functions.Like(d.AlamatDomisili, likeParam) ||
                              EF.Functions.Like(d.NamaCustomer, likeParam) ||
-                             EF.Functions.Like(d.KodeCustomer, likeParam) ||
                              EF.Functions.Like(d.NomorHP, likeParam)));
 
         protected override IOrderedQueryable<MCustomer> ApplyOrder(
