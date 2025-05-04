@@ -7,32 +7,25 @@ using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController(AppDbContext context) : ControllerBase
+    public class UserController
+: BaseCrudController<User>
     {
-        private readonly AppDbContext _context = context;
+        public UserController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetItems()
-        {
-            return _context.MUser.ToList();
-        }
+        protected override DbSet<User> DbSet
+            => _context.MUser;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetItem(string id)
-        {
-            var item = await _context.MUser.FindAsync(Int64.Parse(id));
+        protected override IQueryable<User> ApplySearch(
+            IQueryable<User> q,
+            string likeParam)
+            => q.Where(d => (EF.Functions.Like(d.KodeUserGroup, likeParam) ||
+                             EF.Functions.Like(d.UserName, likeParam)));
 
-            if (item == null)
-                return NotFound();
+        protected override IOrderedQueryable<User> ApplyOrder(
+            IQueryable<User> q)
+            => q.OrderBy(d => d.UPDDT);
 
-            return item;
-        }
-
-        [HttpGet("code/{code}")]
+        [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<User>> GetItemByCode(string code)
         {
             var item = await _context.MUser.FirstOrDefaultAsync(c => c.KodeUserGroup == code);
@@ -43,110 +36,40 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class UserListOr : BaseBodyListOr
-        {
-        }
-
-        // POST: api/Patient/search
-        // Returns a list of patients matching the search parameters.
-        [HttpPost("search")]
-        public List<User> GetUserGroupListOr([FromBody] UserListOr body)
-        {
-            return _context.MUser
-                .Where(d => (EF.Functions.Like(d.KodeUserGroup, body.GetParam) ||
-                             EF.Functions.Like(d.UserName, body.GetParam)))
-                .OrderBy(d => d.UPDDT)
-                .ToList();
-        }
-
         // POST: api/Patient
         // Create a new patient record by executing a stored procedure with error handling.
-        [HttpPost]
-        public async Task<ActionResult<MCustomer>> CreatePatient([FromBody] MCustomer newPatient)
+        [HttpPost("add")]
+        public async Task<ActionResult<User>> CreateUser([FromBody] User newUser)
         {
-            if (newPatient == null)
+            if (newUser == null)
             {
-                return BadRequest("Patient data is null.");
+                return BadRequest("User data is null.");
             }
+
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
 
             // Prepare SQL parameters. For nullable fields, pass DBNull.Value.
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", newPatient.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@UserID", newUser.UserID ?? (object)DBNull.Value),
         // The stored procedure generates the customer code, so pass an empty string.
-        new SqlParameter("@KodeCustomer", string.Empty),
-        new SqlParameter("@NamaCustomer", newPatient.NamaCustomer ?? (object)DBNull.Value),
-        new SqlParameter("@JenisKelamin", newPatient.JenisKelamin ?? (object)DBNull.Value),
-        new SqlParameter("@TempatLahir", newPatient.TempatLahir ?? (object)DBNull.Value),
-        new SqlParameter("@TanggalLahir", newPatient.TanggalLahir ?? (object)DBNull.Value),
-        new SqlParameter("@GolonganDarah", newPatient.GolonganDarah ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatDomisili", newPatient.AlamatDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@RTDomisili", newPatient.RTDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@RWDomisili", newPatient.RWDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanDomisili", newPatient.KelurahanDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanDomisili", newPatient.KecamatanDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KotaDomisili", newPatient.KotaDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosDomisili", newPatient.KodePosDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@WargaNegara", newPatient.WargaNegara ?? (object)DBNull.Value),
-        new SqlParameter("@EMAIL", newPatient.Email ?? (object)DBNull.Value),
-        new SqlParameter("@NomorHP", newPatient.NomorHP ?? (object)DBNull.Value),
-        new SqlParameter("@StatusMenikah", newPatient.StatusMenikah ?? (object)DBNull.Value),
-        new SqlParameter("@AGAMA", newPatient.Agama ?? (object)DBNull.Value),
-        new SqlParameter("@Hobbi", newPatient.Hobbi ?? (object)DBNull.Value),
-        new SqlParameter("@Pendidikan", newPatient.Pendidikan ?? (object)DBNull.Value),
-        new SqlParameter("@PROFESI", newPatient.Profesi ?? (object)DBNull.Value),
-        new SqlParameter("@Referensi", newPatient.Referensi ?? (object)DBNull.Value),
-        new SqlParameter("@NIK", newPatient.NIK ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatNIK", newPatient.AlamatNIK ?? (object)DBNull.Value),
-        new SqlParameter("@RTNIK", newPatient.RTNIK ?? (object)DBNull.Value),
-        new SqlParameter("@RWNIK", newPatient.RWNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanNIK", newPatient.KelurahanNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanNIK", newPatient.KecamatanNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KotaNIK", newPatient.KotaNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosNIK", newPatient.KodePosNIK ?? (object)DBNull.Value),
-        new SqlParameter("@HubunganKeluarga", newPatient.HubunganKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NamaKeluarga", newPatient.NamaKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatKeluarga", newPatient.AlamatKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@RTKeluarga", newPatient.RTKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@RWKeluarga", newPatient.RWKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanKeluarga", newPatient.KelurahanKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanKeluarga", newPatient.KecamatanKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KotaKeluarga", newPatient.KotaKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosKeluarga", newPatient.KodePosKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NomorHPKeluarga", newPatient.NomorHPKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NOTE", newPatient.Note ?? (object)DBNull.Value),
-        new SqlParameter("@AKTIF", newPatient.AKTIF ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", newPatient.USRID ?? (object)DBNull.Value),
-        // Output parameter for the new generated KodeCustomer.
-        new SqlParameter
-        {
-            ParameterName = "@NewKodeCustomer",
-            SqlDbType = System.Data.SqlDbType.Char,
-            Size = 10,
-            Direction = System.Data.ParameterDirection.Output
-        }
+        new SqlParameter("@UserName", newUser.UserName ?? (object)DBNull.Value),
+        new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
+        new SqlParameter("@KodeUserGroup", newUser.KodeUserGroup ?? (object)DBNull.Value),
+         new SqlParameter("@UserInput", newUser.UserInput ?? (object)DBNull.Value),
+         new SqlParameter("@KodeLokasi", newUser.KodeLokasi ?? (object)DBNull.Value)
     };
 
             try
             {
                 // Call the stored procedure using ExecuteSqlRawAsync.
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_MCustomer_Add " +
-                    "@KodeLokasi, @KodeCustomer, @NamaCustomer, @JenisKelamin, @TempatLahir, @TanggalLahir, " +
-                    "@GolonganDarah, @AlamatDomisili, @RTDomisili, @RWDomisili, @KelurahanDomisili, @KecamatanDomisili, " +
-                    "@KotaDomisili, @KodePosDomisili, @WargaNegara, @EMAIL, @NomorHP, @StatusMenikah, @AGAMA, @Hobbi, " +
-                    "@Pendidikan, @PROFESI, @Referensi, @NIK, @AlamatNIK, @RTNIK, @RWNIK, @KelurahanNIK, @KecamatanNIK, " +
-                    "@KotaNIK, @KodePosNIK, @HubunganKeluarga, @NamaKeluarga, @AlamatKeluarga, @RTKeluarga, @RWKeluarga, " +
-                    "@KelurahanKeluarga, @KecamatanKeluarga, @KotaKeluarga, @KodePosKeluarga, @NomorHPKeluarga, @NOTE, " +
-                    "@AKTIF, @USRID, @NewKodeCustomer OUTPUT",
+                    "EXEC dbo.usp_MUser_Add " +
+                    "@UserID, @UserName, @Password, @KodeUserGroup, @UserInput, @KodeLokasi",
                     sqlParameters);
 
-                // Retrieve the value of the output parameter.
-                var newKodeCustomer = sqlParameters.Last().Value?.ToString();
-                newPatient.KodeCustomer = newKodeCustomer;
-
                 // Return the newly created patient. Adjust properties as needed.
-                return CreatedAtAction(nameof(GetItem), new { id = newPatient.IDCustomer }, newPatient);
+                return CreatedAtAction(nameof(GetItem), new { id = newUser.UserID }, newUser);
             }
             catch (SqlException ex)
             {
@@ -163,79 +86,38 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         // PUT: api/Patient/{kode}
-        [HttpPut("{kode}")]
-        public async Task<IActionResult> UpdatePatient(string kode, [FromBody] MCustomer updatedPatient)
+        [HttpPut("edit/{kode}")]
+        public async Task<IActionResult> UpdateUser(string kode, [FromBody] User updatedUser)
         {
-            if (updatedPatient == null)
+            if (updatedUser == null)
             {
-                return BadRequest("Patient data is null.");
+                return BadRequest("User data is null.");
             }
 
             // Ensure that the provided route parameter matches the patient record's key.
-            if (kode != updatedPatient.KodeCustomer)
+            if (kode != updatedUser.KodeUserGroup)
             {
-                return BadRequest("KodeCustomer mismatch between route and body.");
+                return BadRequest("KodeUser mismatch between route and body.");
             }
+
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(updatedUser.Password);
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", updatedPatient.KodeLokasi ?? (object)DBNull.Value),
-        new SqlParameter("@KodeCustomer", updatedPatient.KodeCustomer ?? (object)DBNull.Value),
-        new SqlParameter("@NamaCustomer", updatedPatient.NamaCustomer ?? (object)DBNull.Value),
-        new SqlParameter("@JenisKelamin", updatedPatient.JenisKelamin ?? (object)DBNull.Value),
-        new SqlParameter("@TempatLahir", updatedPatient.TempatLahir ?? (object)DBNull.Value),
-        new SqlParameter("@TanggalLahir", updatedPatient.TanggalLahir ?? (object)DBNull.Value),
-        new SqlParameter("@GolonganDarah", updatedPatient.GolonganDarah ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatDomisili", updatedPatient.AlamatDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@RTDomisili", updatedPatient.RTDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@RWDomisili", updatedPatient.RWDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanDomisili", updatedPatient.KelurahanDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanDomisili", updatedPatient.KecamatanDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KotaDomisili", updatedPatient.KotaDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosDomisili", updatedPatient.KodePosDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@WargaNegara", updatedPatient.WargaNegara ?? (object)DBNull.Value),
-        new SqlParameter("@EMAIL", updatedPatient.Email ?? (object)DBNull.Value),
-        new SqlParameter("@NomorHP", updatedPatient.NomorHP ?? (object)DBNull.Value),
-        new SqlParameter("@StatusMenikah", updatedPatient.StatusMenikah ?? (object)DBNull.Value),
-        new SqlParameter("@AGAMA", updatedPatient.Agama ?? (object)DBNull.Value),
-        new SqlParameter("@Hobbi", updatedPatient.Hobbi ?? (object)DBNull.Value),
-        new SqlParameter("@Pendidikan", updatedPatient.Pendidikan ?? (object)DBNull.Value),
-        new SqlParameter("@PROFESI", updatedPatient.Profesi ?? (object)DBNull.Value),
-        new SqlParameter("@Referensi", updatedPatient.Referensi ?? (object)DBNull.Value),
-        new SqlParameter("@NIK", updatedPatient.NIK ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatNIK", updatedPatient.AlamatNIK ?? (object)DBNull.Value),
-        new SqlParameter("@RTNIK", updatedPatient.RTNIK ?? (object)DBNull.Value),
-        new SqlParameter("@RWNIK", updatedPatient.RWNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanNIK", updatedPatient.KelurahanNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanNIK", updatedPatient.KecamatanNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KotaNIK", updatedPatient.KotaNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosNIK", updatedPatient.KodePosNIK ?? (object)DBNull.Value),
-        new SqlParameter("@HubunganKeluarga", updatedPatient.HubunganKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NamaKeluarga", updatedPatient.NamaKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatKeluarga", updatedPatient.AlamatKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@RTKeluarga", updatedPatient.RTKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@RWKeluarga", updatedPatient.RWKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanKeluarga", updatedPatient.KelurahanKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanKeluarga", updatedPatient.KecamatanKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KotaKeluarga", updatedPatient.KotaKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosKeluarga", updatedPatient.KodePosKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NomorHPKeluarga", updatedPatient.NomorHPKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NOTE", updatedPatient.Note ?? (object)DBNull.Value),
-        new SqlParameter("@AKTIF", updatedPatient.AKTIF ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", updatedPatient.USRID ?? (object)DBNull.Value)
+        new SqlParameter("@UserID", updatedUser.UserID ?? (object)DBNull.Value),
+        // The stored procedure generates the customer code, so pass an empty string.
+        new SqlParameter("@UserName", updatedUser.UserName ?? (object)DBNull.Value),
+        new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
+        new SqlParameter("@KodeUserGroup", updatedUser.KodeUserGroup ?? (object)DBNull.Value),
+         new SqlParameter("@UserInput", updatedUser.UserInput ?? (object)DBNull.Value),
+         new SqlParameter("@KodeLokasi", updatedUser.KodeLokasi ?? (object)DBNull.Value)
     };
 
             try
             {
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_MCustomer_Edit " +
-                    "@KodeLokasi, @KodeCustomer, @NamaCustomer, @JenisKelamin, @TempatLahir, @TanggalLahir, " +
-                    "@GolonganDarah, @AlamatDomisili, @RTDomisili, @RWDomisili, @KelurahanDomisili, @KecamatanDomisili, " +
-                    "@KotaDomisili, @KodePosDomisili, @WargaNegara, @EMAIL, @NomorHP, @StatusMenikah, @AGAMA, @Hobbi, " +
-                    "@Pendidikan, @PROFESI, @Referensi, @NIK, @AlamatNIK, @RTNIK, @RWNIK, @KelurahanNIK, @KecamatanNIK, " +
-                    "@KotaNIK, @KodePosNIK, @HubunganKeluarga, @NamaKeluarga, @AlamatKeluarga, @RTKeluarga, @RWKeluarga, " +
-                    "@KelurahanKeluarga, @KecamatanKeluarga, @KotaKeluarga, @KodePosKeluarga, @NomorHPKeluarga, @NOTE, " +
-                    "@AKTIF, @USRID",
+                    "EXEC dbo.usp_MUser_Edit " +
+                    "@UserID, @UserName, @Password, @KodeUserGroup, @UserInput, @KodeLokasi",
                     sqlParameters);
 
                 return NoContent();
@@ -255,25 +137,19 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // DELETE: api/Patient/{id}
         // Delete a patient record.
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePatient(long id)
+        [HttpDelete("del/{id}")]
+        public async Task<IActionResult> DeleteUser(long id)
         {
-            var patient = await _context.MCustomer.FindAsync(id);
+            var patient = await _context.MUser.FindAsync(id);
             if (patient == null)
             {
                 return NotFound();
             }
 
-            _context.MCustomer.Remove(patient);
+            _context.MUser.Remove(patient);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        // Helper method to verify if a patient exists.
-        private bool PatientExists(long id)
-        {
-            return _context.MCustomer.Any(e => e.IDCustomer == id);
         }
     }
 }

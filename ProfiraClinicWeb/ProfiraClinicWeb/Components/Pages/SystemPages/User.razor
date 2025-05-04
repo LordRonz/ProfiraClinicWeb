@@ -52,8 +52,8 @@
             var dataSource = Users.Select(el =>
                 (object)new
                 {
-                    view = $"group-login",
-                    edit = $"group-login/edit",
+                    view = $"login-user/{el.UserID}",
+                    edit = $"group-login/edit/{el.UserID}",
                     memberId = el.UserID,
                     namaPasien = el.UserName,
                     groupLogin = el.KodeUserGroup,
@@ -80,12 +80,4 @@
             System.Diagnostics.Debug.WriteLine($"Error loading patients: {ex.Message}");
         }
     }
-
-    private int ChartIndex = -1; // default value cannot be 0 -> first selected index is 0.
-
-    public List<ChartSeries> Series = new List<ChartSeries>()
-    {
-        new ChartSeries() { Name = "Sales", Data = new double[] { 4500, 5300, 6250, 7800, 9800, 15000 } },
-    };
-    public string[] XAxisLabels = { "January", "February", "March", "April", "May", "June" };
 }

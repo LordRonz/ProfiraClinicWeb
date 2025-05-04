@@ -7,32 +7,25 @@ using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserGroupController(AppDbContext context) : ControllerBase
+    public class UserGroupController
+: BaseCrudController<UserGroup>
     {
-        private readonly AppDbContext _context = context;
+        public UserGroupController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserGroup>>> GetItems()
-        {
-            return _context.MUserGroup.ToList();
-        }
+        protected override DbSet<UserGroup> DbSet
+            => _context.MUserGroup;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserGroup>> GetItem(string id)
-        {
-            var item = await _context.MUserGroup.FindAsync(Int64.Parse(id));
+        protected override IQueryable<UserGroup> ApplySearch(
+            IQueryable<UserGroup> q,
+            string likeParam)
+            => q.Where(d => (EF.Functions.Like(d.KodeUserGroup, likeParam) ||
+                             EF.Functions.Like(d.NamaUserGroup, likeParam)));
 
-            if (item == null)
-                return NotFound();
+        protected override IOrderedQueryable<UserGroup> ApplyOrder(
+            IQueryable<UserGroup> q)
+            => q.OrderBy(d => d.UPDDT);
 
-            return item;
-        }
-
-        [HttpGet("code/{code}")]
+        [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<UserGroup>> GetItemByCode(string code)
         {
             var item = await _context.MUserGroup.FirstOrDefaultAsync(c => c.KodeUserGroup == code);
@@ -43,25 +36,9 @@ namespace ProfiraClinicWebAPI.Controllers
             return item;
         }
 
-        public class UserGroupBodyListOr : BaseBodyListOr
-        {
-        }
-
-        // POST: api/Patient/search
-        // Returns a list of patients matching the search parameters.
-        [HttpPost("search")]
-        public List<UserGroup> GetUserGroupListOr([FromBody] UserGroupBodyListOr body)
-        {
-            return _context.MUserGroup
-                .Where(d => (EF.Functions.Like(d.KodeUserGroup, body.GetParam) ||
-                             EF.Functions.Like(d.NamaUserGroup, body.GetParam)))
-                .OrderBy(d => d.UPDDT)
-                .ToList();
-        }
-
         // POST: api/Patient
         // Create a new patient record by executing a stored procedure with error handling.
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<UserGroup>> CreateUserGroup([FromBody] UserGroup newUserGroup)
         {
             if (newUserGroup == null)
@@ -103,7 +80,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         // PUT: api/Patient/{kode}
-        [HttpPut("{kode}")]
+        [HttpPut("edit/{kode}")]
         public async Task<IActionResult> UpdatePatient(string kode, [FromBody] UserGroup updatedUserGroup)
         {
             if (updatedUserGroup == null)
@@ -148,7 +125,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // DELETE: api/Patient/{id}
         // Delete a patient record.
-        [HttpDelete("{id}")]
+        [HttpDelete("del/{id}")]
         public async Task<IActionResult> DeletePatient(long id)
         {
             var patient = await _context.MCustomer.FindAsync(id);
@@ -161,12 +138,6 @@ namespace ProfiraClinicWebAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        // Helper method to verify if a patient exists.
-        private bool PatientExists(long id)
-        {
-            return _context.MCustomer.Any(e => e.IDCustomer == id);
         }
     }
 }

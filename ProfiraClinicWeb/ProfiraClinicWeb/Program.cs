@@ -44,6 +44,10 @@ builder.Services.AddHttpClient<ClinicApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
 });
+builder.Services.AddHttpClient<CustomerRiwayatAsalService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+});
 
 
 var app = builder.Build();
