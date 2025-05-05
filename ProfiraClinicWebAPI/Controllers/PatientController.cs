@@ -27,6 +27,19 @@ namespace ProfiraClinicWebAPI.Controllers
             IQueryable<MCustomer> q)
             => q.OrderBy(d => d.KodeCustomer);
 
+        protected override IQueryable<MCustomer> ApplyLastFilter(
+        IQueryable<MCustomer> q,
+        DateTime lastDate)
+        {
+            // Suppose your table actually uses  
+            //    RecordDate      (instead of CreatedAt)  
+            //    LastModified    (instead of UpdatedAt)
+
+            return q.Where(p =>
+                p.UPDDT > lastDate
+            );
+        }
+
         [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
         {
