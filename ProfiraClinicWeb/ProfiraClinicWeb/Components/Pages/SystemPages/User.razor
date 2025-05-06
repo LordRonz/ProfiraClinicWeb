@@ -53,7 +53,7 @@
                 (object)new
                 {
                     view = $"login-user/{el.UserID}",
-                    edit = $"group-login/edit/{el.UserID}",
+                    edit = $"login-user/edit/{el.UserID}",
                     memberId = el.UserID,
                     namaPasien = el.UserName,
                     groupLogin = el.KodeUserGroup,
@@ -71,7 +71,7 @@
                     new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
                                 },
                 dataSource,
-                "/clinic/add"
+                "/login-user/add"
             );
         }
         catch (Exception ex)

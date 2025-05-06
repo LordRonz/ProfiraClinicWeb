@@ -1,0 +1,213 @@
+﻿@page "/login-user/{Id}/edit"
+
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Helpers
+@using System.ComponentModel.DataAnnotations
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject HttpClient httpClient
+@inject GroupUserApiService GroupUserApiService
+@inject UserApiService UserApiService
+@inject NavigationManager NavigationManager
+
+<MudCard Class="p-4 h-100">
+    <MudForm @ref="form" Class="table-form">
+        <MudGrid GutterSize="3">
+            <!-- Row 1: User ID & Nama User -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Nama User"
+                              @bind-Value="userData.UserName"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Required="true" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Password Lama"
+                              @bind-Value="userData.Password"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              Margin="Margin.Dense"
+                              Required="true" />
+            </MudItem>
+
+            <!-- Row 2: Password & Confirm Password -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Password Baru"
+                              @bind-Value="userData.Password"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              Margin="Margin.Dense"
+                              Required="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Entry Ulang Password"
+                              @bind-Value="confirmPassword"
+                              Variant="Variant.Outlined"
+                              InputType="InputType.Password"
+                              Required="true"
+                              Error="passwordMismatch"
+                              Margin="Margin.Dense"
+                              ErrorText="Passwords do not match" />
+            </MudItem>
+            <!-- Optional spacer so the select isn't full‑width -->
+            <MudItem xs="12" sm="6">
+                <!-- empty to keep the grid balanced -->
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+            <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
+                Kembali
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       Type="Submit"
+                       Disabled="!form.IsValid"
+                       OnClick="SubmitAsync">
+                Simpan
+            </MudButton>
+        </MudStack>
+    </MudForm>
+</MudCard>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    // The patient model used for data binding.
+    private ProfiraClinic.Models.Core.User userData = new ProfiraClinic.Models.Core.User();
+    private MudForm form;
+    private string confirmPassword;
+    private bool passwordMismatch => !string.IsNullOrEmpty(confirmPassword) && confirmPassword != userData.Password;
+    private List<UserGroup> UserGroups = new List<UserGroup>();
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var apiResponse = await GroupUserApiService.GetUserGroupsAsync();
+        if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+            UserGroups = apiResponse.Data;
+
+        Layout.ChangeTitleAndRoute("Pengguna", "Tambah Pengguna");
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/login-user");
+    }
+
+    private async Task SubmitAsync()
+    {
+        await form.Validate();
+
+        if (passwordMismatch)
+        {
+            return;
+        }
+
+        if (form.IsValid)
+        {
+            var result = await UserApiService.UpdateUserAsync(userData.KodeUserGroup, userData);
+            if (result.StatusCode < 300)
+                NavigationManager.NavigateTo("/login-user");
+            else
+                Snackbar.Add(result.Message, Severity.Error);
+        }
+    }
+
+    [Inject]
+    private ISnackbar Snackbar { get; set; }
+}
+
+<style>
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
+
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+
+    .active-tab {
+        background-color: rgba(162, 238, 240, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-panel {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-header {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top: none;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .section {
+        width: 100%;
+        overflow: hidden; /* clip rounded corners */
+        border-radius: 8px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        background-color: #a2eef0; /* your blue */
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+    }
+
+        .section-header .mud-icon-root {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+    .section-body {
+        padding: 1rem;
+    }
+</style>
