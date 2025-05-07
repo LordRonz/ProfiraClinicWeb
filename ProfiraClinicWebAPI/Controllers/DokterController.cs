@@ -7,46 +7,34 @@ using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     [Authorize]
-    public class DokterController(AppDbContext context) : ControllerBase
+    public class DokterController
+    : BaseCrudController<Dokter>
     {
-        private readonly AppDbContext _context = context;
+        public DokterController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MKaryawan>>> GetItems()
+        protected override DbSet<Dokter> DbSet
+            => _context.Dokter;
+
+        protected override IQueryable<Dokter> ApplySearch(
+            IQueryable<Dokter> q,
+            string likeParam)
+            => q.Where(d => (EF.Functions.Like(d.DokterID, likeParam) ||
+                             EF.Functions.Like(d.KodeJenisDokter, likeParam) ||
+                             EF.Functions.Like(d.KodeJabatan, likeParam)));
+
+        protected override IOrderedQueryable<Dokter> ApplyOrder(
+            IQueryable<Dokter> q)
+            => q.OrderBy(d => d.UPDDT);
+
+        protected override IQueryable<Dokter> ApplyLastFilter(
+        IQueryable<Dokter> q,
+        DateTime lastDate)
         {
-            return _context.MKaryawan.ToList();
-        }
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MKaryawan>> GetItem(string id)
-        {
-            var item = await _context.MKaryawan.FindAsync(id);
-
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public class BodyListOr: BaseBodyListOr
-        {
-        }
-
-        [HttpPost]
-        public List<MKaryawan> GetDivisiListOr([FromBody] BodyListOr body)
-        {
-            return _context.MKaryawan
-                .Where(d => (EF.Functions.Like(d.KodeKaryawan, body.GetParam) ||
-                             EF.Functions.Like(d.NamaKaryawan, body.GetParam) ||
-                             EF.Functions.Like(d.Alamat, body.GetParam) ||
-                             EF.Functions.Like(d.NomorHP, body.GetParam)))
-                .OrderBy(d => d.KodeKaryawan)
-                .ToList();
+            return q.Where(p =>
+                p.UPDDT > lastDate
+            );
         }
     }
 }
