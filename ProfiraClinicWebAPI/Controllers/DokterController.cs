@@ -19,8 +19,9 @@ namespace ProfiraClinicWebAPI.Controllers
         protected override IQueryable<Dokter> ApplySearch(
             IQueryable<Dokter> q,
             string likeParam)
-            => q.Where(d => (EF.Functions.Like(d.DokterID, likeParam) ||
+            => q.Where(d => (EF.Functions.Like(d.KodeKaryawan, likeParam) ||
                              EF.Functions.Like(d.KodeJenisDokter, likeParam) ||
+                             EF.Functions.Like(d.KodeLokasi, likeParam) ||
                              EF.Functions.Like(d.KodeJabatan, likeParam)));
 
         protected override IOrderedQueryable<Dokter> ApplyOrder(

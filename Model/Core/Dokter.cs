@@ -10,12 +10,15 @@ using System.Threading.Tasks;
 namespace ProfiraClinic.Models.Core
 {
     [Table("PDokter")]
-    [Keyless]
     public class Dokter
     {
+        [Key]
+        [Column(TypeName = "int")]
+        public int IDDokter { get; set; }
+
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string? DokterID { get; set; }
+        public string? KodeKaryawan { get; set; }
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
@@ -27,11 +30,11 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "varchar(255)")]
         [MaxLength(255)]
-        public string Keterangan { get; set; }
+        public string? Keterangan { get; set; }
 
         [Column(TypeName = "varchar(255)")]
         [MaxLength(255)]
-        public string FOTO { get; set; }
+        public string? FOTO { get; set; }
 
         [Column(TypeName = "numeric(12,2)")]
         public decimal? PROverheadKlinik { get; set; }
@@ -44,6 +47,10 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "numeric(12,2)")]
         public decimal? PRInsentifDokter { get; set; }
+
+        [Column(TypeName = "char(10)")]
+        [MaxLength(10)]
+        public string? KodeLokasi { get; set; }
 
         public DateTime? UPDDT { get; set; }
 
