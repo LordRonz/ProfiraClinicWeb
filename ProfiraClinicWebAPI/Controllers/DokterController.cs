@@ -37,5 +37,19 @@ namespace ProfiraClinicWebAPI.Controllers
                 p.UPDDT > lastDate
             );
         }
+
+        [NonAction]
+        public override Task<ActionResult<IEnumerable<Dokter>>> GetItems(string last = null)
+            => base.GetItems(last);
+
+        [HttpGet("GetList")]
+        public async Task<IActionResult> GetList()
+        {
+            var list = await _context.DokterList
+                .FromSqlRaw("EXEC dbo.usp_PDokter_List")
+                .ToListAsync();
+
+            return Ok(list);
+        }
     }
 }

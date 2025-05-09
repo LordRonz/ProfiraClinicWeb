@@ -38,6 +38,10 @@ namespace ProfiraClinicWebAPI.Data
             }
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<DokterListDto>()
+            .HasNoKey()
+            .ToView(null);
         }
 
         public DbSet<MCustomer> MCustomer { get; set; }
@@ -53,5 +57,8 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<GroupBarang> GroupBarang { get; set; }
         public DbSet<CustomerRiwayatAsal> CustomerRiwayatAsal { get; set; }
         public DbSet<Dokter> Dokter { get; set; }
+        public DbSet<Jabatan> Jabatan { get; set; }
+        public DbSet<JenisDokter> JenisDokter { get; set; }
+        public DbSet<DokterListDto> DokterList { get; set; }
     }
 }
