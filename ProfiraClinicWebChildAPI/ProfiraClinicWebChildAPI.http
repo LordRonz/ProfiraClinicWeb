@@ -1,0 +1,6 @@
+@ProfiraClinicWebChildAPI_HostAddress = http://localhost:5207
+
+GET {{ProfiraClinicWebChildAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
