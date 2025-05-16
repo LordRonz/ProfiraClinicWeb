@@ -43,5 +43,8 @@ namespace ProfiraClinicWebChildAPI.Data
             .HasNoKey()
             .ToView(null);
         }
+
+        public DbSet<MCustomer> MCustomer { get; set; }
+
     }
 }

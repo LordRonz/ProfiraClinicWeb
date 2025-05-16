@@ -1,35 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProfiraClinic.Models.Core;
-using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using ProfiraClinicWebAPI.Helper;
-using System.Net.Http;
+using ProfiraClinicWebChildAPI.Controllers;
+using ProfiraClinicWebChildAPI.Data;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
     public class PatientController
     : BaseCrudController<MCustomer>
     {
-        private readonly IBackgroundTaskQueue _taskQueue;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly string[] _childApis;
-        private readonly ILogger<PatientController> _logger;
-
-        public PatientController(AppDbContext ctx, IBackgroundTaskQueue taskQueue, IHttpClientFactory httpClientFactory, IConfiguration config,
-        ILogger<PatientController> logger)
-            : base(ctx)
-        {
-            _taskQueue = taskQueue;
-            _httpClientFactory = httpClientFactory;
-            _logger = logger;
-
-            _childApis = config
-              .GetSection("ChildApis")
-              .Get<string[]>()
-              ?? Array.Empty<string>();
-        }
+        public PatientController(AppDbContext ctx) : base(ctx) { }
 
         protected override DbSet<MCustomer> DbSet
             => _context.MCustomer;
@@ -78,23 +60,15 @@ namespace ProfiraClinicWebAPI.Controllers
             // Prepare SQL parameters. For nullable fields, pass DBNull.Value.
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", newPatient.KodeLokasi ?? (object)DBNull.Value),
         // The stored procedure generates the customer code, so pass an empty string.
-        new SqlParameter("@KodeCustomer", string.Empty),
+        new SqlParameter("@KodeCustomer", newPatient.KodeCustomer ?? (object)DBNull.Value),
         new SqlParameter("@NamaCustomer", newPatient.NamaCustomer ?? (object)DBNull.Value),
         new SqlParameter("@JenisKelamin", newPatient.JenisKelamin ?? (object)DBNull.Value),
         new SqlParameter("@TempatLahir", newPatient.TempatLahir ?? (object)DBNull.Value),
         new SqlParameter("@TanggalLahir", newPatient.TanggalLahir ?? (object)DBNull.Value),
         new SqlParameter("@GolonganDarah", newPatient.GolonganDarah ?? (object)DBNull.Value),
         new SqlParameter("@AlamatDomisili", newPatient.AlamatDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@RTDomisili", newPatient.RTDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@RWDomisili", newPatient.RWDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanDomisili", newPatient.KelurahanDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanDomisili", newPatient.KecamatanDomisili ?? (object)DBNull.Value),
         new SqlParameter("@KotaDomisili", newPatient.KotaDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosDomisili", newPatient.KodePosDomisili ?? (object)DBNull.Value),
-        new SqlParameter("@WargaNegara", newPatient.WargaNegara ?? (object)DBNull.Value),
-        new SqlParameter("@EMAIL", newPatient.Email ?? (object)DBNull.Value),
         new SqlParameter("@NomorHP", newPatient.NomorHP ?? (object)DBNull.Value),
         new SqlParameter("@StatusMenikah", newPatient.StatusMenikah ?? (object)DBNull.Value),
         new SqlParameter("@AGAMA", newPatient.Agama ?? (object)DBNull.Value),
@@ -102,24 +76,6 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@Pendidikan", newPatient.Pendidikan ?? (object)DBNull.Value),
         new SqlParameter("@PROFESI", newPatient.Profesi ?? (object)DBNull.Value),
         new SqlParameter("@Referensi", newPatient.Referensi ?? (object)DBNull.Value),
-        new SqlParameter("@NIK", newPatient.NIK ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatNIK", newPatient.AlamatNIK ?? (object)DBNull.Value),
-        new SqlParameter("@RTNIK", newPatient.RTNIK ?? (object)DBNull.Value),
-        new SqlParameter("@RWNIK", newPatient.RWNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanNIK", newPatient.KelurahanNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanNIK", newPatient.KecamatanNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KotaNIK", newPatient.KotaNIK ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosNIK", newPatient.KodePosNIK ?? (object)DBNull.Value),
-        new SqlParameter("@HubunganKeluarga", newPatient.HubunganKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NamaKeluarga", newPatient.NamaKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@AlamatKeluarga", newPatient.AlamatKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@RTKeluarga", newPatient.RTKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@RWKeluarga", newPatient.RWKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KelurahanKeluarga", newPatient.KelurahanKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KecamatanKeluarga", newPatient.KecamatanKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KotaKeluarga", newPatient.KotaKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@KodePosKeluarga", newPatient.KodePosKeluarga ?? (object)DBNull.Value),
-        new SqlParameter("@NomorHPKeluarga", newPatient.NomorHPKeluarga ?? (object)DBNull.Value),
         new SqlParameter("@NOTE", newPatient.Note ?? (object)DBNull.Value),
         new SqlParameter("@AKTIF", newPatient.AKTIF ?? (object)DBNull.Value),
         new SqlParameter("@USRID", newPatient.USRID ?? (object)DBNull.Value),
@@ -137,14 +93,12 @@ namespace ProfiraClinicWebAPI.Controllers
             {
                 // Call the stored procedure using ExecuteSqlRawAsync.
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_MCustomer_Add " +
-                    "@KodeLokasi, @KodeCustomer, @NamaCustomer, @JenisKelamin, @TempatLahir, @TanggalLahir, " +
-                    "@GolonganDarah, @AlamatDomisili, @RTDomisili, @RWDomisili, @KelurahanDomisili, @KecamatanDomisili, " +
-                    "@KotaDomisili, @KodePosDomisili, @WargaNegara, @EMAIL, @NomorHP, @StatusMenikah, @AGAMA, @Hobbi, " +
-                    "@Pendidikan, @PROFESI, @Referensi, @NIK, @AlamatNIK, @RTNIK, @RWNIK, @KelurahanNIK, @KecamatanNIK, " +
-                    "@KotaNIK, @KodePosNIK, @HubunganKeluarga, @NamaKeluarga, @AlamatKeluarga, @RTKeluarga, @RWKeluarga, " +
-                    "@KelurahanKeluarga, @KecamatanKeluarga, @KotaKeluarga, @KodePosKeluarga, @NomorHPKeluarga, @NOTE, " +
-                    "@AKTIF, @USRID, @NewKodeCustomer OUTPUT",
+                    "EXEC dbo.sp_MCustomer_Add " +
+                    "@KodeCustomer, @NamaCustomer, @JenisKelamin, @TempatLahir, @TanggalLahir, " +
+                    "@GolonganDarah, @AlamatDomisili, " +
+                    "@KotaDomisili, @NomorHP, @StatusMenikah, @AGAMA, @Hobbi, " +
+                    "@Pendidikan, @PROFESI, @Referensi, @NOTE, " +
+                    "@AKTIF, @USRID",
                     sqlParameters);
 
                 // Retrieve the value of the output parameter.
@@ -152,36 +106,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 newPatient.KodeCustomer = newKodeCustomer;
 
                 // Return the newly created patient. Adjust properties as needed.
-                var result = CreatedAtAction(nameof(GetItem),
-                                 new { id = newPatient.IDCustomer },
-                                 newPatient);
-
-                // 🔥 fire-and-forget via background queue:
-                _ = _taskQueue.EnqueueAsync(async ct =>
-                {
-                    foreach (var baseUrl in _childApis)
-                    {
-                        // make a fresh client--you could also reuse one if you prefer
-                        var client = _httpClientFactory.CreateClient();
-                        client.BaseAddress = new Uri($"{baseUrl}/");
-
-                        try
-                        {
-                            // assumes each API exposes POST /patient/add
-                            await client.PostAsJsonAsync("api/patient/add", newPatient, ct);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(
-                              ex,
-                              "Error calling child API {ApiUrl}/patient/add",
-                              baseUrl
-                            );
-                        }
-                    }
-                });
-
-                return result;
+                return CreatedAtAction(nameof(GetItem), new { id = newPatient.IDCustomer }, newPatient);
             }
             catch (SqlException ex)
             {

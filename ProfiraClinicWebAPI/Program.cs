@@ -89,6 +89,10 @@ builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clien
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddHostedService<QueuedHostedService>();
+
+
 ConfigurationHelper.Configuration = builder.Configuration;
 
 var app = builder.Build();
