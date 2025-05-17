@@ -48,6 +48,10 @@ builder.Services.AddHttpClient<CustomerRiwayatAsalService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
 });
+builder.Services.AddHttpClient<AuthApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+});
 
 
 var app = builder.Build();

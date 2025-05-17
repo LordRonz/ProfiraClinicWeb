@@ -92,17 +92,6 @@ else
                 NavManager.NavigateTo("/admin/login");
                 return;
             }
-            var authPayload = ProfiraClinicWeb.Utils.Auth.ValidateToken(token.Value);
-            if (authPayload == null)
-            {
-                NavManager.NavigateTo("/admin/login");
-                return;
-            }
-
-            userName = ProfiraClinicWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-            var customer = await dbContext.MKaryawan.Where(c => c.UserName == userName).FirstOrDefaultAsync();
-
-            loaded = true;
 
             StateHasChanged();
         }

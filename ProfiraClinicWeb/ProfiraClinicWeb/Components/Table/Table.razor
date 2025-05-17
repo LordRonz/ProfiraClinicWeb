@@ -4,7 +4,7 @@
 
 @if (WithAdd == true) {
     <div class="d-flex justify-content-end mb-2">
-        <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
+        <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">@AddButtonText</MudButton>
     </div>
 }
 <div class="mb-5">
@@ -117,6 +117,9 @@
 
     [Parameter]
     public bool? WithAdd { get; set; } = true;
+
+    [Parameter]
+    public string? AddButtonText { get; set; } = "Tambah";
 
     private bool FilterFunc1(Dictionary<string, string> element) => FilterFunc(element, searchString1.ToLower().Trim());
 

@@ -5,6 +5,7 @@
 @using ProfiraClinicWeb.Data;
 @using ProfiraClinic.Models;
 @using Microsoft.EntityFrameworkCore;
+@using ProfiraClinicWeb.Services
 @using Color = MudBlazor.Color;
 @using BC = BCrypt.Net.BCrypt;
 
@@ -41,6 +42,7 @@
 @inject ISnackbar Snackbar
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
+@inject AuthApiService AuthApiService
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
     List<MKaryawan> customers = new List<MKaryawan>();
@@ -117,19 +119,8 @@
 
     public async Task OnSubmit()
     {
-        var customer = await dbContext.MKaryawan.Where(c => c.UserName == userName).FirstOrDefaultAsync();
-        if (customer == null)
-        {
-            addSnackbar("User not found");
-            return;
-        }
-        if (!BC.Verify(userPass, customer.UserPassword))
-        {
-            addSnackbar("Invalid username or password");
-            return;
-        }
 
-        var token = ProfiraClinicWeb.Utils.Auth.GenerateToken(customer.UserName);
+        var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass });
 
         await ProtectedSessionStore.SetAsync("token", token);
 
