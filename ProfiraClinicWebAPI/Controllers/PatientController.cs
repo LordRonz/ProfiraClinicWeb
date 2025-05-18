@@ -9,6 +9,7 @@ using System.Net.Http;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
+    [Authorize]
     public class PatientController
     : BaseCrudController<MCustomer>
     {

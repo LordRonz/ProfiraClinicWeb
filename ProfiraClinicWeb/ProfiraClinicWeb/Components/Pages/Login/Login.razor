@@ -119,14 +119,21 @@
 
     public async Task OnSubmit()
     {
+        try
+        {
+            var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass });
 
-        var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass });
+            await ProtectedSessionStore.SetAsync("token", token);
 
-        await ProtectedSessionStore.SetAsync("token", token);
+            addSnackbar("Logged In", Severity.Success);
 
-        addSnackbar("Logged In", Severity.Success);
+            NavManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            addSnackbar($"Failed to login: {ex.Message}", Severity.Error);
 
-        NavManager.NavigateTo("/");
+        }
     }
 }
 

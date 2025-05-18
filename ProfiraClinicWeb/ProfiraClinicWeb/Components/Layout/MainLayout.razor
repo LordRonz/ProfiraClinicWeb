@@ -2,6 +2,8 @@
 @using ProfiraClinicWeb.Data
 @using ProfiraClinic.Models
 @using Microsoft.EntityFrameworkCore;
+@using ProfiraClinicWeb.Helpers
+@using ProfiraClinicWeb.Services
 
 @* <div class="page">
     <div class="sidebar">
@@ -216,6 +218,8 @@
 @inject IJSRuntime JSRuntime
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject AppDbContext dbContext
+@inject ITokenProvider TokenProvider
+@inject INavigationRedirector Redirector
 @code {
     bool _drawerOpen = true;
 
@@ -369,11 +373,27 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        System.Diagnostics.Debug.WriteLine(Redirector.ShouldRedirect);
+        System.Diagnostics.Debug.WriteLine(Redirector.TargetUrl);
+        if (Redirector.ShouldRedirect && Redirector.TargetUrl != null)
+        {
+            Redirector.ShouldRedirect = false;    // reset flag
+            var url = Redirector.TargetUrl;
+            Redirector.TargetUrl = null;
+
+            NavigationManager.NavigateTo(url, forceLoad: true);
+        }
         if (firstRender)
         {
             var kary = await ProtectedSessionStore.GetAsync<MKaryawan>("user");
 
             Kary = kary.Value;
+
+            var result = await ProtectedSessionStore.GetAsync<string>("token");
+            if (result.Success && !string.IsNullOrWhiteSpace(result.Value))
+            {
+                TokenProvider.Token = result.Value;
+            }
             StateHasChanged();
         }
     }
