@@ -1,9 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Data
-@using ProfiraClinic.Models
 @using Microsoft.EntityFrameworkCore;
 @using ProfiraClinicWeb.Helpers
 @using ProfiraClinicWeb.Services
+@inject UserApiService ApiService
 
 @* <div class="page">
     <div class="sidebar">
@@ -61,12 +62,15 @@
                     <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                 <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
+                    @if (!string.IsNullOrEmpty(user?.UserName))
+                    {
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">@user.UserName</MudText>
+                    }
                     <MudAvatar>
                         <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
                     </MudAvatar>
                     <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-		                <div class="d-flex flex-column pa-1">
+                        <div class="d-flex flex-column pa-1">
                             <MudList T="string" Clickable="true">
                                 <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                 <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
@@ -74,8 +78,8 @@
                                 <MudDivider />
                                 <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
                             </MudList>
-		                </div>
-	                </MudPopover>
+                        </div>
+                    </MudPopover>
                 </div>
             </MudAppBar>
         } else
@@ -103,36 +107,36 @@
                 <MudSpacer></MudSpacer>
                 <div class="d-flex flex-column align-items-end">
                     <div class="d-flex justify-content-center align-items-center">
-                    <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
+                        <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
                             <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #fff;" />
-                    </MudBadge>
+                        </MudBadge>
                         <div class="mr-8">
                             <MudIcon Icon="@Icons.Material.Filled.Search" Style="color: #fff;" />
                         </div>
-                    @* <div class="d-flex align-items-center gap-1 mr-2">
+                        @* <div class="d-flex align-items-center gap-1 mr-2">
                         <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-                        
+
                     </div> *@
 
-                    @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+                        @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
-                    <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                        <MudText Typo="Typo.body2">@Kary?.NamaKaryawan</MudText>
-                        <MudAvatar>
-                            <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
-                        </MudAvatar>
-                        <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-                            <div class="d-flex flex-column pa-1">
-                                <MudList T="string" Clickable="true">
-                                    <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
-                                    <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
-                                    <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
-                                    <MudDivider />
-                                    <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
-                                </MudList>
-                            </div>
-                        </MudPopover>
+                        <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
+                            <MudText Typo="Typo.body2">@Kary?.NamaKaryawan</MudText>
+                            <MudAvatar>
+                                <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+                            </MudAvatar>
+                            <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                                <div class="d-flex flex-column pa-1">
+                                    <MudList T="string" Clickable="true">
+                                        <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
+                                        <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
+                                        <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
+                                        <MudDivider />
+                                        <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
+                                    </MudList>
+                                </div>
+                            </MudPopover>
                         </div>
                     </div>
                     @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "dokter/dashboard") {
@@ -155,6 +159,7 @@
                         <MudDrawerHeader Class="overflow-hidden">
                             <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="@(_drawerOpen ? 85 : 98)" Style="@(_drawerOpen ? "" : "margin-left: -32px;")" />
                         </MudDrawerHeader>
+                        <p class="text-center">@user?.Klinik?.KETLK</p>
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Dashboard" : "")</MudNavLink>
@@ -228,6 +233,8 @@
     string path = "";
 
     MKaryawan Kary;
+
+    CurrentUser user;
 
     public string Search { get; set; }
 
@@ -383,19 +390,16 @@
 
             NavigationManager.NavigateTo(url, forceLoad: true);
         }
-        if (firstRender)
-        {
-            var kary = await ProtectedSessionStore.GetAsync<MKaryawan>("user");
-
-            Kary = kary.Value;
-
+        if (firstRender) {
             var result = await ProtectedSessionStore.GetAsync<string>("token");
             if (result.Success && !string.IsNullOrWhiteSpace(result.Value))
             {
                 TokenProvider.Token = result.Value;
+                var userResponse = await ApiService.GetCurrentUserAsync();
+                user = userResponse.Data;
             }
-            StateHasChanged();
         }
+        StateHasChanged();
     }
 
     // Reset some variables on route change

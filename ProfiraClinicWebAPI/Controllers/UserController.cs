@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
+using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
+    [Authorize]
     public class UserController
 : BaseCrudController<User>
     {
@@ -132,6 +136,46 @@ namespace ProfiraClinicWebAPI.Controllers
                 // General exception catch block.
                 return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
+        }
+
+        [HttpGet("me")]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            // 1) grab the user ID from the JWT (must match whatever you set in your AuthService)
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            // 2) look it up
+            var user = await _context.MUser
+                           .AsNoTracking()
+                           .FirstOrDefaultAsync(u => u.UserName == userName);
+
+            if (user == null)
+                return NotFound();
+
+            // 3) clear out anything you don’t want to return
+            user.Password = null;
+
+            MKlinik? clinic = null;
+            if (!string.IsNullOrEmpty(user.KodeLokasi))
+            {
+                clinic = await _context.MKlinik
+                                       .AsNoTracking()
+                                       .FirstOrDefaultAsync(k => k.KDLOK == user.KodeLokasi);
+            }
+
+            // 4) map to DTO (and clear password)
+            var dto = new CurrentUser
+            {
+                UserID = user.UserID,
+                UserName = user.UserName,
+                KodeUserGroup = user.KodeUserGroup,
+                KodeLokasi = user.KodeLokasi,
+                Klinik = clinic
+            };
+
+            return Ok(dto);
         }
 
 

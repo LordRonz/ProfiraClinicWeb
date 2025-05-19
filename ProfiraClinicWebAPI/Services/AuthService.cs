@@ -46,7 +46,7 @@ namespace ProfiraClinicWebAPI.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Username),
                 new Claim(ClaimTypes.Role, "Client"),
             };
 

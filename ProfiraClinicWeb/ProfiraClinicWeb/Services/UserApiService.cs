@@ -24,6 +24,18 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
+        public async Task<ApiResponse<CurrentUser>> GetCurrentUserAsync()
+        {
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<CurrentUser>>("api/User/me");
+
+            if (response == null)
+            {
+                throw new HttpRequestException("Failed to retrieve response from API.");
+            }
+
+            return response;
+        }
+
         public async Task<ApiResponse<User>> GetUserByCodeAsync(String id)
         {
             var response = await _httpClient.GetFromJsonAsync<ApiResponse<User>>($"api/User/GetByCode/{id}");
