@@ -5,11 +5,17 @@ namespace ProfiraClinic.Models
 {
     public class PPerawatanH
     {
+        [Column]
+        public long IDPerawatanHeader { get; set; }
+
         [Column(TypeName = "char(10)")]
         public string KodeJenis { get; set; }
 
         [Column(TypeName = "char(10)")]
-        public string KodeGroup { get; set; }
+        public string KodeGroupPerawatan { get; set; }
+
+        [Column(TypeName = "char(10)")]
+        public string? KategoriPerawatan { get; set; }
 
         [Key]
         [Column(TypeName = "char(10)")]

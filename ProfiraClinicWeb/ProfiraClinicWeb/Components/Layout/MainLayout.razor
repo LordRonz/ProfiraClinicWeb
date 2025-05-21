@@ -167,9 +167,9 @@
 
                             <MudCollapse Expanded="@masterMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Paket</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Paket Perawatan</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Perawatan</MudNavLink>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Produk</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Barang</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
                             </MudCollapse>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>

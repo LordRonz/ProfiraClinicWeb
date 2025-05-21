@@ -42,7 +42,7 @@ namespace ProfiraClinicWebAPI.Controllers
         {
             return _context.PPerawatanH
                 .Where(d => (EF.Functions.Like(d.KodeJenis, body.GetParam) ||
-                             EF.Functions.Like(d.KodeGroup, body.GetParam) ||
+                             EF.Functions.Like(d.KodeGroupPerawatan, body.GetParam) ||
                              EF.Functions.Like(d.KodePerawatan, body.GetParam) ||
                              EF.Functions.Like(d.NamaPerawatan, body.GetParam)))
                 .OrderBy(d => d.KodePerawatan)
