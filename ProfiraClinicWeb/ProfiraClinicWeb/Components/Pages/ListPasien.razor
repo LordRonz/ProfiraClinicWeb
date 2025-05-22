@@ -61,7 +61,7 @@
                         alamat = "", // You can map the address property if available.
                         noHp = el.NomorHP,
                         tglLahir = el.TanggalLahir?.ToString("dd/MM/yyyy"),
-                        aktif = el.AKTIF == "1" ? "Aktif" : "Tidak Aktif",
+                        aktif = el.AKTIF == "1" ? "Ya" : "Tidak",
                     }
                 ).ToList();
 
@@ -74,7 +74,7 @@
                         new TableColumn { Caption = "Alamat", DataField = "alamat" },
                         new TableColumn { Caption = "No. HP", DataField = "noHp" },
                         new TableColumn { Caption = "Tgl Lahir", DataField = "tglLahir" },
-                        new TableColumn { Caption = "Aktif", DataField = "aktif" },
+                        new TableColumn { Caption = "Aktif?", DataField = "aktif" },
                         },
                     dataSource,
                     "/pasien/add"

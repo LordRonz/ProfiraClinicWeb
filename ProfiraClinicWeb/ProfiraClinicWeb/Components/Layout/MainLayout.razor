@@ -380,8 +380,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        System.Diagnostics.Debug.WriteLine(Redirector.ShouldRedirect);
-        System.Diagnostics.Debug.WriteLine(Redirector.TargetUrl);
         if (Redirector.ShouldRedirect && Redirector.TargetUrl != null)
         {
             Redirector.ShouldRedirect = false;    // reset flag
