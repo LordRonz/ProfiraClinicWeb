@@ -29,42 +29,42 @@
                         <div class="section-body d-flex flex-column gap-3">
 
                             <MudTextField T="string"
-                            Label="Masukkan Nama Sesuai KTP"
-                            @bind-Value="patient.NamaCustomer"
-                            Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                          Label="Masukkan Nama Sesuai KTP"
+                                          @bind-Value="patient.NamaCustomer"
+                                          Variant="Variant.Outlined" Margin="Margin.Dense" />
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Tempat Lahir"
-                                    @bind-Value="patient.TempatLahir"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Tempat Lahir"
+                                                  @bind-Value="patient.TempatLahir"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudDatePicker Label="Tanggal Lahir"
-                                    @bind-Date="date"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                   @bind-Date="date"
+                                                   Variant="Variant.Outlined"
+                                                   Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="3">
                                     <MudRadioGroup T="string"
-                                    Label="Jenis Kelamin"
-                                    @bind-Value="selectedGender"
-                                    Row="true">
+                                                   Label="Jenis Kelamin"
+                                                   @bind-Value="selectedGender"
+                                                   Row="true">
                                         <MudRadio T="string" Value="@("0")">Perempuan</MudRadio>
                                         <MudRadio T="string" Value="@("1")">Laki-laki</MudRadio>
                                     </MudRadioGroup>
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudSelect T="string"
-                                    Label="Agama"
-                                    @bind-Value="selectedReligion"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Agama"
+                                               @bind-Value="selectedReligion"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("Islam")'>Islam</MudSelectItem>
                                         <MudSelectItem Value='@("Kristen")'>Kristen</MudSelectItem>
                                         <MudSelectItem Value='@("Katolik")'>Katolik</MudSelectItem>
@@ -75,20 +75,20 @@
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudSelect T="string"
-                                    Label="Status Perkawinan"
-                                    @bind-Value="selectedMaritalStatus"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Status Perkawinan"
+                                               @bind-Value="selectedMaritalStatus"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("0")'>Belum Menikah</MudSelectItem>
                                         <MudSelectItem Value='@("1")'>Menikah</MudSelectItem>
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudSelect T="string"
-                                    Label="Gol. Darah"
-                                    @bind-Value="selectedBloodType"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Gol. Darah"
+                                               @bind-Value="selectedBloodType"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("A")'>A</MudSelectItem>
                                         <MudSelectItem Value='@("B")'>B</MudSelectItem>
                                         <MudSelectItem Value='@("AB")'>AB</MudSelectItem>
@@ -100,10 +100,10 @@
                             <MudGrid GutterSize="2">
                                 <MudItem xs="4">
                                     <MudSelect T="string"
-                                    Label="Referensi"
-                                    @bind-Value="patient.Referensi"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Referensi"
+                                               @bind-Value="patient.Referensi"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("Surat Kabar")'>Surat Kabar</MudSelectItem>
                                         <MudSelectItem Value='@("Media Sosial")'>Media Sosial</MudSelectItem>
                                         <MudSelectItem Value='@("Iklan")'>Iklan</MudSelectItem>
@@ -112,10 +112,10 @@
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudSelect T="string"
-                                    Label="Pendidikan"
-                                    @bind-Value="patient.Pendidikan"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Pendidikan"
+                                               @bind-Value="patient.Pendidikan"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("SD")'>SD</MudSelectItem>
                                         <MudSelectItem Value='@("SMP")'>SMP</MudSelectItem>
                                         <MudSelectItem Value='@("SMA")'>SMA</MudSelectItem>
@@ -127,49 +127,49 @@
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="Pekerjaan"
-                                    @bind-Value="patient.Profesi"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Pekerjaan"
+                                                  @bind-Value="patient.Profesi"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="4">
                                     <MudSelect T="string"
-                                    Label="Warga Negara"
-                                    @bind-Value="selectedNationality"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Warga Negara"
+                                               @bind-Value="selectedNationality"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("WNI")'>WNI</MudSelectItem>
                                         <MudSelectItem Value='@("WNA")'>WNA</MudSelectItem>
                                     </MudSelect>
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="No. Handphone"
-                                    @bind-Value="patient.NomorHP"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="No. Handphone"
+                                                  @bind-Value="patient.NomorHP"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="Email"
-                                    @bind-Value="patient.Email"
-                                    Required="true"
-                                    RequiredError="Email is required!"
-                                    Validation="@(new EmailAddressAttribute{ ErrorMessage = "Invalid email" })"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Email"
+                                                  @bind-Value="patient.Email"
+                                                  Required="true"
+                                                  RequiredError="Email is required!"
+                                                  Validation="@(new EmailAddressAttribute{ ErrorMessage = "Invalid email" })"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudTextField T="string"
-                            Label="Catatan"
-                            Lines="3"
-                            @bind-Value="patient.Note"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Catatan"
+                                          Lines="3"
+                                          @bind-Value="patient.Note"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
                         </div>
                     </MudPaper>
 
@@ -182,39 +182,39 @@
                         <div class="section-body d-flex flex-column gap-3">
 
                             <MudTextField T="string"
-                            Label="Alamat"
-                            Lines="2"
-                            @bind-Value="patient.AlamatDomisili"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Alamat"
+                                          Lines="2"
+                                          @bind-Value="patient.AlamatDomisili"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
 
                             <MudTextField T="string"
-                            Label="Kota"
-                            @bind-Value="patient.KotaDomisili"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Kota"
+                                          @bind-Value="patient.KotaDomisili"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="RT"
-                                    @bind-Value="patient.NamaCustomer"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="RT"
+                                                  @bind-Value="patient.NamaCustomer"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="RW"
-                                    @bind-Value="patient.NamaCustomer"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="RW"
+                                                  @bind-Value="patient.NamaCustomer"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="Kode Pos"
-                                    @bind-Value="patient.NamaCustomer"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kode Pos"
+                                                  @bind-Value="patient.NamaCustomer"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
                         </div>
@@ -226,77 +226,77 @@
                             <MudIcon Icon="@Icons.Material.Filled.CreditCard" />
                             <span>Kartu Identitas</span>
                             <MudCheckBox T="string" @bind-Checked="sameAsAlamat"
-                            Label="Sama dengan Alamat Sekarang"
-                            Dense="true"
-                            Class="ml-auto" />
+                                         Label="Sama dengan Alamat Sekarang"
+                                         Dense="true"
+                                         Class="ml-auto" />
                         </div>
                         <div class="section-body d-flex flex-column gap-3">
                             <MudGrid GutterSize="2">
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Nomor Kartu"
-                                    @bind-Value="patient.NIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Nomor Kartu"
+                                                  @bind-Value="patient.NIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="8">
                                     <MudTextField T="string"
-                                    Label="Alamat"
-                                    Lines="2"
-                                    @bind-Value="patient.AlamatNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Alamat"
+                                                  Lines="2"
+                                                  @bind-Value="patient.AlamatNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="Kota"
-                                    @bind-Value="patient.KotaNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kota"
+                                                  @bind-Value="patient.KotaNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="3">
                                     <MudTextField T="string"
-                                    Label="RT"
-                                    @bind-Value="patient.RTNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="RT"
+                                                  @bind-Value="patient.RTNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudTextField T="string"
-                                    Label="RW"
-                                    @bind-Value="patient.RWNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="RW"
+                                                  @bind-Value="patient.RWNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Kode Pos"
-                                    @bind-Value="patient.KodePosNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kode Pos"
+                                                  @bind-Value="patient.KodePosNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Kelurahan"
-                                    @bind-Value="patient.KelurahanNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kelurahan"
+                                                  @bind-Value="patient.KelurahanNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Kecamatan"
-                                    @bind-Value="patient.KecamatanNIK"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kecamatan"
+                                                  @bind-Value="patient.KecamatanNIK"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
                         </div>
@@ -308,17 +308,17 @@
                             <MudIcon Icon="@Icons.Material.Filled.FamilyRestroom" />
                             <span>Keluarga</span>
                             <MudButton Icon="@Icons.Material.Filled.Add"
-                            Variant="Variant.Text"
-                            Class="ml-auto" />
+                                       Variant="Variant.Text"
+                                       Class="ml-auto" />
                         </div>
                         <div class="section-body d-flex flex-column gap-3">
                             <MudGrid GutterSize="2">
                                 <MudItem xs="4">
                                     <MudSelect T="string"
-                                    Label="Hubungan dengan Pasien"
-                                    @bind-Value="patient.HubunganKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense">
+                                               Label="Hubungan dengan Pasien"
+                                               @bind-Value="patient.HubunganKeluarga"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
                                         <MudSelectItem Value='@("Orangtua")'>Orangtua</MudSelectItem>
                                         <MudSelectItem Value='@("Anak")'>Anak</MudSelectItem>
                                         <MudSelectItem Value='@("Saudara")'>Saudara</MudSelectItem>
@@ -327,64 +327,64 @@
                                 </MudItem>
                                 <MudItem xs="8">
                                     <MudTextField T="string"
-                                    Label="Nama Keluarga (tanpa gelar)"
-                                    @bind-Value="patient.NamaKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Nama Keluarga (tanpa gelar)"
+                                                  @bind-Value="patient.NamaKeluarga"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudTextField T="string"
-                            Label="Alamat"
-                            Lines="2"
-                            @bind-Value="patient.AlamatKeluarga"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Alamat"
+                                          Lines="2"
+                                          @bind-Value="patient.AlamatKeluarga"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
 
                             <MudTextField T="string"
-                            Label="Kota"
-                            @bind-Value="patient.KotaKeluarga"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Kota"
+                                          @bind-Value="patient.KotaKeluarga"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="RT"
-                                    @bind-Value="patient.RTKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="RT"
+                                                  @bind-Value="patient.RTKeluarga"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="RW"
-                                    @bind-Value="patient.RWKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="RW"
+                                                  @bind-Value="patient.RWKeluarga"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="4">
                                     <MudTextField T="string"
-                                    Label="Kode Pos"
-                                    @bind-Value="patient.KodePosKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kode Pos"
+                                                  @bind-Value="patient.KodePosKeluarga"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
 
                             <MudGrid GutterSize="2">
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Kelurahan"
-                                    @bind-Value="patient.KelurahanKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kelurahan"
+                                                  @bind-Value="patient.KelurahanKeluarga"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                                 <MudItem xs="6">
                                     <MudTextField T="string"
-                                    Label="Kecamatan"
-                                    @bind-Value="patient.KecamatanKeluarga"
-                                    Variant="Variant.Outlined"
-                                    Margin="Margin.Dense" />
+                                                  Label="Kecamatan"
+                                                  @bind-Value="patient.KecamatanKeluarga"
+                                                  Variant="Variant.Outlined"
+                                                  Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
                         </div>
@@ -392,9 +392,9 @@
 
 
                     <MudButton Variant="Variant.Filled"
-                    Color="MudBlazor.Color.Primary"
-                    Class="ml-auto rounded-3"
-                    OnClick="SubmitAsync">
+                               Color="MudBlazor.Color.Primary"
+                               Class="ml-auto rounded-3"
+                               OnClick="SubmitAsync">
                         Simpan
                     </MudButton>
 
@@ -407,66 +407,31 @@
 
                     <!-- Riwayat Penyakit Dahulu -->
                     <MudTextField T="string"
-                    Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)"
-                    Lines="4"
-                    @bind-Value="customerRiwayat.PenyakitDahulu"
-                    Variant="Variant.Outlined"
-                    Margin="Margin.Dense" />
+                                  Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)"
+                                  Lines="4"
+                                  @bind-Value="customerRiwayat.PenyakitDahulu"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" />
 
                     <!-- Riwayat Penyakit Sekarang -->
                     <div class="section d-flex">
                         <MudText Typo="Typo.subtitle2" Class="mb-1 mr-16">Riwayat Penyakit Sekarang</MudText>
                         <div>
                             <MudGrid GutterSize="2">
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="DM"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="Hipertensi"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="TBC"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="Asthma"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="Hepatitis"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="Kelainan Darah"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                    Label="Lain‑lain, sebutkan"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
-                                </MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="DM" @bind-Value="PenyakitSekarangSelections[0]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Hipertensi" @bind-Value="PenyakitSekarangSelections[1]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="TBC" @bind-Value="PenyakitSekarangSelections[2]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Asthma" @bind-Value="PenyakitSekarangSelections[3]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Hepatitis" @bind-Value="PenyakitSekarangSelections[4]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Kelainan Darah" @bind-Value="PenyakitSekarangSelections[5]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Lain‑lain, sebutkan" @bind-Value="PenyakitSekarangSelections[6]" Dense="true" /></MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                            Label="Detail Penyakit Sekarang"
-                            Lines="3"
-                            @bind-Value="customerRiwayat.PenyakitSekarang"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Detail Penyakit Sekarang"
+                                          Lines="3"
+                                          @bind-Value="customerRiwayat.PenyakitSekarang"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
                         </div>
                     </div>
 
@@ -477,23 +442,23 @@
                             <MudGrid GutterSize="2" Class="mb-2">
                                 <MudItem xs="2">
                                     <MudCheckBox T="bool"
-                                    Label="Tidak"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Tidak"
+                                                 @bind-Value="AlergiObatSelections[0]"
+                                                 Dense="true" />
                                 </MudItem>
                                 <MudItem xs="5">
                                     <MudCheckBox T="bool"
-                                    Label="Ya, Sebutkan"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Ya, Sebutkan"
+                                                 @bind-Value="AlergiObatSelections[1]"
+                                                 Dense="true" />
                                 </MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                            Label="Jenis Obat yang Alergi"
-                            Lines="2"
-                            @bind-Value="customerRiwayat.KetAlergiObat"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Jenis Obat yang Alergi"
+                                          Lines="2"
+                                          @bind-Value="customerRiwayat.KetAlergiObat"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
                         </div>
                     </div>
 
@@ -504,23 +469,23 @@
                             <MudGrid GutterSize="2" AlignItems="Center" Class="mb-2">
                                 <MudItem xs="2">
                                     <MudCheckBox T="bool"
-                                    Label="Tidak"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Tidak"
+                                                 @bind-Value="AlergiMakananSelections[0]"
+                                                 Dense="true" />
                                 </MudItem>
                                 <MudItem xs="2">
                                     <MudCheckBox T="bool"
-                                    Label="Ya, Sebutkan"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Ya, Sebutkan"
+                                                 @bind-Value="AlergiMakananSelections[1]"
+                                                 Dense="true" />
                                 </MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                            Label="Jenis Makanan yang Alergi"
-                            Lines="2"
-                            @bind-Value="customerRiwayat.KetAlergiMakanan"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Jenis Makanan yang Alergi"
+                                          Lines="2"
+                                          @bind-Value="customerRiwayat.KetAlergiMakanan"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
                         </div>
                     </div>
 
@@ -531,42 +496,42 @@
                             <MudGrid GutterSize="2" Class="mb-2">
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
-                                    Label="Merokok"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Merokok"
+                                                 @bind-Value="ResikoSelections[0]"
+                                                 Dense="true" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
-                                    Label="Obesitas"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Obesitas"
+                                                 @bind-Value="ResikoSelections[1]"
+                                                 Dense="true" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
-                                    Label="Dislipidemia"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Dislipidemia"
+                                                 @bind-Value="ResikoSelections[2]"
+                                                 Dense="true" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
-                                    Label="Lain‑lain, sebutkan"
-                                    @bind-Checked="tempSelection"
-                                    Dense="true" />
+                                                 Label="Lain‑lain, sebutkan"
+                                                 @bind-Value="ResikoSelections[3]"
+                                                 Dense="true" />
                                 </MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                            Label="Detail Faktor Resiko"
-                            Lines="2"
-                            @bind-Value="customerRiwayat.KetResiko"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense" />
+                                          Label="Detail Faktor Resiko"
+                                          Lines="2"
+                                          @bind-Value="customerRiwayat.KetResiko"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
                         </div>
                     </div>
 
                     <MudButton Variant="Variant.Outlined"
-                    Color="MudBlazor.Color.Primary"
-                    OnClick="SubmitRiwayatAsync"
-                    Class="ml-auto rounded-3">
+                               Color="MudBlazor.Color.Primary"
+                               OnClick="SubmitRiwayatAsync"
+                               Class="ml-auto rounded-3">
                         Simpan Riwayat
                     </MudButton>
                 </MudForm>
@@ -595,6 +560,16 @@
     private string selectedNationality = "WNI";
     private string selectedMaritalStatus = "0"; // "0" for Belum Menikah, "1" for Menikah.
     private string selectedReligion = "Islam";
+
+    private string chkPenyakit = "0000000";
+    private string chkAlergiObat = "00";
+    private string chkAlergiMakanan = "00";
+    private string chkResiko = "0000";
+
+    private bool[] PenyakitSekarangSelections = new bool[7];
+    private bool[] AlergiObatSelections = new bool[2];
+    private bool[] AlergiMakananSelections = new bool[2];
+    private bool[] ResikoSelections = new bool[4];
 
     private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
 
@@ -626,6 +601,7 @@
             selectedNationality = patient.WargaNegara ?? "WNI";
             // Optionally, map additional fields.
             selectedReligion = patient.Agama ?? "Islam";
+
         }
 
         var response2 = await CustomerRiwayatApiService.GetCustomerRiwayatAsalByCodeAsync(Id);
@@ -633,6 +609,20 @@
         {
             customerRiwayat = response2.Data;
             customerRiwayat.KodeCustomer = Id;
+
+            chkPenyakit = response2.Data.chkPenyakit ?? "0000000";
+            chkAlergiObat = response2.Data.chkAlergiObat ?? "00";
+            chkAlergiMakanan = response2.Data.chkAlergiMakanan ?? "00";
+            chkResiko = response2.Data.chkResiko ?? "0000";
+
+            for (int i = 0; i < PenyakitSekarangSelections.Length && i < chkPenyakit.Length; i++)
+                PenyakitSekarangSelections[i] = chkPenyakit[i] == '1';
+            for (int i = 0; i < AlergiObatSelections.Length && i < chkAlergiObat.Length; i++)
+                AlergiObatSelections[i] = chkAlergiObat[i] == '1';
+            for (int i = 0; i < AlergiMakananSelections.Length && i < chkAlergiMakanan.Length; i++)
+                AlergiMakananSelections[i] = chkAlergiMakanan[i] == '1';
+            for (int i = 0; i < ResikoSelections.Length && i < chkResiko.Length; i++)
+                ResikoSelections[i] = chkResiko[i] == '1';
         }
     }
 
@@ -663,6 +653,19 @@
     private async Task SubmitRiwayatAsync()
     {
         customerRiwayat.KodeCustomer = Id;
+        chkPenyakit = string.Concat(PenyakitSekarangSelections
+                                .Select(b => b ? '1' : '0'));
+
+        customerRiwayat.chkPenyakit = chkPenyakit;
+        customerRiwayat.chkAlergiObat = string.Concat(AlergiObatSelections
+                                .Select(b => b ? '1' : '0'));
+        customerRiwayat.chkAlergiMakanan = string.Concat(AlergiMakananSelections
+                                .Select(b => b ? '1' : '0'));
+        customerRiwayat.chkResiko = string.Concat(ResikoSelections
+                                .Select(b => b ? '1' : '0'));
+
+        System.Diagnostics.Debug.WriteLine(customerRiwayat.chkPenyakit);
+
         var result = await CustomerRiwayatApiService.CreateCustomerRiwayatAsalAsync(customerRiwayat);
         if (result.StatusCode < 300)
         {
