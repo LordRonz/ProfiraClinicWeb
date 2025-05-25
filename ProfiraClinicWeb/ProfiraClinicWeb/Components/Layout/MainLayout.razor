@@ -40,7 +40,7 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 
 <CascadingValue Value="this">
-    <MudLayout Class="bg-dark bg-opacity-25" Style='@GetBgClass()'>
+    <MudLayout Class="@LayoutCss" Style='@GetBgClass()'>
         @* Top navbar *@
 
         @if (!isDoctor) {
@@ -250,6 +250,9 @@
 
     public string PasienUsia { get; set; } = "";
 
+    private string LayoutCss =>
+    $"bg-wave-fixed {(isDoctor ? "wave-blue" : "wave")}";
+
     MudTheme MyCustomTheme = new MudTheme()
         {
             Typography = new Typography()
@@ -418,6 +421,26 @@
 }
 
 <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        background-color: rgb(234,228,228); /* your bg-dark bg-opacity-25 */
+    }
+    .bg-wave-fixed {
+        background-repeat: no-repeat;
+        background-size: 100% 45%;
+        background-attachment: fixed;
+        height: 100vh;
+    }
+
+        .bg-wave-fixed.doctor {
+            background-image: url("images/wave-blue.png");
+        }
+
+        .bg-wave-fixed.patient {
+            background-image: url("images/wave.png");
+        }
+
     .minh-100 {
         min-height: 100%;
     }

@@ -83,6 +83,12 @@ builder.Services.AddHttpClient<GroupBarangApiService>(client =>
 }).AddHttpMessageHandler<BearerTokenHandler>()
     .AddHttpMessageHandler<AuthRedirectHandler>();
 
+builder.Services.AddHttpClient<DokterApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+}).AddHttpMessageHandler<BearerTokenHandler>()
+    .AddHttpMessageHandler<AuthRedirectHandler>();
+
 builder.Services.AddHttpClient<AuthApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
