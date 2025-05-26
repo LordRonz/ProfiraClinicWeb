@@ -17,15 +17,32 @@
             <MudImage Src="@GetLady()" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
         </div>
         <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
-            <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3" >
+            <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
                     <MudSwitch Class="pl-4" @bind-Value="@isDoctor" />
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
 
-                    <MudSelect OuterClass="bg-transparent rounded-pill" Margin="Margin.Dense" InputClass="bg-transparent" Style="border-radius: 20px; background-color: #F1F5F9;" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Pilih clinic" AnchorOrigin="Origin.BottomCenter">
-                        <MudSelectItem Style="height: 30px" Value="@("Profira Manyar")" />
-                        <MudSelectItem Style="height: 30px" Value="@("Profira HR")" />
+                    <MudSelect T="string"
+                               @bind-Value="selectedKlinikCode"
+                               OuterClass="bg-transparent rounded-pill"
+                               InputClass="bg-transparent"
+                               Style="border-radius: 20px; background-color: #F1F5F9;"
+                               DisableUnderLine="true"
+                               Variant="Variant.Filled"
+                               Label="Pilih clinic"
+                               AnchorOrigin="Origin.BottomCenter">
+                        @if (kliniks == null || !kliniks.Any())
+                        {
+                            <MudSelectItem Value="@("")">Loading clinics...</MudSelectItem>
+                        }
+                        else
+                        {
+                            @foreach (var k in kliniks)
+                            {
+                                <MudSelectItem Value="@k.KDLOK">@k.KETLK</MudSelectItem>
+                            }
+                        }
                     </MudSelect>
                     <MudCheckBox @bind-Value="@rememberMe" Dense="true">
                         Remember me
@@ -43,9 +60,16 @@
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
 @inject AuthApiService AuthApiService
+@inject ClinicApiService ClinicApiService
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
     List<MKaryawan> customers = new List<MKaryawan>();
+
+    List<MKlinik> kliniks = new List<MKlinik>();
+
+    MKlinik? selectedKlinik;
+
+    private string selectedKlinikCode;
 
     bool success;
     bool rememberMe = false;
@@ -74,7 +98,7 @@
 
     void ButtonVisibilityClick()
     {
-        @if (isShow)
+        if (isShow)
         {
             isShow = false;
             PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -108,6 +132,12 @@
     protected override async Task OnInitializedAsync()
     {
         customers = await dbContext.MKaryawan.ToListAsync();
+        var apiResponse = await ClinicApiService.GetClinicsAsync();
+        System.Diagnostics.Debug.WriteLine("Done");
+        if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+        {
+            kliniks = apiResponse.Data;
+        }
     }
 
     private void addSnackbar(string message, Severity severity = Severity.Error)
@@ -121,7 +151,8 @@
     {
         try
         {
-            var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass });
+            var clinic = kliniks.FirstOrDefault(k => k.KDLOK == selectedKlinikCode);
+            var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass, KodeLokasi = clinic?.KDLOK });
 
             await ProtectedSessionStore.SetAsync("token", token);
 

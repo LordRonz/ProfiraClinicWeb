@@ -11,6 +11,7 @@ namespace ProfiraClinicWeb.Services
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        public string? KodeLokasi { get; set; }
     }
 
     // Model for response containing the JWT token

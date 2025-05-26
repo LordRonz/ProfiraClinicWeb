@@ -36,6 +36,7 @@ namespace ProfiraClinicWebAPI.Services
             return new LoginModel
             {
                 Username = user.UserName,
+                KodeLokasi = user.KodeLokasi,
             };
         }
 
