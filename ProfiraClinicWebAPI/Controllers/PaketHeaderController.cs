@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 
@@ -23,5 +24,19 @@ namespace ProfiraClinicWebAPI.Controllers
         protected override IOrderedQueryable<PaketHeader> ApplyOrder(
             IQueryable<PaketHeader> q)
             => q.OrderBy(d => d.KodePaket);
+
+        [NonAction]
+        public override Task<ActionResult<IEnumerable<PaketHeader>>> GetItems(string last = null)
+            => base.GetItems(last);
+
+        [HttpGet("GetList")]
+        public async Task<IActionResult> GetList()
+        {
+            var list = await _context.PaketHeaderList
+                .FromSqlRaw("EXEC dbo.usp_PPaket_List")
+                .ToListAsync();
+
+            return Ok(list);
+        }
     }
 }

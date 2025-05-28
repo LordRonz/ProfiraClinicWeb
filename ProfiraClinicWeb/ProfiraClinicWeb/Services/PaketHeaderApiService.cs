@@ -12,9 +12,9 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<PaketHeader>>> GetPaketHeadersAsync()
+        public async Task<ApiResponse<List<PaketHeaderList>>> GetPaketHeadersAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<PaketHeader>>>("api/PaketHeader/GetList");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<PaketHeaderList>>>("api/PaketHeader/GetList");
 
             if (response == null)
             {

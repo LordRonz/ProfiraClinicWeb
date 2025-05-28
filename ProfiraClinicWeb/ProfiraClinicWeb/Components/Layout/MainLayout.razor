@@ -172,7 +172,11 @@
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Group Paket</MudNavLink>
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/package-item"))">Paket Perawatan</MudNavLink>
                                 </MudCollapse>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Perawatan</MudNavLink>
+                                <MudNavLink OnClick="@TogglePerawatan">Perawatan</MudNavLink>
+                                <MudCollapse Expanded="@perawatanMenuExpanded" Class="ml-2">
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Group Perawatan</MudNavLink>
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment-item"))">Item Perawatan</MudNavLink>
+                                </MudCollapse>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Barang</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
                             </MudCollapse>
@@ -290,6 +294,14 @@
     void TogglePaket()
     {
         paketMenuExpanded = !paketMenuExpanded;
+    }
+
+    bool perawatanMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void TogglePerawatan()
+    {
+        perawatanMenuExpanded = !perawatanMenuExpanded;
     }
 
     // Existing methods...
