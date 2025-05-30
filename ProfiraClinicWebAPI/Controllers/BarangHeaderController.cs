@@ -37,5 +37,15 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return Ok(list);
         }
+
+        [HttpGet("GetListItem")]
+        public async Task<IActionResult> GetListItem()
+        {
+            var list = await _context.BarangHeaderList
+                .FromSqlRaw("EXEC dbo.usp_MBarang_List")
+                .ToListAsync();
+
+            return Ok(list);
+        }
     }
 }
