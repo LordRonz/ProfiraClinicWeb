@@ -1,4 +1,4 @@
-﻿@page "/product"
+﻿@page "/product-item"
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Utils
@@ -59,17 +59,23 @@
                         edit = $"product/{el.KodeBarang}/edit",
                         kodeBarang = el.KodeBarang,
                         namaBarang = el.NamaBarang,
-                        unit1 = el.DiscMember,
+                        unitJual = el.UnitJual,
+                        hargaJual = el.HargaJual.ToString("C", System.Globalization.CultureInfo.CurrentCulture),
+                        discMember = el.DiscMember.ToString("P", System.Globalization.CultureInfo.CurrentCulture),
+                        discNonMember = el.DiscNonMember.ToString("P", System.Globalization.CultureInfo.CurrentCulture),
                         aktif = el.Aktif == "1" ? "Ya" : "Tidak",
                     }
                 ).ToList();
 
                 PackageTableConfig = new TableConfig(
                     new List<TableColumn> {
-                        new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
                         new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
-                        new TableColumn { Caption = "Kode Group Barang", DataField = "kodeGroupBarang" },
-                        new TableColumn { Caption = "Nama Group Barang", DataField = "namaGroupBarang" },
+                        new TableColumn { Caption = "Kode Barang", DataField = "kodeBarang" },
+                        new TableColumn { Caption = "Nama Barang", DataField = "namaBarang" },
+                        new TableColumn { Caption = "Unit Jual", DataField = "unitJual" },
+                        new TableColumn { Caption = "Harga Jual", DataField = "hargaJual" },
+                        new TableColumn { Caption = "Disc Member", DataField = "discMember" },
+                        new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember" },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },
                                         },
                     dataSource,

@@ -177,7 +177,11 @@
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Group Perawatan</MudNavLink>
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment-item"))">Item Perawatan</MudNavLink>
                                 </MudCollapse>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Barang</MudNavLink>
+                                <MudNavLink OnClick="@ToggleBarang">Barang</MudNavLink>
+                                <MudCollapse Expanded="@barangMenuExpanded" Class="ml-2">
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Group Barang</MudNavLink>
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product-item"))">Parameter Harga Jual</MudNavLink>
+                                </MudCollapse>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
                             </MudCollapse>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>
@@ -302,6 +306,14 @@
     void TogglePerawatan()
     {
         perawatanMenuExpanded = !perawatanMenuExpanded;
+    }
+
+    bool barangMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void ToggleBarang()
+    {
+        barangMenuExpanded = !barangMenuExpanded;
     }
 
     // Existing methods...
