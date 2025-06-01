@@ -19,6 +19,6 @@ namespace ProfiraClinic.Models.Core
         public string AKTIF { get; set; }
         public DateTime UPDDT { get; set; }
         public string USRID { get; set; } = null!;
-        public string FOTO { get; set; }
+        public string? FOTO { get; set; }
     }
 }
