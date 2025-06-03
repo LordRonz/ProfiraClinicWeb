@@ -5,33 +5,33 @@ using ProfiraClinicWebAPI.Data;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    public class BarangHeaderController
-    : BaseCrudController<BarangHeader>
+    public class BarangController
+    : BaseCrudController<Barang>
     {
-        public BarangHeaderController(AppDbContext ctx) : base(ctx) { }
+        public BarangController(AppDbContext ctx) : base(ctx) { }
 
-        protected override DbSet<BarangHeader> DbSet
-            => _context.BarangHeader;
+        protected override DbSet<Barang> DbSet
+            => _context.Barang;
 
-        protected override IQueryable<BarangHeader> ApplySearch(
-            IQueryable<BarangHeader> q,
+        protected override IQueryable<Barang> ApplySearch(
+            IQueryable<Barang> q,
             string likeParam)
             => q.Where(d
                 => EF.Functions.Like(d.KodeBarang, likeParam)
             || EF.Functions.Like(d.KodeBarang, likeParam));
 
-        protected override IOrderedQueryable<BarangHeader> ApplyOrder(
-            IQueryable<BarangHeader> q)
+        protected override IOrderedQueryable<Barang> ApplyOrder(
+            IQueryable<Barang> q)
             => q.OrderBy(d => d.KodeBarang);
 
         [NonAction]
-        public override Task<ActionResult<IEnumerable<BarangHeader>>> GetItems(string last = null)
+        public override Task<ActionResult<IEnumerable<Barang>>> GetItems(string last = null)
             => base.GetItems(last);
 
         [HttpGet("GetList")]
         public async Task<IActionResult> GetList()
         {
-            var list = await _context.BarangHeaderList
+            var list = await _context.Barang
                 .FromSqlRaw("EXEC dbo.usp_PBarang_List")
                 .ToListAsync();
 
@@ -41,7 +41,7 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpGet("GetListItem")]
         public async Task<IActionResult> GetListItem()
         {
-            var list = await _context.BarangListDto
+            var list = await _context.Barang
                 .FromSqlRaw("EXEC dbo.usp_MBarang_List")
                 .ToListAsync();
 

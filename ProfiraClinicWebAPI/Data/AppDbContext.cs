@@ -66,5 +66,7 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<PaketHeaderList> PaketHeaderList { get; set; }
         public DbSet<BarangHeaderList> BarangHeaderList { get; set; }
         public DbSet<BarangHeader> BarangHeader { get; set; }
+        public DbSet<Barang> Barang { get; set; }
+        public DbSet<BarangListDto> BarangListDto { get; set; }
     }
 }
