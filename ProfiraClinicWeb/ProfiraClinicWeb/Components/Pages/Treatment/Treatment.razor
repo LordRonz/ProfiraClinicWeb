@@ -6,7 +6,7 @@
 @inject GroupPerawatanApiService ApiService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" AddButtonText="Pasien Baru" />
+    <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" AddButtonText="Tambah" />
 </MudCard>
 
 @code {
@@ -24,7 +24,7 @@
     // This method sets up the page title.
     protected override void OnInitialized()
     {
-        Layout.ChangeTitleAndRoute("Perawatan", "List Perawatan");
+        Layout.ChangeTitleAndRoute("Group Perawatan", "Master / Group Perawatan");
     }
 
     // When the component is initialized, call the API service to retrieve patients.

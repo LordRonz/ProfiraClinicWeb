@@ -9,11 +9,11 @@
 }
 <div class="mb-5">
     <MudCard Class="rounded-3">
-        <MudStack Spacing="1" Class="w-100 table-header">
+        <MudStack Spacing="1" Class="w-100 table-header pb-4">
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudCollapse Expanded="_expanded" Class="px-4">
                 <div class="d-flex justify-content-start align-items-start gap-4">
-                    <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
+                    <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll @bind-Value="value" @bind-SelectedValues="options" OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
                         @foreach (TableColumn col in Config.GetColumn())
                         {
                             @if(col.Type == ColumnType.Data) {
@@ -23,15 +23,15 @@
                     </MudSelect>
                     <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
                 </div>
-                <div class="d-flex justify-content-between mb-4">
-                    <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
-                    @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
-                </div>
+                @* <div class="d-flex justify-content-between mb-4"> *@
+                @*     <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton> *@
+                @*     @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
+                @* </div> *@
             </MudCollapse>
         </MudStack>
     </MudCard>
 </div>
-<MudTable HeaderClass="@GetHeaderClass()" Striped="true" Bordered="true" Items="@Config.GetData()" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
+<MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="@Config.GetData()" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
     <ColGroup>
         @foreach (TableColumn col in Config.GetColumn())
         {
@@ -53,11 +53,11 @@
         }
     </ColGroup>
     <HeaderContent>
-            @foreach (TableColumn col in Config.GetColumn())
-            {
-                // Pass the Dto properties to the component
-                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
-            }
+        @foreach (TableColumn col in Config.GetColumn())
+        {
+            // Pass the Dto properties to the component
+            <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+        }
     </HeaderContent>
     <RowTemplate>
         @foreach (TableColumn col in Config.GetColumn())
@@ -110,6 +110,10 @@
         _expanded = !_expanded;
     }
 
+    private IEnumerable<string> options { get; set; } = ["namaPasien"];
+
+    private string value { get; set; } = "Nothing selected";
+
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
     [Parameter]
@@ -143,7 +147,7 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         System.Diagnostics.Debug.Print(element.Values.ToList()[2]);
-        
+
         var filters = Config.GetFilters();
         foreach (var filter in filters)
         {
@@ -161,6 +165,18 @@
         }
 
         return false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var columns = Config.GetColumn().Select(p => p.DataField);
+            options = Config.GetColumn()
+                .Select(p => p.DataField)
+                .ToHashSet();
+            StateHasChanged();
+        }
     }
 }
 

@@ -6,7 +6,7 @@
 @inject BarangHeaderApiService ApiService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" AddButtonText="Pasien Baru" />
+    <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" />
 </MudCard>
 
 @code {
@@ -24,7 +24,7 @@
     // This method sets up the page title.
     protected override void OnInitialized()
     {
-        Layout.ChangeTitleAndRoute("Barang", "List Barang");
+        Layout.ChangeTitleAndRoute("Parameter Harga Jual", "Master / Barang");
     }
 
     // When the component is initialized, call the API service to retrieve patients.
@@ -51,6 +51,8 @@
 
                 System.Diagnostics.Debug.WriteLine("Parsing to table data");
 
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
                 // Prepare the table data source using the patient data retrieved from the API.
                 var dataSource = Barangs.Select(el =>
                     (object)new
@@ -60,9 +62,9 @@
                         kodeBarang = el.KodeBarang,
                         namaBarang = el.NamaBarang,
                         unitJual = el.UnitJual,
-                        hargaJual = el.HargaJual.ToString("C", System.Globalization.CultureInfo.CurrentCulture),
-                        discMember = el.DiscMember.ToString("P", System.Globalization.CultureInfo.CurrentCulture),
-                        discNonMember = el.DiscNonMember.ToString("P", System.Globalization.CultureInfo.CurrentCulture),
+                        hargaJual = el.HargaJual.ToString("C", culture),
+                        discMember = ((int)el.DiscMember).ToString() + "%",
+                        discNonMember = ((int)el.DiscNonMember).ToString() + "%",
                         aktif = el.Aktif == "1" ? "Ya" : "Tidak",
                     }
                 ).ToList();
