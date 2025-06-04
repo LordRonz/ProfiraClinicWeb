@@ -24,6 +24,18 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
+        public async Task<ApiResponse<List<BarangListDto>>> GetBarangItemsAsync()
+        {
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<BarangListDto>>>("api/BarangHeader/GetListItem");
+
+            if (response == null)
+            {
+                throw new HttpRequestException("Failed to retrieve response from API.");
+            }
+
+            return response;
+        }
+
         public async Task<ApiResponse<BarangHeader>> GetBarangHeaderByCodeAsync(String id)
         {
             var response = await _httpClient.GetFromJsonAsync<ApiResponse<BarangHeader>>($"api/BarangHeader/GetByCode/{id}");

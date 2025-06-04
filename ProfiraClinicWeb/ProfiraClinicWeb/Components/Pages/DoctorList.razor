@@ -4,6 +4,7 @@
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
 @inject DokterApiService ApiService
+@inject ImagesApiService ImagesService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <div class="mt-4 d-flex flex-wrap gap-3">
@@ -13,10 +14,11 @@
                 <MudCardContent>
                     <!-- Flex row: avatar on left, texts on right -->
                     <div class="d-flex align-items-center">
-                        <!-- Placeholder avatar -->
-                        <MudAvatar Size="MudBlazor.Size.Large"
-                                   Src="https://via.placeholder.com/64"
-                                   Class="me-8" />
+                        <MudAvatar Size="MudBlazor.Size.Large" Class="me-8">
+                            <MudImage Src="@(string.IsNullOrWhiteSpace(dokter.FOTO)
+                                  ? "https://via.placeholder.com/64"
+                                  : ImagesService.GetImageUri(dokter.FOTO))"></MudImage>
+                        </MudAvatar>
 
                         <!-- Text block -->
                         <div>

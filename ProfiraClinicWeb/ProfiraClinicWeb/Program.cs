@@ -107,6 +107,12 @@ builder.Services.AddHttpClient<BarangHeaderApiService>(client =>
 }).AddHttpMessageHandler<BearerTokenHandler>()
     .AddHttpMessageHandler<AuthRedirectHandler>();
 
+builder.Services.AddHttpClient<ImagesApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+}).AddHttpMessageHandler<BearerTokenHandler>()
+    .AddHttpMessageHandler<AuthRedirectHandler>();
+
 builder.Services.AddHttpClient<AuthApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
