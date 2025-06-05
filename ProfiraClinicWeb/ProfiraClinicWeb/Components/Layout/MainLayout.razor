@@ -52,7 +52,7 @@
                 </div>
                 <MudSpacer></MudSpacer>
                 <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
-                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+                    <MudIcon Size="MudBlazor.Size.Large" Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
                 </MudBadge>
                 <div class="d-flex align-items-center gap-1 mr-2">
                     <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
@@ -62,13 +62,11 @@
                     <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                 <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                    @if (!string.IsNullOrEmpty(user?.UserName))
-                    {
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">@user.UserName</MudText>
-                    }
-                    <MudAvatar>
-                        <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
-                    </MudAvatar>
+                    
+                    @* <MudAvatar> *@
+                    @*     <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage> *@
+                    @* </MudAvatar> *@
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Size="MudBlazor.Size.Large" Color="MudBlazor.Color.Default" />
                     <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
                         <div class="d-flex flex-column pa-1">
                             <MudList T="string" Clickable="true">
@@ -80,6 +78,10 @@
                             </MudList>
                         </div>
                     </MudPopover>
+                    @if (!string.IsNullOrEmpty(user?.UserName))
+                    {
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">@user.UserName</MudText>
+                    }
                 </div>
             </MudAppBar>
         } else
