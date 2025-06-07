@@ -62,7 +62,7 @@
                     <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                 <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                    
+
                     @* <MudAvatar> *@
                     @*     <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage> *@
                     @* </MudAvatar> *@
@@ -165,21 +165,49 @@
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Dashboard" : "")</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Description" OnClick="@ToggleMaster" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Description" OnClick="@ToggleMaster" Class="fw-semibold">
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    @(_drawerOpen ? "Master" : "")
+                                    <MudIcon Icon="@(masterMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                </div>
+                            </MudNavLink>
 
                             <MudCollapse Expanded="@masterMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
-                                <MudNavLink OnClick="@TogglePaket">Paket Perawatan</MudNavLink>
+                                <MudNavLink OnClick="@TogglePaket">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        @(_drawerOpen ? "Paket Perawatan" : "")
+                                        <MudIcon Icon="@(paketMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                    </div>
+                                </MudNavLink>
                                 <MudCollapse Expanded="@paketMenuExpanded" Class="ml-2">
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Group Paket</MudNavLink>
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/package-item"))">Paket Perawatan</MudNavLink>
                                 </MudCollapse>
-                                <MudNavLink OnClick="@TogglePerawatan">Perawatan</MudNavLink>
+                                <MudNavLink OnClick="@TogglePerawatan">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        @(_drawerOpen ? "Perawatan" : "")
+                                        <MudIcon Icon="@(perawatanMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                    </div>
+                                </MudNavLink>
                                 <MudCollapse Expanded="@perawatanMenuExpanded" Class="ml-2">
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Group Perawatan</MudNavLink>
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment-item"))">Item Perawatan</MudNavLink>
                                 </MudCollapse>
-                                <MudNavLink OnClick="@ToggleBarang">Barang</MudNavLink>
+                                <MudNavLink OnClick="@ToggleBarang">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        @(_drawerOpen ? "Barang" : "")
+                                        <MudIcon Icon="@(barangMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                    </div>
+                                </MudNavLink>
                                 <MudCollapse Expanded="@barangMenuExpanded" Class="ml-2">
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Group Barang</MudNavLink>
                                     <MudNavLink OnClick="@(() => OnClickMasterNav("/product-item-2"))">Item Barang</MudNavLink>
@@ -189,7 +217,14 @@
                             </MudCollapse>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>
 
-                            <MudNavLink Icon="@Icons.Material.Filled.Build" OnClick="@ToggleSystem" Class="fw-semibold">@(_drawerOpen ? "System" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Build" OnClick="@ToggleSystem" Class="fw-semibold">
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    @(_drawerOpen ? "System" : "")
+                                    <MudIcon Icon="@(systemMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                </div>
+                            </MudNavLink>
                             <MudCollapse Expanded="@systemMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/group-login"))">Setup Group Login</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/login-user"))">Setup Login User</MudNavLink>

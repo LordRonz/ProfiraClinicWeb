@@ -225,7 +225,7 @@
                         <div class="section-header">
                             <MudIcon Icon="@Icons.Material.Filled.CreditCard" />
                             <span>Kartu Identitas</span>
-                            <MudCheckBox T="bool" @bind-Checked:get="sameAsAlamat" @bind-Checked:set="OnSameAsAlamatChanged"
+                            <MudCheckBox T="bool" @bind-Value="SameAsAlamat"
                             Label="Sama dengan Alamat Sekarang"
                             Dense="true"
                             Class="ml-auto" />
@@ -598,6 +598,12 @@
     private string selectedReligion = "Islam";
 
     private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
+
+    public bool SameAsAlamat
+    {
+        get { return sameAsAlamat; }
+        set { OnSameAsAlamatChanged(value); }
+    }
 
     MudForm form;
 
