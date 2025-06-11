@@ -58,7 +58,7 @@
                         memberId = el.KodeCustomer,
                         namaPasien = el.NamaCustomer,
                         // Assuming that PatientModel has properties that map to these columns.
-                        alamat = "", // You can map the address property if available.
+                        alamat = el.AlamatDomisili, // You can map the address property if available.
                         noHp = el.NomorHP,
                         tglLahir = el.TanggalLahir?.ToString("dd/MM/yyyy"),
                         aktif = el.AKTIF == "1" ? "Ya" : "Tidak",

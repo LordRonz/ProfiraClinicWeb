@@ -52,6 +52,8 @@
 
                 System.Diagnostics.Debug.WriteLine("Parsing to table data");
 
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
                 // Prepare the table data source using the patient data retrieved from the API.
                 var dataSource = Perawatans.Select(el =>
                     (object)new
@@ -63,9 +65,9 @@
                         jenisPerawatan = el.KodeJenis,
                         kodePerawatan = el.KodePerawatan,
                         namaPerawatan = el.NamaPerawatan,
-                        harga = el.Harga,
-                        discMember = el.DiscMember,
-                        discNonMember = el.DiscNonMember,
+                        harga = el.Harga.ToString("C", culture),
+                        discMember = ((int)el.DiscMember).ToString() + "%",
+                        discNonMember = ((int)el.DiscNonMember).ToString() + "%",
                         point = el.Point,
                         aktif = el.Aktif == "1" ? "Ya" : "Tidak",
                     }
@@ -80,7 +82,7 @@
                         new TableColumn { Caption = "Kode Perawatan", DataField = "kodePerawatan" },
                         new TableColumn { Caption = "Nama Perawatan", DataField = "namaPerawatan" },
                         new TableColumn { Caption = "Harga", DataField = "harga" },
-                        new TableColumn { Caption = "Disc Member", DataField = "discMember" },
+                        new TableColumn { Caption = "Disc Member", DataField = "discMember", Alignment = "right" },
                         new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember" },
                         new TableColumn { Caption = "Point", DataField = "point" },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },

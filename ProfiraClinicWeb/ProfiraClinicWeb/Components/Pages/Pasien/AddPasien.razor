@@ -650,6 +650,8 @@
         patient.StatusMenikah = selectedMaritalStatus; // or use another field/property if needed
         patient.KodeCustomer = "INITIAL";
         patient.KodeLokasi = "LOKASI1";
+        patient.AKTIF = "1";
+        patient.UPDDT = DateTime.Now;
 
         // Call the API service update method.
         var result = await CustomerApiService.CreatePatientAsync(patient);

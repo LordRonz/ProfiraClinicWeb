@@ -51,6 +51,8 @@
 
                 System.Diagnostics.Debug.WriteLine("Parsing to table data");
 
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
                 // Prepare the table data source using the patient data retrieved from the API.
                 var dataSource = Pakets.Select(el =>
                     (object)new
@@ -61,9 +63,9 @@
                         kodePaketHeader = el.KodePaket,
                         namaPaketHeader = el.KodePaket,
                         namaGroupPaket = el.NamaGroupPaket,
-                        hargaJual = el.HARGA,
-                        discMember = el.DiscMember,
-                        discNonMember = el.DiscNonMember,
+                        hargaJual = el.HARGA.ToString("C", culture),
+                        discMember = ((int)el.DiscMember).ToString() + "%",
+                        discNonMember = ((int)el.DiscNonMember).ToString() + "%",
                         masaPaket = el.MasaLaku,
                         aktif = el.Aktif == "1" ? "Ya" : "Tidak",
                     }
