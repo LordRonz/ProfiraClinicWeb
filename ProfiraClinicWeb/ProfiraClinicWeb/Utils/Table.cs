@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices.Marshalling;
+using static ProfiraClinicWeb.Components.Table.Table;
 
 namespace ProfiraClinicWeb.Utils
 {
@@ -10,6 +11,9 @@ namespace ProfiraClinicWeb.Utils
         View,
         Delete,
     }
+
+
+    public enum ColumnAlign { Left, Center, Right }
 
     public class TableFilter
     {
@@ -26,6 +30,7 @@ namespace ProfiraClinicWeb.Utils
         public string? CustomIcon { get; set; }
         public MudBlazor.Color? Color { get; set; }
         public Func<object, Task>? Action { get; set; }
+        public ColumnAlign Align { get; set; } = ColumnAlign.Left;
     }
 
     public class TableConfig(List<TableColumn> column, List<object> dataSource, string? addRoute = "", List<TableFilter>? filters = null)

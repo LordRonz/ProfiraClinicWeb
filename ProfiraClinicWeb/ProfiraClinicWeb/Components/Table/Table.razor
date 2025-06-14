@@ -62,31 +62,33 @@
     <RowTemplate>
         @foreach (TableColumn col in Config.GetColumn())
         {
-            // Pass the Dto properties to the component
-            @switch (col.Type)
+            @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
+            var cellClass = col.Align switch
             {
-                case ColumnType.Data:
-                    <MudTd DataLabel="@col.Caption">@context.GetValueOrDefault(col.DataField)</MudTd>
-                    break;
-                case ColumnType.Edit:
-                    <MudTd DataLabel="@col.Caption">
+                ColumnAlign.Right => "text-end",
+                ColumnAlign.Center => "text-center",
+                _ => ""
+            };
+            <MudTd DataLabel="@col.Caption" Class="@cellClass">
+                @switch (col.Type)
+                {
+                    case ColumnType.Data:
+                        @context.GetValueOrDefault(col.DataField)
+                        break;
+                    case ColumnType.Edit:
                         <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
-                    </MudTd>
-                    break;
-                case ColumnType.View:
-                    <MudTd DataLabel="@col.Caption">
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
-                    </MudTd>
-                    break;
-                case ColumnType.Delete:
-                    <MudTd DataLabel="@col.Caption">
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
-                    </MudTd>
-                    break;
-                case null:
-                    <MudTd DataLabel="@col.Caption">@context.GetValueOrDefault(col.DataField)</MudTd>
-                    break;
-            }
+                        break;
+                    case ColumnType.View:
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                        break;
+                    case ColumnType.Delete:
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
+                        break;
+                    default:
+                        @context.GetValueOrDefault(col.DataField)
+                        break;
+                }
+            </MudTd>
         }
     </RowTemplate>
     <PagerContent>
