@@ -45,7 +45,7 @@
                                     <MudDatePicker Label="Tanggal Lahir"
                                     @bind-Date="date"
                                     Variant="Variant.Outlined"
-                                                   DateFormat="dd/MM/yyyy"
+                                    DateFormat="dd/MM/yyyy"
                                     Margin="Margin.Dense" />
                                 </MudItem>
                             </MudGrid>
@@ -408,66 +408,31 @@
 
                     <!-- Riwayat Penyakit Dahulu -->
                     <MudTextField T="string"
-                        Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)"
-                        Lines="4"
-                        @bind-Value="customerRiwayat.PenyakitDahulu"
-                        Variant="Variant.Outlined"
-                        Margin="Margin.Dense" />
+                    Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)"
+                    Lines="4"
+                    @bind-Value="customerRiwayat.PenyakitDahulu"
+                    Variant="Variant.Outlined"
+                    Margin="Margin.Dense" />
 
                     <!-- Riwayat Penyakit Sekarang -->
                     <div class="section d-flex">
                         <MudText Typo="Typo.subtitle2" Class="mb-1 mr-16">Riwayat Penyakit Sekarang</MudText>
                         <div>
                             <MudGrid GutterSize="2">
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="DM"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="Hipertensi"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="TBC"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="Asthma"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="Hepatitis"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="Kelainan Darah"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
-                                <MudItem xs="3">
-                                    <MudCheckBox T="bool"
-                                                 Label="Lain‑lain, sebutkan"
-                                                 @bind-Checked="tempSelection"
-                                                 Dense="true" />
-                                </MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="DM" @bind-Value="PenyakitSekarangSelections[0]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Hipertensi" @bind-Value="PenyakitSekarangSelections[1]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="TBC" @bind-Value="PenyakitSekarangSelections[2]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Asthma" @bind-Value="PenyakitSekarangSelections[3]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Hepatitis" @bind-Value="PenyakitSekarangSelections[4]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Kelainan Darah" @bind-Value="PenyakitSekarangSelections[5]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Lain‑lain, sebutkan" @bind-Value="PenyakitSekarangSelections[6]" Dense="true" /></MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                                          Label="Detail Penyakit Sekarang"
-                                          Lines="3"
-                                          @bind-Value="customerRiwayat.PenyakitSekarang"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                            Label="Detail Penyakit Sekarang"
+                            Lines="3"
+                            @bind-Value="customerRiwayat.PenyakitSekarang"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense" />
                         </div>
                     </div>
 
@@ -479,23 +444,23 @@
                                 <MudItem xs="2">
                                     <MudCheckBox T="bool"
                                                  Label="Tidak"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="AlergiObatSelections[0]"
                                                  Dense="true" />
                                 </MudItem>
                                 <MudItem xs="5">
                                     <MudCheckBox T="bool"
                                                  Label="Ya, Sebutkan"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="AlergiObatSelections[1]"
                                                  Dense="true" />
                                 </MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                                          Label="Jenis Obat yang Alergi"
-                                          Lines="2"
-                                          @bind-Value="customerRiwayat.KetAlergiObat"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
-                            </div>
+                            Label="Jenis Obat yang Alergi"
+                            Lines="2"
+                            @bind-Value="customerRiwayat.KetAlergiObat"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense" />
+                        </div>
                     </div>
 
                     <!-- Riwayat Alergi Makanan -->
@@ -506,22 +471,22 @@
                                 <MudItem xs="2">
                                     <MudCheckBox T="bool"
                                                  Label="Tidak"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="AlergiMakananSelections[0]"
                                                  Dense="true" />
                                 </MudItem>
                                 <MudItem xs="2">
                                     <MudCheckBox T="bool"
                                                  Label="Ya, Sebutkan"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="AlergiMakananSelections[1]"
                                                  Dense="true" />
                                 </MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                                          Label="Jenis Makanan yang Alergi"
-                                          Lines="2"
-                                          @bind-Value="customerRiwayat.KetAlergiMakanan"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                            Label="Jenis Makanan yang Alergi"
+                            Lines="2"
+                            @bind-Value="customerRiwayat.KetAlergiMakanan"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense" />
                         </div>
                     </div>
 
@@ -533,43 +498,36 @@
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
                                                  Label="Merokok"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="ResikoSelections[0]"
                                                  Dense="true" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
                                                  Label="Obesitas"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="ResikoSelections[1]"
                                                  Dense="true" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
                                                  Label="Dislipidemia"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="ResikoSelections[2]"
                                                  Dense="true" />
                                 </MudItem>
                                 <MudItem xs="3">
                                     <MudCheckBox T="bool"
                                                  Label="Lain‑lain, sebutkan"
-                                                 @bind-Checked="tempSelection"
+                                                 @bind-Value="ResikoSelections[3]"
                                                  Dense="true" />
                                 </MudItem>
                             </MudGrid>
                             <MudTextField T="string"
-                                          Label="Detail Faktor Resiko"
-                                          Lines="2"
-                                          @bind-Value="customerRiwayat.KetResiko"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense" />
+                            Label="Detail Faktor Resiko"
+                            Lines="2"
+                            @bind-Value="customerRiwayat.KetResiko"
+                            Variant="Variant.Outlined"
+                            Margin="Margin.Dense" />
                         </div>
                     </div>
-
-                    <MudButton Variant="Variant.Outlined"
-                               Color="MudBlazor.Color.Primary"
-                               OnClick="SubmitRiwayatAsync"
-                               Class="ml-auto rounded-3">
-                        Simpan Riwayat
-                    </MudButton>
                 </MudForm>
             </MudTabPanel>
 
@@ -597,6 +555,16 @@
     private string selectedNationality = "WNI";
     private string selectedMaritalStatus = "0"; // "0" for Belum Menikah, "1" for Menikah.
     private string selectedReligion = "Islam";
+
+    private string chkPenyakit = "0000000";
+    private string chkAlergiObat = "00";
+    private string chkAlergiMakanan = "00";
+    private string chkResiko = "0000";
+
+    private bool[] PenyakitSekarangSelections = new bool[7];
+    private bool[] AlergiObatSelections = new bool[2];
+    private bool[] AlergiMakananSelections = new bool[2];
+    private bool[] ResikoSelections = new bool[4];
 
     private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
 
@@ -658,6 +626,7 @@
         var result = await CustomerApiService.CreatePatientAsync(patient);
         if (result.StatusCode < 300)
         {
+            await SubmitRiwayatAsync(result.Data.KodeCustomer);
             NavigationManager.NavigateTo("/list-pasien");
         }
         else
@@ -667,8 +636,19 @@
         }
     }
 
-    private async Task SubmitRiwayatAsync()
+    private async Task SubmitRiwayatAsync(string kodeCustomer)
     {
+        customerRiwayat.KodeCustomer = kodeCustomer;
+        chkPenyakit = string.Concat(PenyakitSekarangSelections
+                                .Select(b => b ? '1' : '0'));
+
+        customerRiwayat.chkPenyakit = chkPenyakit;
+        customerRiwayat.chkAlergiObat = string.Concat(AlergiObatSelections
+                                .Select(b => b ? '1' : '0'));
+        customerRiwayat.chkAlergiMakanan = string.Concat(AlergiMakananSelections
+                                .Select(b => b ? '1' : '0'));
+        customerRiwayat.chkResiko = string.Concat(ResikoSelections
+                                .Select(b => b ? '1' : '0'));
         var result = await CustomerRiwayatApiService.CreateCustomerRiwayatAsalAsync(customerRiwayat);
         if (result.StatusCode < 300)
         {
