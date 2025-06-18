@@ -14,7 +14,7 @@ namespace ProfiraClinicWeb.Services
 
         public async Task<ApiResponse<List<UserGroup>>> GetUserGroupsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<UserGroup>>>("api/UserGroup");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<UserGroup>>>("api/UserGroup/GetList");
 
             if (response == null)
             {
@@ -24,9 +24,9 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
-        public async Task<ApiResponse<MCustomer>> GetUserGroupByCodeAsync(String id)
+        public async Task<ApiResponse<UserGroup>> GetUserGroupByCodeAsync(String id)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<MCustomer>>($"api/UserGroup/code/{id}");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<UserGroup>>($"api/UserGroup/GetByCode/{id}");
 
             if (response == null)
             {
@@ -39,7 +39,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<UserGroup>> CreateUserGroupAsync(UserGroup userGroup)
         {
             // POST the userGroup object as JSON to the API.
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/UserGroup", userGroup);
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/UserGroup/add", userGroup);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -53,10 +53,10 @@ namespace ProfiraClinicWeb.Services
             return createdUserGroupResponse;
         }
 
-        public async Task<ApiResponse<object>> UpdateUserGroupAsync(string kodeCustomer, MCustomer patient)
+        public async Task<ApiResponse<object>> UpdateUserGroupAsync(string kodeGroup, UserGroup userGroup)
         {
             // The endpoint expects a PUT request with the userGroup identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/UserGroup/{kodeCustomer}", patient);
+            var responseMessage = await _httpClient.PutAsJsonAsync($"api/UserGroup/edit/{kodeGroup}", userGroup);
 
             if (!responseMessage.IsSuccessStatusCode)
             {

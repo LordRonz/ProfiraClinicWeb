@@ -5,44 +5,23 @@ using ProfiraClinicWebAPI.Data;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class GroupPaketController(AppDbContext context) : ControllerBase
+    public class GroupPaketController
+    : BaseCrudController<GroupPaket>
     {
-        private readonly AppDbContext _context = context;
+        public GroupPaketController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GroupPaket>>> GetItems()
-        {
-            return _context.GroupPaket.ToList();
-        }
+        protected override DbSet<GroupPaket> DbSet
+            => _context.GroupPaket;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<GroupPaket>> GetItem(string id)
-        {
-            var item = await _context.GroupPaket.FindAsync(id);
+        protected override IQueryable<GroupPaket> ApplySearch(
+            IQueryable<GroupPaket> q,
+            string likeParam)
+            => q.Where(d
+                => EF.Functions.Like(d.NamaGroupPaket, likeParam)
+                || EF.Functions.Like(d.KodeGroupPaket, likeParam));
 
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public class GroupPaketBodyListOr
-        {
-            public string Param { get; set; } = "%";
-            public string GetParam { get => this.Param.Equals("%") ? this.Param : $"%{this.Param}%"; }
-        }
-
-        [HttpPost]
-        public List<GroupPaket> GetCustomerListOr([FromBody] GroupPaketBodyListOr body)
-        {
-            return _context.GroupPaket
-                .Where(d => (EF.Functions.Like(d.NamaGroupPaket, body.GetParam) || EF.Functions.Like(d.KodeGroupPaket, body.GetParam)))
-                .OrderBy(d => d.KodeGroupPaket)
-                .ToList();
-        }
+        protected override IOrderedQueryable<GroupPaket> ApplyOrder(
+            IQueryable<GroupPaket> q)
+            => q.OrderBy(d => d.KodeGroupPaket);
     }
 }

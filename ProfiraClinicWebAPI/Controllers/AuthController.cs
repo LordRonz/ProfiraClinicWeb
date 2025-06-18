@@ -24,8 +24,13 @@ namespace ProfiraClinicWebAPI.Controllers
             var authenticatedUser = _authService.Authenticate(model.Username, model.Password);
             if (authenticatedUser == null || authenticatedUser.Equals(null))
                 return Unauthorized();
+            if (!string.IsNullOrEmpty(authenticatedUser.KodeLokasi) && !string.IsNullOrEmpty(model.KodeLokasi))
+            {
+                if (model.KodeLokasi != authenticatedUser.KodeLokasi)
+                    return BadRequest("Invalid Kode Lokasi");
+            }
 
-            var token = _authService.GenerateToken(authenticatedUser);
+                var token = _authService.GenerateToken(authenticatedUser);
             return Ok(new { Token = token });
         }
 

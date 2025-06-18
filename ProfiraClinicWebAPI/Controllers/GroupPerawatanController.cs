@@ -6,42 +6,23 @@ using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class GroupPerawatanController(AppDbContext context) : ControllerBase
+    public class GroupPerawatanController
+    : BaseCrudController<GroupPerawatan>
     {
-        private readonly AppDbContext _context = context;
+        public GroupPerawatanController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GroupPerawatan>>> GetItems()
-        {
-            return _context.GroupPerawatan.ToList();
-        }
+        protected override DbSet<GroupPerawatan> DbSet
+            => _context.GroupPerawatan;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<GroupPerawatan>> GetItem(string id)
-        {
-            var item = await _context.GroupPerawatan.FindAsync(id);
+        protected override IQueryable<GroupPerawatan> ApplySearch(
+            IQueryable<GroupPerawatan> q,
+            string likeParam)
+            => q.Where(d
+                => EF.Functions.Like(d.NamaGroupPerawatan, likeParam)
+                || EF.Functions.Like(d.KodeGroupPerawatan, likeParam));
 
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public class GroupGroupPerawatanBodyListOr : BaseBodyListOr
-        {
-        }
-
-        [HttpPost]
-        public List<GroupPerawatan> GetCustomerListOr([FromBody] GroupGroupPerawatanBodyListOr body)
-        {
-            return _context.GroupPerawatan
-                .Where(d => (EF.Functions.Like(d.NamaGroupPerawatan, body.GetParam) || EF.Functions.Like(d.KodeGroupPerawatan, body.GetParam)))
-                .OrderBy(d => d.KodeGroupPerawatan)
-                .ToList();
-        }
+        protected override IOrderedQueryable<GroupPerawatan> ApplyOrder(
+            IQueryable<GroupPerawatan> q)
+            => q.OrderBy(d => d.KodeGroupPerawatan);
     }
 }

@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfiraClinicWebAPI", "Prof
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfiraClinic.Models", "Model\ProfiraClinic.Models.csproj", "{2D1D18B1-3B11-469A-AEB0-57410244FF44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfiraClinicWebChildAPI", "ProfiraClinicWebChildAPI\ProfiraClinicWebChildAPI.csproj", "{BBE8AD38-5515-4231-B276-BAA60C01B634}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2D1D18B1-3B11-469A-AEB0-57410244FF44} = {2D1D18B1-3B11-469A-AEB0-57410244FF44}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +38,10 @@ Global
 		{2D1D18B1-3B11-469A-AEB0-57410244FF44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D1D18B1-3B11-469A-AEB0-57410244FF44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D1D18B1-3B11-469A-AEB0-57410244FF44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBE8AD38-5515-4231-B276-BAA60C01B634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBE8AD38-5515-4231-B276-BAA60C01B634}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBE8AD38-5515-4231-B276-BAA60C01B634}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBE8AD38-5515-4231-B276-BAA60C01B634}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

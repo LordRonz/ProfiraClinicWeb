@@ -36,6 +36,7 @@ namespace ProfiraClinicWebAPI.Services
             return new LoginModel
             {
                 Username = user.UserName,
+                KodeLokasi = user.KodeLokasi,
             };
         }
 
@@ -46,7 +47,7 @@ namespace ProfiraClinicWebAPI.Services
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Username),
                 new Claim(ClaimTypes.Role, "Client"),
             };
 

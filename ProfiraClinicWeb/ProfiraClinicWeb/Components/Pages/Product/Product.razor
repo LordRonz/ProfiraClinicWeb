@@ -1,0 +1,86 @@
+﻿@page "/product"
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Utils
+@using ProfiraClinicWeb.Services
+@inject GroupBarangApiService ApiService
+
+<MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
+    <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" />
+</MudCard>
+
+@code {
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    // Configuration for the table. It will be set once the data is loaded.
+    public TableConfig PackageTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    // Holds the list of patients
+    private List<GroupBarang> Barangs = new List<GroupBarang>();
+
+    // This method sets up the page title.
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Group Barang", "Master / Group Barang");
+    }
+
+    // When the component is initialized, call the API service to retrieve patients.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("Loading pakets...");
+                // Get the API response
+                var apiResponse = await ApiService.GetGroupBarangsAsync();
+                // Check if status code indicates success
+                System.Diagnostics.Debug.WriteLine("Done");
+                if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+                {
+                    Barangs = apiResponse.Data;
+                }
+                else
+                {
+                    // Handle API error case appropriately (e.g., display an error message)
+                    // For example: show a notification, log the error etc.
+                }
+
+                System.Diagnostics.Debug.WriteLine("Parsing to table data");
+
+                // Prepare the table data source using the patient data retrieved from the API.
+                var dataSource = Barangs.Select(el =>
+                    (object)new
+                    {
+                        view = $"product/{el.KodeGroupBarang}",
+                        edit = $"product/{el.KodeGroupBarang}/edit",
+                        kodeGroupBarang = el.KodeGroupBarang,
+                        namaGroupBarang = el.NamaGroupBarang,
+                        aktif = el.Aktif == "1" ? "Ya" : "Tidak",
+                    }
+                ).ToList();
+
+                PackageTableConfig = new TableConfig(
+                    new List<TableColumn> {
+                        new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
+                        new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
+                        new TableColumn { Caption = "Kode Group Barang", DataField = "kodeGroupBarang" },
+                        new TableColumn { Caption = "Nama Group Barang", DataField = "namaGroupBarang" },
+                        new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                                    },
+                    dataSource,
+                    "/pasien/add"
+                );
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., network errors, deserialization issues, etc.)
+                System.Diagnostics.Debug.WriteLine($"Error loading paket: {ex.Message}");
+            }
+            StateHasChanged();
+        }
+    }
+}

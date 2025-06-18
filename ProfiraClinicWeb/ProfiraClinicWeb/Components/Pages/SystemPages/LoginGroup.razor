@@ -52,8 +52,8 @@
             var dataSource = UserGroups.Select(el =>
                 (object)new
                 {
-                    view = $"group-login",
-                    edit = $"group-login/edit",
+                    view = $"group-login/{el.KodeUserGroup}",
+                    edit = $"group-login/{el.KodeUserGroup}/edit",
                     memberId = el.KodeUserGroup,
                     namaPasien = el.NamaUserGroup,
                 }

@@ -8,6 +8,7 @@
 @using MudBlazor
 @inject HttpClient httpClient
 @inject CustomerApiService CustomerApiService
+@inject CustomerRiwayatAsalService CustomerRiwayatApiService
 @inject NavigationManager NavigationManager
 
 <MudCard Class="p-4">
@@ -402,16 +403,135 @@
 
             <!-- ───────── Riwayat Awal Pasien ───────── -->
             <MudTabPanel Text="Riwayat Awal Pasien">
-                <MudForm @ref="form" Class="d-flex flex-column gap-3">
+                <MudForm @ref="form" Class="d-flex flex-column gap-4">
+
+                    <!-- Riwayat Penyakit Dahulu -->
                     <MudTextField T="string"
                                   Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)"
                                   Lines="4"
-                                  @bind-Value="patient.NamaCustomer"
+                                  @bind-Value="customerRiwayat.PenyakitDahulu"
                                   Variant="Variant.Outlined"
                                   Margin="Margin.Dense" />
+
+                    <!-- Riwayat Penyakit Sekarang -->
+                    <div class="section d-flex">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1 mr-16">Riwayat Penyakit Sekarang</MudText>
+                        <div>
+                            <MudGrid GutterSize="2">
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="DM" @bind-Value="PenyakitSekarangSelections[0]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Hipertensi" @bind-Value="PenyakitSekarangSelections[1]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="TBC" @bind-Value="PenyakitSekarangSelections[2]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Asthma" @bind-Value="PenyakitSekarangSelections[3]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Hepatitis" @bind-Value="PenyakitSekarangSelections[4]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Kelainan Darah" @bind-Value="PenyakitSekarangSelections[5]" Dense="true" /></MudItem>
+                                <MudItem xs="3"><MudCheckBox T="bool" Label="Lain‑lain, sebutkan" @bind-Value="PenyakitSekarangSelections[6]" Dense="true" /></MudItem>
+                            </MudGrid>
+                            <MudTextField T="string"
+                                          Label="Detail Penyakit Sekarang"
+                                          Lines="3"
+                                          @bind-Value="customerRiwayat.PenyakitSekarang"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </div>
+                    </div>
+
+                    <!-- Riwayat Alergi Obat -->
+                    <div class="section d-flex">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1 mr-16">Riwayat Alergi Obat</MudText>
+                        <div class="w-50">
+                            <MudGrid GutterSize="2" Class="mb-2">
+                                <MudItem xs="2">
+                                    <MudCheckBox T="bool"
+                                                 Label="Tidak"
+                                                 @bind-Value="AlergiObatSelections[0]"
+                                                 Dense="true" />
+                                </MudItem>
+                                <MudItem xs="5">
+                                    <MudCheckBox T="bool"
+                                                 Label="Ya, Sebutkan"
+                                                 @bind-Value="AlergiObatSelections[1]"
+                                                 Dense="true" />
+                                </MudItem>
+                            </MudGrid>
+                            <MudTextField T="string"
+                                          Label="Jenis Obat yang Alergi"
+                                          Lines="2"
+                                          @bind-Value="customerRiwayat.KetAlergiObat"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </div>
+                    </div>
+
+                    <!-- Riwayat Alergi Makanan -->
+                    <div class="section d-flex">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1 mr-16">Riwayat Alergi Makanan</MudText>
+                        <div class="w-50">
+                            <MudGrid GutterSize="2" AlignItems="Center" Class="mb-2">
+                                <MudItem xs="2">
+                                    <MudCheckBox T="bool"
+                                                 Label="Tidak"
+                                                 @bind-Value="AlergiMakananSelections[0]"
+                                                 Dense="true" />
+                                </MudItem>
+                                <MudItem xs="2">
+                                    <MudCheckBox T="bool"
+                                                 Label="Ya, Sebutkan"
+                                                 @bind-Value="AlergiMakananSelections[1]"
+                                                 Dense="true" />
+                                </MudItem>
+                            </MudGrid>
+                            <MudTextField T="string"
+                                          Label="Jenis Makanan yang Alergi"
+                                          Lines="2"
+                                          @bind-Value="customerRiwayat.KetAlergiMakanan"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </div>
+                    </div>
+
+                    <!-- Faktor Resiko -->
+                    <div class="section d-flex">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1 mr-16">Faktor Resiko</MudText>
+                        <div class="w-50">
+                            <MudGrid GutterSize="2" Class="mb-2">
+                                <MudItem xs="3">
+                                    <MudCheckBox T="bool"
+                                                 Label="Merokok"
+                                                 @bind-Value="ResikoSelections[0]"
+                                                 Dense="true" />
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudCheckBox T="bool"
+                                                 Label="Obesitas"
+                                                 @bind-Value="ResikoSelections[1]"
+                                                 Dense="true" />
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudCheckBox T="bool"
+                                                 Label="Dislipidemia"
+                                                 @bind-Value="ResikoSelections[2]"
+                                                 Dense="true" />
+                                </MudItem>
+                                <MudItem xs="3">
+                                    <MudCheckBox T="bool"
+                                                 Label="Lain‑lain, sebutkan"
+                                                 @bind-Value="ResikoSelections[3]"
+                                                 Dense="true" />
+                                </MudItem>
+                            </MudGrid>
+                            <MudTextField T="string"
+                                          Label="Detail Faktor Resiko"
+                                          Lines="2"
+                                          @bind-Value="customerRiwayat.KetResiko"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" />
+                        </div>
+                    </div>
+
                     <MudButton Variant="Variant.Outlined"
                                Color="MudBlazor.Color.Primary"
-                               OnClick="SubmitAsync">
+                               OnClick="SubmitRiwayatAsync"
+                               Class="ml-auto rounded-3">
                         Simpan Riwayat
                     </MudButton>
                 </MudForm>
@@ -428,6 +548,8 @@
 
     // The patient model used for data binding.
     private MCustomer patient = new MCustomer();
+    private CustomerRiwayatAsal customerRiwayat = new CustomerRiwayatAsal();
+
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
@@ -439,7 +561,19 @@
     private string selectedMaritalStatus = "0"; // "0" for Belum Menikah, "1" for Menikah.
     private string selectedReligion = "Islam";
 
+    private string chkPenyakit = "0000000";
+    private string chkAlergiObat = "00";
+    private string chkAlergiMakanan = "00";
+    private string chkResiko = "0000";
+
+    private bool[] PenyakitSekarangSelections = new bool[7];
+    private bool[] AlergiObatSelections = new bool[2];
+    private bool[] AlergiMakananSelections = new bool[2];
+    private bool[] ResikoSelections = new bool[4];
+
     private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
+
+    bool tempSelection = false;
 
     MudForm form;
 
@@ -467,6 +601,28 @@
             selectedNationality = patient.WargaNegara ?? "WNI";
             // Optionally, map additional fields.
             selectedReligion = patient.Agama ?? "Islam";
+
+        }
+
+        var response2 = await CustomerRiwayatApiService.GetCustomerRiwayatAsalByCodeAsync(Id);
+        if (response2 != null && response2.StatusCode == 200)
+        {
+            customerRiwayat = response2.Data;
+            customerRiwayat.KodeCustomer = Id;
+
+            chkPenyakit = response2.Data.chkPenyakit ?? "0000000";
+            chkAlergiObat = response2.Data.chkAlergiObat ?? "00";
+            chkAlergiMakanan = response2.Data.chkAlergiMakanan ?? "00";
+            chkResiko = response2.Data.chkResiko ?? "0000";
+
+            for (int i = 0; i < PenyakitSekarangSelections.Length && i < chkPenyakit.Length; i++)
+                PenyakitSekarangSelections[i] = chkPenyakit[i] == '1';
+            for (int i = 0; i < AlergiObatSelections.Length && i < chkAlergiObat.Length; i++)
+                AlergiObatSelections[i] = chkAlergiObat[i] == '1';
+            for (int i = 0; i < AlergiMakananSelections.Length && i < chkAlergiMakanan.Length; i++)
+                AlergiMakananSelections[i] = chkAlergiMakanan[i] == '1';
+            for (int i = 0; i < ResikoSelections.Length && i < chkResiko.Length; i++)
+                ResikoSelections[i] = chkResiko[i] == '1';
         }
     }
 
@@ -485,7 +641,35 @@
         var result = await CustomerApiService.UpdatePatientAsync(patient.KodeCustomer, patient);
         if (result.StatusCode < 300)
         {
-            NavigationManager.NavigateTo("/pasien");
+            NavigationManager.NavigateTo("/list-pasien");
+        }
+        else
+        {
+            // Here you can display a snackbar or alert message with result.Message.
+            System.Diagnostics.Debug.WriteLine(result.Message);
+        }
+    }
+
+    private async Task SubmitRiwayatAsync()
+    {
+        customerRiwayat.KodeCustomer = Id;
+        chkPenyakit = string.Concat(PenyakitSekarangSelections
+                                .Select(b => b ? '1' : '0'));
+
+        customerRiwayat.chkPenyakit = chkPenyakit;
+        customerRiwayat.chkAlergiObat = string.Concat(AlergiObatSelections
+                                .Select(b => b ? '1' : '0'));
+        customerRiwayat.chkAlergiMakanan = string.Concat(AlergiMakananSelections
+                                .Select(b => b ? '1' : '0'));
+        customerRiwayat.chkResiko = string.Concat(ResikoSelections
+                                .Select(b => b ? '1' : '0'));
+
+        System.Diagnostics.Debug.WriteLine(customerRiwayat.chkPenyakit);
+
+        var result = await CustomerRiwayatApiService.CreateCustomerRiwayatAsalAsync(customerRiwayat);
+        if (result.StatusCode < 300)
+        {
+            NavigationManager.NavigateTo("/list-pasien");
         }
         else
         {
@@ -521,6 +705,8 @@
         height: 30px !important;
         padding: 0px 10px !important;
         font-size: 12px !important;
+        display: flex !important;
+        align-items: center;
     }
 
     .table-form .mud-input-label {

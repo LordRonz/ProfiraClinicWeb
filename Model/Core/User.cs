@@ -17,7 +17,7 @@ namespace ProfiraClinic.Models.Core
         public string UserName { get; set; }
 
         [Column(TypeName = "varchar(100)")]
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string Password { get; set; }
 
         public DateTime? UPDDT { get; set; }

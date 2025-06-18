@@ -4,16 +4,16 @@
 
 @if (WithAdd == true) {
     <div class="d-flex justify-content-end mb-2">
-        <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton>
+        <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">@AddButtonText</MudButton>
     </div>
 }
 <div class="mb-5">
     <MudCard Class="rounded-3">
-        <MudStack Spacing="1" Class="w-100 table-header">
+        <MudStack Spacing="1" Class="w-100 table-header pb-4">
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudCollapse Expanded="_expanded" Class="px-4">
                 <div class="d-flex justify-content-start align-items-start gap-4">
-                    <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
+                    <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll @bind-Value="value" @bind-SelectedValues="options" OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
                         @foreach (TableColumn col in Config.GetColumn())
                         {
                             @if(col.Type == ColumnType.Data) {
@@ -23,15 +23,15 @@
                     </MudSelect>
                     <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
                 </div>
-                <div class="d-flex justify-content-between mb-4">
-                    <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton>
-                    @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
-                </div>
+                @* <div class="d-flex justify-content-between mb-4"> *@
+                @*     <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton> *@
+                @*     @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
+                @* </div> *@
             </MudCollapse>
         </MudStack>
     </MudCard>
 </div>
-<MudTable HeaderClass="@GetHeaderClass()" Striped="true" Bordered="true" Items="@Config.GetData()" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
+<MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="@Config.GetData()" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
     <ColGroup>
         @foreach (TableColumn col in Config.GetColumn())
         {
@@ -53,40 +53,42 @@
         }
     </ColGroup>
     <HeaderContent>
-            @foreach (TableColumn col in Config.GetColumn())
-            {
-                // Pass the Dto properties to the component
-                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
-            }
+        @foreach (TableColumn col in Config.GetColumn())
+        {
+            // Pass the Dto properties to the component
+            <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+        }
     </HeaderContent>
     <RowTemplate>
         @foreach (TableColumn col in Config.GetColumn())
         {
-            // Pass the Dto properties to the component
-            @switch (col.Type)
+            @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
+            var cellClass = col.Align switch
             {
-                case ColumnType.Data:
-                    <MudTd DataLabel="@col.Caption">@context.GetValueOrDefault(col.DataField)</MudTd>
-                    break;
-                case ColumnType.Edit:
-                    <MudTd DataLabel="@col.Caption">
+                ColumnAlign.Right => "text-end",
+                ColumnAlign.Center => "text-center",
+                _ => ""
+            };
+            <MudTd DataLabel="@col.Caption" Class="@cellClass">
+                @switch (col.Type)
+                {
+                    case ColumnType.Data:
+                        @context.GetValueOrDefault(col.DataField)
+                        break;
+                    case ColumnType.Edit:
                         <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
-                    </MudTd>
-                    break;
-                case ColumnType.View:
-                    <MudTd DataLabel="@col.Caption">
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
-                    </MudTd>
-                    break;
-                case ColumnType.Delete:
-                    <MudTd DataLabel="@col.Caption">
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? @Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
-                    </MudTd>
-                    break;
-                case null:
-                    <MudTd DataLabel="@col.Caption">@context.GetValueOrDefault(col.DataField)</MudTd>
-                    break;
-            }
+                        break;
+                    case ColumnType.View:
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                        break;
+                    case ColumnType.Delete:
+                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
+                        break;
+                    default:
+                        @context.GetValueOrDefault(col.DataField)
+                        break;
+                }
+            </MudTd>
         }
     </RowTemplate>
     <PagerContent>
@@ -110,6 +112,10 @@
         _expanded = !_expanded;
     }
 
+    private IEnumerable<string> options { get; set; } = [];
+
+    private string value { get; set; } = "Nothing selected";
+
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
     [Parameter]
@@ -117,6 +123,9 @@
 
     [Parameter]
     public bool? WithAdd { get; set; } = true;
+
+    [Parameter]
+    public string? AddButtonText { get; set; } = "Tambah";
 
     private bool FilterFunc1(Dictionary<string, string> element) => FilterFunc(element, searchString1.ToLower().Trim());
 
@@ -140,7 +149,7 @@
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
         System.Diagnostics.Debug.Print(element.Values.ToList()[2]);
-        
+
         var filters = Config.GetFilters();
         foreach (var filter in filters)
         {
@@ -158,6 +167,18 @@
         }
 
         return false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var columns = Config.GetColumn().Select(p => p.DataField);
+            options = Config.GetColumn()
+                .Select(p => p.DataField)
+                .ToHashSet();
+            StateHasChanged();
+        }
     }
 }
 

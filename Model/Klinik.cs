@@ -18,5 +18,6 @@ namespace ProfiraClinic.Models
         public string? USRID { get; set; }
         public string? DBName { get; set; }
         public string? BranchID { get; set; }
+        public string? IDLokasi { get; set; }
     }
 }

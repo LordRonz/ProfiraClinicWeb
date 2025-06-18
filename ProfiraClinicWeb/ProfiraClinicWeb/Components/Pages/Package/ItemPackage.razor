@@ -1,0 +1,99 @@
+﻿@page "/package-item"
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Utils
+@using ProfiraClinicWeb.Services
+@inject PaketHeaderApiService ApiService
+
+<MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
+    <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" />
+</MudCard>
+
+@code {
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    // Configuration for the table. It will be set once the data is loaded.
+    public TableConfig PackageTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    // Holds the list of patients
+    private List<PaketHeaderList> Pakets = new List<PaketHeaderList>();
+
+    // This method sets up the page title.
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Item Paket Perawatan", "Master / Paket Perawatan");
+    }
+
+    // When the component is initialized, call the API service to retrieve patients.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("Loading pakets...");
+                // Get the API response
+                var apiResponse = await ApiService.GetPaketHeadersAsync();
+                // Check if status code indicates success
+                System.Diagnostics.Debug.WriteLine("Done");
+                if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+                {
+                    Pakets = apiResponse.Data;
+                }
+                else
+                {
+                    // Handle API error case appropriately (e.g., display an error message)
+                    // For example: show a notification, log the error etc.
+                }
+
+                System.Diagnostics.Debug.WriteLine("Parsing to table data");
+
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
+                // Prepare the table data source using the patient data retrieved from the API.
+                var dataSource = Pakets.Select(el =>
+                    (object)new
+                    {
+                        view = $"paket/{el.KodePaket}",
+                        edit = $"paket/{el.KodePaket}/edit",
+                        kodeJenis = el.KodeJenis,
+                        kodePaketHeader = el.KodePaket,
+                        namaPaketHeader = el.NamaPaket,
+                        namaGroupPaket = el.NamaGroupPaket,
+                        hargaJual = el.HARGA.ToString("C", culture).Replace("Rp", ""),
+                        discMember = ((int)el.DiscMember).ToString() + "%",
+                        discNonMember = ((int)el.DiscNonMember).ToString() + "%",
+                        masaPaket = el.MasaLaku,
+                        aktif = el.Aktif == "1" ? "Ya" : "Tidak",
+                    }
+                ).ToList();
+
+                PackageTableConfig = new TableConfig(
+                    new List<TableColumn> {
+                        new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
+                        new TableColumn { Caption = "Kategori Rawat", DataField = "kodeJenis" },
+                        new TableColumn { Caption = "Group Paket", DataField = "namaGroupPaket" },
+                        new TableColumn { Caption = "Kode Paket", DataField = "kodePaketHeader" },
+                        new TableColumn { Caption = "Nama  Paket", DataField = "namaPaketHeader" },
+                        new TableColumn { Caption = "Harga Jual", DataField = "hargaJual", Align = ColumnAlign.Right },
+                        new TableColumn { Caption = "Disc Member", DataField = "discMember", Align = ColumnAlign.Right },
+                        new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember", Align = ColumnAlign.Right },
+                        new TableColumn { Caption = "Masa Paket", DataField = "masaPaket" },
+                        new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                                },
+                    dataSource,
+                    "/package/add"
+                );
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., network errors, deserialization issues, etc.)
+                System.Diagnostics.Debug.WriteLine($"Error loading paket: {ex.Message}");
+            }
+            StateHasChanged();
+        }
+    }
+}

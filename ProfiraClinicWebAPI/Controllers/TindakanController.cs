@@ -4,49 +4,36 @@ using ProfiraClinic.Models;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using ProfiraClinicWebAPI.Helper;
+using ProfiraClinic.Models.Core;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class TindakanController(AppDbContext context) : ControllerBase
+    public class TindakanController(AppDbContext ctx)
+        : BaseCrudController<PPerawatanH>(ctx)
     {
-        private readonly AppDbContext _context = context;
+        protected override DbSet<PPerawatanH> DbSet
+            => _context.PPerawatanH;
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PPerawatanH>>> GetItems()
+        protected override IQueryable<PPerawatanH> ApplySearch(
+            IQueryable<PPerawatanH> q,
+            string likeParam)
+            => q.Where(d
+                => EF.Functions.Like(d.KodeJenis, likeParam)
+                || EF.Functions.Like(d.KodeGroupPerawatan, likeParam)
+            || EF.Functions.Like(d.KodePerawatan, likeParam)
+            || EF.Functions.Like(d.NamaPerawatan, likeParam));
+
+        protected override IOrderedQueryable<PPerawatanH> ApplyOrder(
+            IQueryable<PPerawatanH> q)
+            => q.OrderBy(d => d.KodePerawatan);
+
+        protected override IQueryable<PPerawatanH> ApplyLastFilter(
+        IQueryable<PPerawatanH> q,
+        DateTime lastDate)
         {
-            return _context.PPerawatanH.ToList();
-        }
-
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PPerawatanH>> GetItem(string id)
-        {
-            var item = await _context.PPerawatanH.FindAsync(id);
-
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public class TindakanBodyListOr : BaseBodyListOr
-        {
-        }
-
-        [HttpPost]
-        public List<PPerawatanH> GetDivisiListOr([FromBody] TindakanBodyListOr body)
-        {
-            return _context.PPerawatanH
-                .Where(d => (EF.Functions.Like(d.KodeJenis, body.GetParam) ||
-                             EF.Functions.Like(d.KodeGroup, body.GetParam) ||
-                             EF.Functions.Like(d.KodePerawatan, body.GetParam) ||
-                             EF.Functions.Like(d.NamaPerawatan, body.GetParam)))
-                .OrderBy(d => d.KodePerawatan)
-                .ToList();
+            return q.Where(p =>
+                p.UpdDt > lastDate
+            );
         }
     }
 }

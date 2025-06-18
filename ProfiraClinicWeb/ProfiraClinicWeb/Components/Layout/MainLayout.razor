@@ -1,7 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Data
-@using ProfiraClinic.Models
 @using Microsoft.EntityFrameworkCore;
+@using ProfiraClinicWeb.Helpers
+@using ProfiraClinicWeb.Services
+@inject UserApiService ApiService
 
 @* <div class="page">
     <div class="sidebar">
@@ -37,7 +40,7 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 
 <CascadingValue Value="this">
-    <MudLayout Class="bg-dark bg-opacity-25" Style='@GetBgClass()'>
+    <MudLayout Class="@LayoutCss" Style='@GetBgClass()'>
         @* Top navbar *@
 
         @if (!isDoctor) {
@@ -49,7 +52,7 @@
                 </div>
                 <MudSpacer></MudSpacer>
                 <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
-                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
+                    <MudIcon Size="MudBlazor.Size.Large" Icon="@Icons.Material.Filled.Notifications" Color="MudBlazor.Color.Default" />
                 </MudBadge>
                 <div class="d-flex align-items-center gap-1 mr-2">
                     <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
@@ -59,12 +62,13 @@
                     <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                 <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">Valerie Luna</MudText>
-                    <MudAvatar>
-                        <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
-                    </MudAvatar>
+
+                    @* <MudAvatar> *@
+                    @*     <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage> *@
+                    @* </MudAvatar> *@
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Size="MudBlazor.Size.Large" Color="MudBlazor.Color.Default" />
                     <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-		                <div class="d-flex flex-column pa-1">
+                        <div class="d-flex flex-column pa-1">
                             <MudList T="string" Clickable="true">
                                 <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                 <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
@@ -72,8 +76,12 @@
                                 <MudDivider />
                                 <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
                             </MudList>
-		                </div>
-	                </MudPopover>
+                        </div>
+                    </MudPopover>
+                    @if (!string.IsNullOrEmpty(user?.UserName))
+                    {
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Dark">@user.UserName</MudText>
+                    }
                 </div>
             </MudAppBar>
         } else
@@ -101,36 +109,36 @@
                 <MudSpacer></MudSpacer>
                 <div class="d-flex flex-column align-items-end">
                     <div class="d-flex justify-content-center align-items-center">
-                    <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
+                        <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
                             <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #fff;" />
-                    </MudBadge>
+                        </MudBadge>
                         <div class="mr-8">
                             <MudIcon Icon="@Icons.Material.Filled.Search" Style="color: #fff;" />
                         </div>
-                    @* <div class="d-flex align-items-center gap-1 mr-2">
+                        @* <div class="d-flex align-items-center gap-1 mr-2">
                         <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-                        
+
                     </div> *@
 
-                    @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
+                        @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
-                    <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                        <MudText Typo="Typo.body2">@Kary?.NamaKaryawan</MudText>
-                        <MudAvatar>
-                            <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
-                        </MudAvatar>
-                        <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
-                            <div class="d-flex flex-column pa-1">
-                                <MudList T="string" Clickable="true">
-                                    <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
-                                    <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
-                                    <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
-                                    <MudDivider />
-                                    <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
-                                </MudList>
-                            </div>
-                        </MudPopover>
+                        <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
+                            <MudText Typo="Typo.body2">@Kary?.NamaKaryawan</MudText>
+                            <MudAvatar>
+                                <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+                            </MudAvatar>
+                            <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
+                                <div class="d-flex flex-column pa-1">
+                                    <MudList T="string" Clickable="true">
+                                        <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
+                                        <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
+                                        <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
+                                        <MudDivider />
+                                        <MudListItem Text="Logout" Icon="@Icons.Material.Filled.Logout" OnClick="OpenDialog" />
+                                    </MudList>
+                                </div>
+                            </MudPopover>
                         </div>
                     </div>
                     @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "dokter/dashboard") {
@@ -153,21 +161,70 @@
                         <MudDrawerHeader Class="overflow-hidden">
                             <MudImage Src="images/logo.jpg" Alt="Profira" Class="" Height="@(_drawerOpen ? 85 : 98)" Style="@(_drawerOpen ? "" : "margin-left: -32px;")" />
                         </MudDrawerHeader>
+                        <p class="text-center">@user?.Klinik?.KETLK</p>
                         <MudDivider Class="my-2 sidebar-divider w-75 mx-auto mb-6 flex-grow-0" />
                         <MudNavMenu Color="MudBlazor.Color.Warning">
                             <MudNavLink Icon="@Icons.Material.Filled.Home" Href="/" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Dashboard" : "")</MudNavLink>
-                            <MudNavLink Icon="@Icons.Material.Filled.Description" OnClick="@ToggleMaster" Class="fw-semibold">@(_drawerOpen ? "Master" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Description" OnClick="@ToggleMaster" Class="fw-semibold">
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    @(_drawerOpen ? "Master" : "")
+                                    <MudIcon Icon="@(masterMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                </div>
+                            </MudNavLink>
 
                             <MudCollapse Expanded="@masterMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/clinic"))">Klinik</MudNavLink>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Paket</MudNavLink>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Perawatan</MudNavLink>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Produk</MudNavLink>
+                                <MudNavLink OnClick="@TogglePaket">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        @(_drawerOpen ? "Paket Perawatan" : "")
+                                        <MudIcon Icon="@(paketMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                    </div>
+                                </MudNavLink>
+                                <MudCollapse Expanded="@paketMenuExpanded" Class="ml-2">
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/package"))">Group Paket</MudNavLink>
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/package-item"))">Paket Perawatan</MudNavLink>
+                                </MudCollapse>
+                                <MudNavLink OnClick="@TogglePerawatan">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        @(_drawerOpen ? "Perawatan" : "")
+                                        <MudIcon Icon="@(perawatanMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                    </div>
+                                </MudNavLink>
+                                <MudCollapse Expanded="@perawatanMenuExpanded" Class="ml-2">
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment"))">Group Perawatan</MudNavLink>
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/treatment-item"))">Item Perawatan</MudNavLink>
+                                </MudCollapse>
+                                <MudNavLink OnClick="@ToggleBarang">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        @(_drawerOpen ? "Barang" : "")
+                                        <MudIcon Icon="@(barangMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                    </div>
+                                </MudNavLink>
+                                <MudCollapse Expanded="@barangMenuExpanded" Class="ml-2">
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product"))">Group Barang</MudNavLink>
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product-item-2"))">Item Barang</MudNavLink>
+                                    <MudNavLink OnClick="@(() => OnClickMasterNav("/product-item"))">Parameter Harga Jual</MudNavLink>
+                                </MudCollapse>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/doctor"))">Dokter</MudNavLink>
                             </MudCollapse>
                             <MudNavLink Icon="@Icons.Material.Filled.Person" Href="/list-pasien" Match="NavLinkMatch.All" Class="fw-semibold">@(_drawerOpen ? "Pasien" : "")</MudNavLink>
 
-                            <MudNavLink Icon="@Icons.Material.Filled.Build" OnClick="@ToggleSystem" Class="fw-semibold">@(_drawerOpen ? "System" : "")</MudNavLink>
+                            <MudNavLink Icon="@Icons.Material.Filled.Build" OnClick="@ToggleSystem" Class="fw-semibold">
+                                <div class="d-flex justify-content-between align-items-center w-100">
+                                    @(_drawerOpen ? "System" : "")
+                                    <MudIcon Icon="@(systemMenuExpanded
+                        ? Icons.Material.Filled.ExpandLess
+                        : Icons.Material.Filled.ExpandMore)" />
+                                </div>
+                            </MudNavLink>
                             <MudCollapse Expanded="@systemMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/group-login"))">Setup Group Login</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/login-user"))">Setup Login User</MudNavLink>
@@ -216,6 +273,8 @@
 @inject IJSRuntime JSRuntime
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject AppDbContext dbContext
+@inject ITokenProvider TokenProvider
+@inject INavigationRedirector Redirector
 @code {
     bool _drawerOpen = true;
 
@@ -224,6 +283,8 @@
     string path = "";
 
     MKaryawan Kary;
+
+    CurrentUser user;
 
     public string Search { get; set; }
 
@@ -238,6 +299,9 @@
     public string PasienName { get; set; } = "";
 
     public string PasienUsia { get; set; } = "";
+
+    private string LayoutCss =>
+    $"bg-wave-fixed {(isDoctor ? "wave-blue" : "wave")}";
 
     MudTheme MyCustomTheme = new MudTheme()
         {
@@ -266,6 +330,30 @@
         systemMenuExpanded = !systemMenuExpanded;
     }
 
+    bool paketMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void TogglePaket()
+    {
+        paketMenuExpanded = !paketMenuExpanded;
+    }
+
+    bool perawatanMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void TogglePerawatan()
+    {
+        perawatanMenuExpanded = !perawatanMenuExpanded;
+    }
+
+    bool barangMenuExpanded = false;
+
+    // Toggle the master sub-menu in the sidebar
+    void ToggleBarang()
+    {
+        barangMenuExpanded = !barangMenuExpanded;
+    }
+
     // Existing methods...
     void OnClickMasterNav(string route)
     {
@@ -273,8 +361,6 @@
         {
             return;
         }
-        // Optionally collapse the menu after navigation
-        masterMenuExpanded = false;
         NavigationManager.NavigateTo(route);
     }
 
@@ -369,13 +455,24 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (Redirector.ShouldRedirect && Redirector.TargetUrl != null)
         {
-            var kary = await ProtectedSessionStore.GetAsync<MKaryawan>("user");
+            Redirector.ShouldRedirect = false;    // reset flag
+            var url = Redirector.TargetUrl;
+            Redirector.TargetUrl = null;
 
-            Kary = kary.Value;
-            StateHasChanged();
+            NavigationManager.NavigateTo(url, forceLoad: true);
         }
+        if (firstRender) {
+            var result = await ProtectedSessionStore.GetAsync<string>("token");
+            if (result.Success && !string.IsNullOrWhiteSpace(result.Value))
+            {
+                TokenProvider.Token = result.Value;
+                var userResponse = await ApiService.GetCurrentUserAsync();
+                user = userResponse.Data;
+            }
+        }
+        StateHasChanged();
     }
 
     // Reset some variables on route change
@@ -396,6 +493,26 @@
 }
 
 <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        background-color: rgb(234,228,228); /* your bg-dark bg-opacity-25 */
+    }
+    .bg-wave-fixed {
+        background-repeat: no-repeat;
+        background-size: 100% 45%;
+        background-attachment: fixed;
+        height: 100vh;
+    }
+
+        .bg-wave-fixed.doctor {
+            background-image: url("images/wave-blue.png");
+        }
+
+        .bg-wave-fixed.patient {
+            background-image: url("images/wave.png");
+        }
+
     .minh-100 {
         min-height: 100%;
     }

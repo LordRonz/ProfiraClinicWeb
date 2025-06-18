@@ -6,42 +6,23 @@ using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class GroupBarangController(AppDbContext context) : ControllerBase
+    public class GroupBarangController
+    : BaseCrudController<GroupBarang>
     {
-        private readonly AppDbContext _context = context;
+        public GroupBarangController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GroupBarang>>> GetItems()
-        {
-            return _context.GroupBarang.ToList();
-        }
+        protected override DbSet<GroupBarang> DbSet
+            => _context.GroupBarang;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<GroupBarang>> GetItem(string id)
-        {
-            var item = await _context.GroupBarang.FindAsync(id);
+        protected override IQueryable<GroupBarang> ApplySearch(
+            IQueryable<GroupBarang> q,
+            string likeParam)
+            => q.Where(d
+                => EF.Functions.Like(d.NamaGroupBarang, likeParam)
+                || EF.Functions.Like(d.KodeGroupBarang, likeParam));
 
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public class GroupBarangBodyListOr : BaseBodyListOr
-        {
-        }
-
-        [HttpPost]
-        public List<GroupBarang> GetGroupBarangListOr([FromBody] GroupBarangBodyListOr body)
-        {
-            return _context.GroupBarang
-                .Where(d => (EF.Functions.Like(d.NamaGroupBarang, body.GetParam) || EF.Functions.Like(d.KodeGroupBarang, body.GetParam)))
-                .OrderBy(d => d.KodeGroupBarang)
-                .ToList();
-        }
+        protected override IOrderedQueryable<GroupBarang> ApplyOrder(
+            IQueryable<GroupBarang> q)
+            => q.OrderBy(d => d.KodeGroupBarang);
     }
 }

@@ -1,46 +1,112 @@
 ﻿@page "/doctor"
 @using System.Net.Http.Json
-@using ProfiraClinicWeb.Models
-@using ProfiraClinicWeb.Utils;
-@inject HttpClient httpClient
-
-@using PatientModel = ProfiraClinicWeb.Models.Patient
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Utils
+@using ProfiraClinicWeb.Services
+@inject DokterApiService ApiService
+@inject ImagesApiService ImagesService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <ProfiraClinicWeb.Components.Table.Table Config="DoctorTableConfig" />
+    <div class="mt-4 d-flex flex-wrap gap-3">
+        @foreach (var dokter in Dokters)
+        {
+            <MudCard Class="p-3" Style="width: 100%;">
+                <MudCardContent>
+                    <!-- Flex row: avatar on left, texts on right -->
+                    <div class="d-flex align-items-center">
+                        <MudAvatar Size="MudBlazor.Size.Large" Class="me-8">
+                            <MudImage Src="@(string.IsNullOrWhiteSpace(dokter.FOTO)
+                                  ? "https://via.placeholder.com/64"
+                                  : ImagesService.GetImageUri(dokter.FOTO))"></MudImage>
+                        </MudAvatar>
+
+                        <!-- Text block -->
+                        <div>
+                            <MudText Typo="Typo.h6">@dokter.NamaDokter</MudText>
+                            <MudText Typo="Typo.body2">@dokter.NamaJenisDokter</MudText>
+                            <MudText Typo="Typo.body2">@dokter.NamaJabatan</MudText>
+                        </div>
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        }
+    </div>
 </MudCard>
 
 @code {
-    private bool _hidePosition;
-    private bool _loading;
-    private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
-
-    public TableConfig DoctorTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    protected override async Task OnInitializedAsync()
-    {
-        var doctors = new List<object>()
-        {
-            (object) new { edit="/pasien/1", kode = "DR01", namaDokter = "dr. Fifin" },
-            (object) new { edit="/pasien/2", kode = "DR02", namaDokter = "dr. Agnes" },
-            (object) new { edit="/pasien/3", kode = "DR03", namaDokter = "dr. Ruth" },
-        };
-
-        DoctorTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit },
-                new TableColumn { Caption="Kode", DataField="kode" },
-                new TableColumn { Caption="Nama Dokter", DataField="namaDokter" },
-        }, doctors, "/clinic/add");
-    }
 
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
-    public TableConfig ClinicTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+    // Configuration for the table. It will be set once the data is loaded.
+    public TableConfig DoctorTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
+    // Holds the list of patients
+    private List<DokterListDto> Dokters = new List<DokterListDto>();
+
+    // This method sets up the page title.
     protected override void OnInitialized()
     {
-        Layout.ChangeTitleAndRoute("Dokter", "Master/Dokter");
+        Layout.ChangeTitleAndRoute("Barang", "List Barang");
+    }
+
+    // When the component is initialized, call the API service to retrieve patients.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("Loading pakets...");
+                // Get the API response
+                var apiResponse = await ApiService.GetDoktersAsync();
+                // Check if status code indicates success
+                System.Diagnostics.Debug.WriteLine("Done");
+                if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+                {
+                    Dokters = apiResponse.Data;
+                }
+                else
+                {
+                    // Handle API error case appropriately (e.g., display an error message)
+                    // For example: show a notification, log the error etc.
+                }
+
+                System.Diagnostics.Debug.WriteLine("Parsing to table data");
+
+                // Prepare the table data source using the patient data retrieved from the API.
+                var dataSource = Dokters.Select(el =>
+                    (object)new
+                    {
+                        view = $"doctor/{el.KodeKaryawan}",
+                        edit = $"doctor/{el.KodeKaryawan}/edit",
+                        kodeDokter = el.KodeKaryawan,
+                        namaDokter = el.NamaDokter,
+                        jenisDokter = el.NamaJenisDokter,
+                        aktif = el.AKTIF == "1" ? "Ya" : "Tidak",
+                    }
+                ).ToList();
+
+                DoctorTableConfig = new TableConfig(
+                    new List<TableColumn> {
+                        new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
+                        new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
+                        new TableColumn { Caption = "Kode Dokter", DataField = "kodeDokter" },
+                        new TableColumn { Caption = "Nama Dokter", DataField = "namaDokter" },
+                        new TableColumn { Caption = "Jenis Dokter", DataField = "jenisDokter" },
+                        new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                                        },
+                    dataSource,
+                    "/doctor/add"
+                );
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., network errors, deserialization issues, etc.)
+                System.Diagnostics.Debug.WriteLine($"Error loading Dokter: {ex.Message}");
+            }
+            StateHasChanged();
+        }
     }
 }

@@ -11,36 +11,60 @@
 
 @if (loaded)
 {
-<div class="d-flex flex-row mb-2">
-    <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
-    <button type="button" @onclick="@(m => ClicMonthNavigate(-1))" class="btn">🔼</button>
-    <button type="button" @onclick="@(m => ClicMonthNavigate(1))" class="btn me-2">🔽</button>
-    <input type="date" class="me-2" value="@(today.ToString("yyyy-MM-dd"))" @onchange="@(e => ChangeFirstDate(e.Value.ToString()))" />
-    <select @bind="@PriorityDisplay" class="me-2">
-        <option value="@PriorityLabel.Code" selected>priority Code</option>
-        <option value="@PriorityLabel.Caption">priority Caption</option>
-    </select>
-    <div>
-        <input type="checkbox" @bind="draggable" id="is-draggable" />
-        <label for="is-draggable">Draggable</label>
+    @* <div class="d-flex flex-row mb-2"> *@
+    @*     <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button> *@
+    @*     <button type="button" @onclick="@(m => ClicMonthNavigate(-1))" class="btn">🔼</button> *@
+    @*     <button type="button" @onclick="@(m => ClicMonthNavigate(1))" class="btn me-2">🔽</button> *@
+    @*     <input type="date" class="me-2" value="@(today.ToString("yyyy-MM-dd"))" @onchange="@(e => ChangeFirstDate(e.Value.ToString()))" /> *@
+    @*     <select @bind="@PriorityDisplay" class="me-2"> *@
+    @*         <option value="@PriorityLabel.Code" selected>priority Code</option> *@
+    @*         <option value="@PriorityLabel.Caption">priority Caption</option> *@
+    @*     </select> *@
+    @*     <div> *@
+    @*         <input type="checkbox" @bind="draggable" id="is-draggable" /> *@
+    @*         <label for="is-draggable">Draggable</label> *@
+    @*     </div> *@
+    @* </div> *@
+
+    @* <CalendarContainer FirstDate="today" *@
+    @* TasksList="TasksList.ToArray()" *@
+    @* DisplayedView="DisplayedView.Monthly"> *@
+    @*     <MonthlyView PriorityDisplay="@PriorityDisplay" *@
+    @*     OutsideCurrentMonthClick="OutsideCurrentMonthClick" *@
+    @*     TaskClick="TaskClick" *@
+    @*     DayClick="DayClick" *@
+    @*     Draggable="@draggable" *@
+    @*     DragStart="DragStart" *@
+    @*     DropTask="DropTask" *@
+    @*     HighlightToday="true" /> *@
+    @* </CalendarContainer> *@
+
+    <div style="
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-family: 'Segoe UI', sans-serif;
+        ">
+        <MudPaper Elevation="8" Class="p-6 text-center" Style="
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            ">
+            <MudIcon Icon="@Icons.Material.Filled.Construction" Size="MudBlazor.Size.Large" Color="Color.Warning" Class="mb-4" />
+            <MudText Typo="Typo.h3" Class="mb-2" Style="font-weight: 600;">Under Construction</MudText>
+            <MudText Typo="Typo.subtitle1" Class="mb-4">
+                We're crafting something amazing for you. Please check back soon!
+            </MudText>
+        </MudPaper>
     </div>
-</div>
 
-<CalendarContainer FirstDate="today"
-                   TasksList="TasksList.ToArray()"
-                   DisplayedView="DisplayedView.Monthly">
-    <MonthlyView PriorityDisplay="@PriorityDisplay"
-                 OutsideCurrentMonthClick="OutsideCurrentMonthClick"
-                 TaskClick="TaskClick"
-                 DayClick="DayClick"
-                 Draggable="@draggable"
-                 DragStart="DragStart"
-                 DropTask="DropTask"
-                 HighlightToday="true" />
-</CalendarContainer>
-
-<br />
-<div class="console">@fakeConsole</div>
+    <br />
+    <div class="console">@fakeConsole</div>
 }
 else
 {
@@ -92,16 +116,6 @@ else
                 NavManager.NavigateTo("/admin/login");
                 return;
             }
-            var authPayload = ProfiraClinicWeb.Utils.Auth.ValidateToken(token.Value);
-            if (authPayload == null)
-            {
-                NavManager.NavigateTo("/admin/login");
-                return;
-            }
-
-            userName = ProfiraClinicWeb.Utils.Auth.GetSubFromSecurityToken(authPayload);
-            var customer = await dbContext.MKaryawan.Where(c => c.UserName == userName).FirstOrDefaultAsync();
-
             loaded = true;
 
             StateHasChanged();

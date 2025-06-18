@@ -4,71 +4,71 @@ using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using System.Text.RegularExpressions;
 using ProfiraClinicWebAPI.Helper;
+using System.Net.Http;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    //[Authorize]
-    public partial class PatientController(AppDbContext context) : ControllerBase
+    [Authorize]
+    public class PatientController
+    : BaseCrudController<MCustomer>
     {
-        private readonly AppDbContext _context = context;
+        private readonly IBackgroundTaskQueue _taskQueue;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string[] _childApis;
+        private readonly ILogger<PatientController> _logger;
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<MCustomer>>> GetItems()
+        public PatientController(AppDbContext ctx, IBackgroundTaskQueue taskQueue, IHttpClientFactory httpClientFactory, IConfiguration config,
+        ILogger<PatientController> logger)
+            : base(ctx)
         {
-            return _context.MCustomer.ToList();
+            _taskQueue = taskQueue;
+            _httpClientFactory = httpClientFactory;
+            _logger = logger;
+
+            _childApis = config
+              .GetSection("ChildApis")
+              .Get<string[]>()
+              ?? Array.Empty<string>();
         }
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MCustomer>> GetItem(string id)
+        protected override DbSet<MCustomer> DbSet
+            => _context.MCustomer;
+
+        protected override IQueryable<MCustomer> ApplySearch(
+            IQueryable<MCustomer> q,
+            string likeParam)
+            => q.Where(d => (EF.Functions.Like(d.KodeCustomer, likeParam) ||
+                             EF.Functions.Like(d.AlamatDomisili, likeParam) ||
+                             EF.Functions.Like(d.NamaCustomer, likeParam) ||
+                             EF.Functions.Like(d.NomorHP, likeParam)));
+
+        protected override IOrderedQueryable<MCustomer> ApplyOrder(
+            IQueryable<MCustomer> q)
+            => q.OrderBy(d => d.KodeCustomer);
+
+        protected override IQueryable<MCustomer> ApplyLastFilter(
+        IQueryable<MCustomer> q,
+        DateTime lastDate)
         {
-            var item = await _context.MCustomer.FindAsync(Int64.Parse(id));
+            // Suppose your table actually uses  
+            //    RecordDate      (instead of CreatedAt)  
+            //    LastModified    (instead of UpdatedAt)
 
-            if (item == null)
-                return NotFound();
-
-            return item;
+            return q.Where(p =>
+                p.UPDDT > lastDate
+            );
         }
 
-        [HttpGet("code/{code}")]
+        [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
         {
-            var item = await _context.MCustomer.FirstOrDefaultAsync(c => c.KodeCustomer == code);
-
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
-
-        public partial class PatientBodyListOr : BaseBodyListOr
-        {
-        }
-
-        // POST: api/Patient/search
-        // Returns a list of patients matching the search parameters.
-        [HttpPost("search")]
-        public List<MCustomer> GetCustomerListOr([FromBody] PatientBodyListOr body)
-        {
-            System.Diagnostics.Debug.WriteLine(body.GetParam);
-            return _context.MCustomer
-                .Where(d => (EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.AlamatDomisili, body.GetParam) ||
-                             EF.Functions.Like(d.NamaCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.KodeCustomer, body.GetParam) ||
-                             EF.Functions.Like(d.NomorHP, body.GetParam)))
-                .OrderBy(d => d.KodeCustomer)
-                .ToList();
+            return await FindOne(c => c.KodeCustomer == code);
         }
 
         // POST: api/Patient
         // Create a new patient record by executing a stored procedure with error handling.
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<MCustomer>> CreatePatient([FromBody] MCustomer newPatient)
         {
             if (newPatient == null)
@@ -153,7 +153,36 @@ namespace ProfiraClinicWebAPI.Controllers
                 newPatient.KodeCustomer = newKodeCustomer;
 
                 // Return the newly created patient. Adjust properties as needed.
-                return CreatedAtAction(nameof(GetItem), new { id = newPatient.IDCustomer }, newPatient);
+                var result = CreatedAtAction(nameof(GetItem),
+                                 new { id = newPatient.IDCustomer },
+                                 newPatient);
+
+                // 🔥 fire-and-forget via background queue:
+                _ = _taskQueue.EnqueueAsync(async ct =>
+                {
+                    foreach (var baseUrl in _childApis)
+                    {
+                        // make a fresh client--you could also reuse one if you prefer
+                        var client = _httpClientFactory.CreateClient();
+                        client.BaseAddress = new Uri($"{baseUrl}/");
+
+                        try
+                        {
+                            // assumes each API exposes POST /patient/add
+                            await client.PostAsJsonAsync("api/patient/add", newPatient, ct);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(
+                              ex,
+                              "Error calling child API {ApiUrl}/patient/add",
+                              baseUrl
+                            );
+                        }
+                    }
+                });
+
+                return result;
             }
             catch (SqlException ex)
             {
@@ -170,7 +199,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         // PUT: api/Patient/{kode}
-        [HttpPut("{kode}")]
+        [HttpPut("edit/{kode}")]
         public async Task<IActionResult> UpdatePatient(string kode, [FromBody] MCustomer updatedPatient)
         {
             if (updatedPatient == null)
@@ -262,7 +291,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // DELETE: api/Patient/{id}
         // Delete a patient record.
-        [HttpDelete("{id}")]
+        [HttpDelete("del/{id}")]
         public async Task<IActionResult> DeletePatient(long id)
         {
             var patient = await _context.MCustomer.FindAsync(id);
