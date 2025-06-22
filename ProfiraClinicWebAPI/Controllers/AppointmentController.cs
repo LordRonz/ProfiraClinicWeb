@@ -1,34 +1,28 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using ProfiraClinic.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class AppointmentController(AppDbContext context) : ControllerBase
+    public class AppointmentController
+    : BaseCrudController<GroupBarang>
     {
-        private readonly AppDbContext _context = context;
+        public AppointmentController(AppDbContext ctx) : base(ctx) { }
 
-        // GET: api/items
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Appointment>>> GetItems()
-        {
-            return _context.Appointment.ToList();
-        }
+        protected override DbSet<Appointment> DbSet
+            => _context.Appointment;
 
-        // GET: api/items/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Appointment>> GetItem(string id)
-        {
-            var item = await _context.Appointment.FindAsync(id);
+        protected override IQueryable<Appointment> ApplySearch(
+            IQueryable<Appointment> q,
+            string likeParam)
+            => q.Where(d
+                => EF.Functions.Like(d.NamaGroupBarang, likeParam)
+                || EF.Functions.Like(d.KodeGroupBarang, likeParam));
 
-            if (item == null)
-                return NotFound();
-
-            return item;
-        }
+        protected override IOrderedQueryable<Appointment> ApplyOrder(
+            IQueryable<Appointment> q)
+            => q.OrderBy(d => d.KodeGroupBarang);
     }
 }
