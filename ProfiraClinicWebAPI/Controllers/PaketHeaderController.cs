@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
@@ -29,14 +30,77 @@ namespace ProfiraClinicWebAPI.Controllers
         public override Task<ActionResult<IEnumerable<PaketHeader>>> GetItems(string last = null)
             => base.GetItems(last);
 
-        [HttpGet("GetList")]
-        public async Task<IActionResult> GetList()
+        [HttpGet("GetByCode/{code}")]
+        public async Task<ActionResult<PaketHeader>> GetItemByCode(string code)
         {
-            var list = await _context.PaketHeaderList
-                .FromSqlRaw("EXEC dbo.usp_PPaket_List")
-                .ToListAsync();
+            return await FindOne(c => c.KodePaket == code);
+        }
 
-            return Ok(list);
+        // POST: api/PaketHeader
+        // Create a new paketHeader record by executing a stored procedure with error handling.
+        [HttpPost("add")]
+        public async Task<ActionResult<PaketHeader>> CreateCustomerRiwayatAsal([FromBody] PaketHeader newPaketHeader)
+        {
+            if (newPaketHeader == null)
+            {
+                return BadRequest("PaketHeader data is null.");
+            }
+
+            // Prepare SQL parameters. For nullable fields, pass DBNull.Value.
+            var sqlParameters = new[]
+            {
+                new SqlParameter("@KodeJenis", newPaketHeader.KodeJenis ?? (object)DBNull.Value),
+                // The stored procedure generates the customer code, so pass an empty string.
+                new SqlParameter("@KodeGroupPaket", newPaketHeader.KodeGroupPaket ?? (object)DBNull.Value),
+                new SqlParameter("@KodePaket", newPaketHeader.KodePaket ?? (object)DBNull.Value),
+                new SqlParameter("@NamaPaket", newPaketHeader.NamaPaket ?? (object)DBNull.Value),
+                new SqlParameter("@HARGA", newPaketHeader.HARGA),
+                new SqlParameter("@DiscMember", newPaketHeader.DiscMember),
+                new SqlParameter("@DiscNonMember", newPaketHeader.DiscNonMember),
+                new SqlParameter("@MasaLaku", newPaketHeader.MasaLaku),
+                new SqlParameter("@AKTIF", newPaketHeader.Aktif ?? (object)DBNull.Value),
+                new SqlParameter("@USRID", newPaketHeader.USRID ?? (object)DBNull.Value)
+            };
+
+            try
+            {
+                // Call the stored procedure using ExecuteSqlRawAsync.
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPaketH_Add " +
+                    "@KodeJenis, @KodeGroupPaket, @KodePaket, @NamaPaket, @HARGA, @DiscMember, " +
+                    "@DiscNonMember, @MasaLaku, @AKTIF, @USRID",
+                    sqlParameters);
+
+                // Return the newly created paketHeader. Adjust properties as needed.
+                return CreatedAtAction(nameof(GetItem), new { id = newPaketHeader.KodePaket }, newPaketHeader);
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // For other exceptions, return a 500 error.
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+
+        // DELETE: api/Patient/{id}
+        // Delete a paketHeader record.
+        [HttpDelete("del/{id}")]
+        public async Task<IActionResult> DeletePaketHeader(long id)
+        {
+            var paketHeader = await _context.PaketHeader.FindAsync(id);
+            if (paketHeader == null)
+            {
+                return NotFound();
+            }
+
+            _context.PaketHeader.Remove(paketHeader);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

@@ -7,7 +7,7 @@ using ProfiraClinicWebAPI.Helper;
 namespace ProfiraClinicWebAPI.Controllers
 {
     public class AppointmentController
-    : BaseCrudController<GroupBarang>
+    : BaseCrudController<Appointment>
     {
         public AppointmentController(AppDbContext ctx) : base(ctx) { }
 
@@ -18,11 +18,14 @@ namespace ProfiraClinicWebAPI.Controllers
             IQueryable<Appointment> q,
             string likeParam)
             => q.Where(d
-                => EF.Functions.Like(d.NamaGroupBarang, likeParam)
-                || EF.Functions.Like(d.KodeGroupBarang, likeParam));
+                => EF.Functions.Like(d.KodeKaryawan, likeParam)
+                || EF.Functions.Like(d.KodeCustomer, likeParam)
+            || EF.Functions.Like(d.KodeLokasi, likeParam)
+            || EF.Functions.Like(d.KodeRuangan, likeParam)
+            || EF.Functions.Like(d.NomorHP, likeParam));
 
         protected override IOrderedQueryable<Appointment> ApplyOrder(
             IQueryable<Appointment> q)
-            => q.OrderBy(d => d.KodeGroupBarang);
+            => q.OrderBy(d => d.TanggalAppointment);
     }
 }

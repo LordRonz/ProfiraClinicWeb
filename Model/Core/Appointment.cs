@@ -26,7 +26,6 @@ namespace ProfiraClinic.Models.Core
         public DateTime? TanggalAppointment { get; set; }
         public DateTime? JamAppointment { get; set; }
 
-        [Key]
         [Column(TypeName = "nchar(10)")]
         public string? KodeKaryawan { get; set; }
 

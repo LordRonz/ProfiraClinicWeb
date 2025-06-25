@@ -1,0 +1,214 @@
+﻿@page "/package-item/add"
+
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject PaketDetailApiService PaketApiService
+@inject PaketHeaderApiService PaketHeaderApiService
+@inject NavigationManager NavigationManager
+
+<MudCard Class="p-4 h-100">
+    <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
+
+    <!-- Header Form -->
+    <MudForm @ref="headerForm" Class="section-body">
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Kode Group Paket" @bind-Value="header.KodeGroupPaket" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal" Label="Harga" @bind-Value="header.HARGA" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudSwitch T="bool" Label="Aktif" @bind-Checked="isActive" />
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+
+    <Divider Class="my-4" />
+
+    <!-- Detail Form -->
+    <MudForm @ref="detailForm" Class="table-form section-body">
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <MudTextField T="string" Label="Kode Perawatan" @bind-Value="detail.KodePerawatan" Variant="Variant.Outlined" Required="true" />
+            </MudItem>
+            <MudItem xs="12" sm="3">
+                <MudNumericField T="int" Label="Jumlah Perawatan" @bind-Value="detail.JumlahPerawatan" Variant="Variant.Outlined" />
+            </MudItem>
+            <MudItem xs="12" sm="6" Class="d-flex align-end">
+                @if (isEditingDetail)
+                {
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Warning" OnClick="UpdateDetail">Update</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" Class="ml-2" OnClick="CancelEdit">Cancel</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" OnClick="AddDetail">Tambah Detail</MudButton>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+
+    <!-- Details Table -->
+    <MudTable Items="details" Hover="true" Class="mt-4">
+        <HeaderContent>
+            <MudTh>No Urut</MudTh>
+            <MudTh>Kode Perawatan</MudTh>
+            <MudTh>Jumlah</MudTh>
+            <MudTh>Aksi</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="No Urut">@context.NoUrut</MudTd>
+            <MudTd DataLabel="Kode Perawatan">@context.KodePerawatan</MudTd>
+            <MudTd DataLabel="Jumlah">@context.JumlahPerawatan</MudTd>
+            <MudTd DataLabel="Aksi">
+                <MudIconButton Icon="Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
+                <MudIconButton Icon="Icons.Material.Filled.Delete" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <!-- Save Header and Details -->
+    <div class="d-flex justify-end mt-4">
+        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Class="save-btn" OnClick="SubmitAll">Simpan Paket</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" Class="back-btn" OnClick="Back">Kembali</MudButton>
+    </div>
+</MudCard>
+
+@code {
+    private MudForm headerForm;
+    private MudForm detailForm;
+
+    private PaketHeader header = new PaketHeader();
+    private PaketDetail detail = new PaketDetail();
+    private List<PaketDetail> details = new List<PaketDetail>();
+    private bool isActive;
+    private bool isEditingDetail = false;
+    private int editingIndex = -1;
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/package-item");
+    }
+
+    protected override void OnInitialized()
+    {
+        header.Aktif = "1";
+        isActive = true;
+    }
+
+    private async Task AddDetail()
+    {
+        await detailForm.Validate();
+        if (detailForm.IsValid)
+        {
+            detail.NoUrut = details.Count + 1;
+            details.Add(new PaketDetail
+            {
+                NoUrut = detail.NoUrut,
+                KodePerawatan = detail.KodePerawatan,
+                JumlahPerawatan = detail.JumlahPerawatan
+            });
+            detail = new PaketDetail();
+        }
+    }
+
+    private void EditDetail(PaketDetail item)
+    {
+        isEditingDetail = true;
+        editingIndex = details.IndexOf(item);
+        detail = new PaketDetail
+        {
+            NoUrut = item.NoUrut,
+            KodePerawatan = item.KodePerawatan,
+            JumlahPerawatan = item.JumlahPerawatan
+        };
+    }
+
+    private void UpdateDetail()
+    {
+        if (isEditingDetail && editingIndex >= 0)
+        {
+            details[editingIndex].KodePerawatan = detail.KodePerawatan;
+            details[editingIndex].JumlahPerawatan = detail.JumlahPerawatan;
+            ResetDetailForm();
+        }
+    }
+
+    private void CancelEdit()
+    {
+        ResetDetailForm();
+    }
+
+    private void RemoveDetail(PaketDetail item)
+    {
+        details.Remove(item);
+        // Re-number NoUrut
+        for (int i = 0; i < details.Count; i++)
+            details[i].NoUrut = i + 1;
+    }
+
+    private void ResetDetailForm()
+    {
+        isEditingDetail = false;
+        editingIndex = -1;
+        detail = new PaketDetail();
+    }
+
+    private async Task SubmitAll()
+    {
+        await headerForm.Validate();
+        if (headerForm.IsValid)
+        {
+            header.Aktif = isActive ? "1" : "0";
+            var paket = new PaketHeader
+            {
+                KodePaket = header.KodePaket,
+                KodeJenis = header.KodeJenis,
+                KodeGroupPaket = header.KodeGroupPaket,
+                NamaPaket = header.NamaPaket,
+                HARGA = header.HARGA,
+                DiscMember = header.DiscMember,
+                DiscNonMember = header.DiscNonMember,
+                MasaLaku = header.MasaLaku,
+                Aktif = header.Aktif,
+                USRID = ""
+            };
+            // API call for header
+            var resultHeader = await PaketHeaderApiService.CreatePaketHeaderAsync(paket);
+            if (resultHeader.StatusCode < 300)
+            {
+                // Save details
+                foreach (var d in details)
+                {
+                    // d.IDPaketHeader = await resultHeader..ReadFromJsonAsync<long>();
+                    await PaketApiService.CreatePaketDetailAsync(d);
+                }
+                NavigationManager.NavigateTo("/paket");
+            }
+            else
+            {
+                // handle error
+            }
+        }
+    }
+}
