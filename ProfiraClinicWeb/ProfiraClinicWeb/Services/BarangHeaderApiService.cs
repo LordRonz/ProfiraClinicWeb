@@ -1,5 +1,9 @@
 ﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ProfiraClinicWeb.Services
 {
@@ -12,71 +16,61 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<BarangHeaderList>>> GetBarangHeadersAsync()
+        public async Task<ApiResponse<PagedResult<BarangHeaderList>>> GetBarangHeadersAsync(
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<BarangHeaderList>>>("api/BarangHeader/GetList");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/BarangHeader/GetList?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<BarangHeaderList>>>(url)
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<List<BarangListDto>>> GetBarangItemsAsync()
+        public async Task<ApiResponse<PagedResult<BarangListDto>>> GetBarangItemsAsync(
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<BarangListDto>>>("api/BarangHeader/GetListItem");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/BarangHeader/GetListItem?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<BarangListDto>>>(url)
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<BarangHeader>> GetBarangHeaderByCodeAsync(String id)
+        public async Task<ApiResponse<BarangHeader>> GetBarangHeaderByCodeAsync(string id)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<BarangHeader>>($"api/BarangHeader/GetByCode/{id}");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<BarangHeader>>($"api/BarangHeader/GetByCode/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
         public async Task<ApiResponse<BarangHeader>> CreateBarangHeaderAsync(BarangHeader paket)
         {
-            // POST the paket object as JSON to the API.
             var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/add", paket);
-
             if (!responseMessage.IsSuccessStatusCode)
             {
-                // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
                 return new ApiResponse<BarangHeader>((int)responseMessage.StatusCode, $"Error creating BarangHeader: {errorMsg}");
             }
-
-            // Deserialize the created paket.
-            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<BarangHeader>>();
-            return createdUserGroupResponse;
+            var created = await responseMessage
+                .Content
+                .ReadFromJsonAsync<ApiResponse<BarangHeader>>();
+            return created!;
         }
 
-        public async Task<ApiResponse<object>> UpdateBarangHeaderAsync(string kodeBarang, BarangHeader paketHeader)
+        public async Task<ApiResponse<object>> UpdateBarangHeaderAsync(
+            string kodeBarang,
+            BarangHeader paketHeader)
         {
-            // The endpoint expects a PUT request with the paket identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/BarangHeader/edit/{kodeBarang}", paketHeader);
-
+            var responseMessage = await _httpClient
+                .PutAsJsonAsync($"api/BarangHeader/edit/{kodeBarang}", paketHeader);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating paketheader: {errorMsg}");
+                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating BarangHeader: {errorMsg}");
             }
-
-            // If no content is returned from the update call, we can return a successful ApiResponse.
             return new ApiResponse<object>((int)responseMessage.StatusCode, "BarangHeader updated successfully");
         }
     }

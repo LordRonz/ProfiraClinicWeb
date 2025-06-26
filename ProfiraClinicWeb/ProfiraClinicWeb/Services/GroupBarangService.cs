@@ -1,4 +1,9 @@
-﻿using ProfiraClinic.Models.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -12,59 +17,65 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<GroupBarang>>> GetGroupBarangsAsync()
+        public async Task<ApiResponse<PagedResult<GroupBarang>>> GetGroupBarangsAsync(
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<GroupBarang>>>("api/GroupBarang/GetList");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/GroupBarang/GetList?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<GroupBarang>>>(url)
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<GroupBarang>> GetGroupBarangByCodeAsync(String id)
+        public async Task<ApiResponse<PagedResult<GroupBarang>>> SearchGroupBarangsAsync(
+            string searchTerm,
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<GroupBarang>>($"api/GroupBarang/GetByCode/{id}");
-
-            if (response == null)
+            var url = $"api/GroupBarang/GetListByString?Page={page}&PageSize={pageSize}";
+            var payload = new { GetParam = searchTerm ?? string.Empty };
+            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
+            if (!respMsg.IsSuccessStatusCode)
             {
-                throw new HttpRequestException("Failed to retrieve response from API.");
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<PagedResult<GroupBarang>>((int)respMsg.StatusCode, $"Error: {err}");
             }
+            var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<GroupBarang>>>();
+            return result!;
+        }
 
+        public async Task<ApiResponse<GroupBarang>> GetGroupBarangByCodeAsync(string id)
+        {
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<GroupBarang>>($"api/GroupBarang/GetByCode/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
         public async Task<ApiResponse<GroupBarang>> CreateGroupBarangAsync(GroupBarang paket)
         {
-            // POST the paket object as JSON to the API.
             var responseMessage = await _httpClient.PostAsJsonAsync("api/GroupBarang/add", paket);
-
             if (!responseMessage.IsSuccessStatusCode)
             {
-                // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
                 return new ApiResponse<GroupBarang>((int)responseMessage.StatusCode, $"Error creating GroupBarang: {errorMsg}");
             }
-
-            // Deserialize the created paket.
-            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<GroupBarang>>();
-            return createdUserGroupResponse;
+            var created = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<GroupBarang>>();
+            return created!;
         }
 
-        public async Task<ApiResponse<object>> UpdateGroupBarangAsync(string kodeGroup, UserGroup userGroup)
+        public async Task<ApiResponse<object>> UpdateGroupBarangAsync(
+            string kodeGroup,
+            GroupBarang paket)
         {
-            // The endpoint expects a PUT request with the paket identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/GroupBarang/edit/{kodeGroup}", userGroup);
-
+            var responseMessage = await _httpClient
+                .PutAsJsonAsync($"api/GroupBarang/edit/{kodeGroup}", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating group perawatan: {errorMsg}");
+                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating GroupBarang: {errorMsg}");
             }
-
-            // If no content is returned from the update call, we can return a successful ApiResponse.
             return new ApiResponse<object>((int)responseMessage.StatusCode, "GroupBarang updated successfully");
         }
     }

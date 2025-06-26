@@ -1,4 +1,9 @@
-﻿using ProfiraClinic.Models.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -12,59 +17,65 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<DokterListDto>>> GetDoktersAsync()
+        public async Task<ApiResponse<PagedResult<DokterListDto>>> GetDoktersAsync(
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<DokterListDto>>>("api/Dokter/GetList");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/Dokter/GetList?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<DokterListDto>>>(url)
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<Dokter>> GetDokterByCodeAsync(String id)
+        public async Task<ApiResponse<PagedResult<DokterListDto>>> SearchDoktersAsync(
+            string searchTerm,
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<Dokter>>($"api/Dokter/GetByCode/{id}");
-
-            if (response == null)
+            var url = $"api/Dokter/GetListByString?Page={page}&PageSize={pageSize}";
+            var payload = new { GetParam = searchTerm ?? string.Empty };
+            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
+            if (!respMsg.IsSuccessStatusCode)
             {
-                throw new HttpRequestException("Failed to retrieve response from API.");
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<PagedResult<DokterListDto>>((int)respMsg.StatusCode, $"Error: {err}");
             }
+            var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<DokterListDto>>>();
+            return result!;
+        }
 
+        public async Task<ApiResponse<Dokter>> GetDokterByCodeAsync(string id)
+        {
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<Dokter>>($"api/Dokter/GetByCode/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
         public async Task<ApiResponse<Dokter>> CreateDokterAsync(Dokter dokter)
         {
-            // POST the dokter object as JSON to the API.
             var responseMessage = await _httpClient.PostAsJsonAsync("api/Dokter/add", dokter);
-
             if (!responseMessage.IsSuccessStatusCode)
             {
-                // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
                 return new ApiResponse<Dokter>((int)responseMessage.StatusCode, $"Error creating Dokter: {errorMsg}");
             }
-
-            // Deserialize the created dokter.
-            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<Dokter>>();
-            return createdUserGroupResponse;
+            var created = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<Dokter>>();
+            return created!;
         }
 
-        public async Task<ApiResponse<object>> UpdateDokterAsync(string kodeGroup, Dokter dokter)
+        public async Task<ApiResponse<object>> UpdateDokterAsync(
+            string kodeGroup,
+            Dokter dokter)
         {
-            // The endpoint expects a PUT request with the dokter identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/Dokter/edit/{kodeGroup}", dokter);
-
+            var responseMessage = await _httpClient
+                .PutAsJsonAsync($"api/Dokter/edit/{kodeGroup}", dokter);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating group perawatan: {errorMsg}");
+                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating Dokter: {errorMsg}");
             }
-
-            // If no content is returned from the update call, we can return a successful ApiResponse.
             return new ApiResponse<object>((int)responseMessage.StatusCode, "Dokter updated successfully");
         }
     }

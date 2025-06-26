@@ -65,7 +65,7 @@
                 System.Diagnostics.Debug.WriteLine("Done");
                 if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
                 {
-                    Dokters = apiResponse.Data;
+                    Dokters = apiResponse.Data.Items;
                 }
                 else
                 {

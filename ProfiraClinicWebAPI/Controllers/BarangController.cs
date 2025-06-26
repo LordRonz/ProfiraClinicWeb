@@ -25,7 +25,7 @@ namespace ProfiraClinicWebAPI.Controllers
             => q.OrderBy(d => d.KodeBarang);
 
         [NonAction]
-        public override Task<ActionResult<IEnumerable<Barang>>> GetItems(string last = null)
+        public override Task<ActionResult> GetItems(string last = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 20 )
             => base.GetItems(last);
 
         [HttpGet("GetList")]
