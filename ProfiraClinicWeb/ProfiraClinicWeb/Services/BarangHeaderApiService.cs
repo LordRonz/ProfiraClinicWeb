@@ -16,24 +16,24 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<PagedResult<BarangHeaderList>>> GetBarangHeadersAsync(
+        public async Task<ApiResponse<List<BarangHeaderList>>> GetBarangHeadersAsync(
             int page = 1,
             int pageSize = 20)
         {
             var url = $"api/BarangHeader/GetList?Page={page}&PageSize={pageSize}";
             var response = await _httpClient
-                .GetFromJsonAsync<ApiResponse<PagedResult<BarangHeaderList>>>(url)
+                .GetFromJsonAsync<ApiResponse<List<BarangHeaderList>>>(url)
                 ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<PagedResult<BarangListDto>>> GetBarangItemsAsync(
+        public async Task<ApiResponse<List<BarangListDto>>> GetBarangItemsAsync(
             int page = 1,
             int pageSize = 20)
         {
             var url = $"api/BarangHeader/GetListItem?Page={page}&PageSize={pageSize}";
             var response = await _httpClient
-                .GetFromJsonAsync<ApiResponse<PagedResult<BarangListDto>>>(url)
+                .GetFromJsonAsync<ApiResponse<List<BarangListDto>>>(url)
                 ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }

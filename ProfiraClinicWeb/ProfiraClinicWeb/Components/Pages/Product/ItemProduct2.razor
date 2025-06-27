@@ -41,7 +41,7 @@
                 System.Diagnostics.Debug.WriteLine("Done");
                 if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
                 {
-                    Barangs = apiResponse.Data.Items;
+                    Barangs = apiResponse.Data;
                 }
                 else
                 {

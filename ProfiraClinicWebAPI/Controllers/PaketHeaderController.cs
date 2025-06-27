@@ -31,6 +31,16 @@ namespace ProfiraClinicWebAPI.Controllers
             [FromQuery] int pageSize = 20)
             => base.GetItems(last);
 
+        [HttpGet("GetList")]
+        public async Task<IActionResult> GetList()
+        {
+            var list = await _context.PaketHeaderList
+                .FromSqlRaw("EXEC dbo.usp_PPaket_List")
+                .ToListAsync();
+
+            return Ok(list);
+        }
+
         [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<PaketHeader>> GetItemByCode(string code)
         {
