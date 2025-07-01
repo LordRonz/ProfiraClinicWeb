@@ -9,7 +9,7 @@ using System.Security.Claims;
 namespace ProfiraClinicWebAPI.Controllers
 {
     [Authorize]
-    public class AppointmentController
+    public class DiagnosaController
     : BaseCrudController<Appointment>
     {
 
@@ -28,7 +28,7 @@ namespace ProfiraClinicWebAPI.Controllers
             public string KodeCustomer { get; set; }
         }
 
-        public AppointmentController(AppDbContext ctx) : base(ctx) { }
+        public DiagnosaController(AppDbContext ctx) : base(ctx) { }
 
         protected override DbSet<Appointment> DbSet
             => _context.Appointment;
