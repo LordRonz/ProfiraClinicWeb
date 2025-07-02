@@ -68,5 +68,8 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<BarangHeader> BarangHeader { get; set; }
         public DbSet<Barang> Barang { get; set; }
         public DbSet<BarangListDto> BarangListDto { get; set; }
+
+
+        public DbSet<TRMDiagnosa> TRMDiagnosa { get; set; }
     }
 }

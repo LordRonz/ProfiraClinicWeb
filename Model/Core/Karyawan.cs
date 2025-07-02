@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,6 +7,13 @@ namespace ProfiraClinic.Models.Core
     [Keyless]
     public class MKaryawan
     {
+        [Column(TypeName = "varchar(50)")]
+        [MaxLength(50)]
+        public string UserName { get; set; }
+
+        [Column(TypeName = "varchar(255)")]
+        [MaxLength(255)]
+        public string UserPassword { get; set; }
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]

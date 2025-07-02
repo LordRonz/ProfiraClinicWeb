@@ -157,6 +157,8 @@ namespace ProfiraClinicWebAPI.Controllers
             // 3) clear out anything you don’t want to return
             user.Password = null;
 
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.UserName == user.UserName);
+
             MKlinik? clinic = null;
             if (!string.IsNullOrEmpty(user.KodeLokasi))
             {
@@ -172,7 +174,8 @@ namespace ProfiraClinicWebAPI.Controllers
                 UserName = user.UserName,
                 KodeUserGroup = user.KodeUserGroup,
                 KodeLokasi = user.KodeLokasi,
-                Klinik = clinic
+                Klinik = clinic,
+                KodeKaryawan = karyawan?.KodeKaryawan,
             };
 
             return Ok(dto);
