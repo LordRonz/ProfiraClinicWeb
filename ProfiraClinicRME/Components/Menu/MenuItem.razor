@@ -1,0 +1,26 @@
+﻿<a href="@Href" class="d-flex justify-content-center align-items-center flex-column gap-2">
+    <div class="@("justify-content-center align-items-center d-flex item-shadow rounded-circle " + Class)" style="width: 110px; height: 110px; background-color: rgba(0, 0, 0, 0.25);">
+        <MudImage Src="@Src" Class="w-100" />
+    </div>
+    <p class="m-0">@Title</p>
+</a>
+
+@code {
+    [Parameter]
+    public string Src { get; set; } = "/images/menu/treatment.png";
+
+    [Parameter]
+    public string Class { get; set; } = "p-3";
+
+    [Parameter]
+    public string Href { get; set; } = "/produk";
+
+    [Parameter]
+    public string Title { get; set; } = "Produk";
+}
+
+<style>
+    .item-shadow {
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    }
+</style>

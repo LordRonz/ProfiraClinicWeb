@@ -1,0 +1,67 @@
+﻿<MudDatePicker PickerVariant="PickerVariant.Static" Label=@Label @bind-Date="SelectedDate" AdditionalDateClassesFunc="CheckDate" />
+
+@code {
+    private DateTime? _selectedDate;
+    private DateTime? SelectedDate
+    {
+        get => _selectedDate;
+        set
+        {
+            if (value.HasValue)
+            {
+                DateTime newValue = value.Value;
+                if (this.markedDates.Contains(newValue))
+                {
+                    this.markedDates.Remove(newValue);
+                }
+                else
+                {
+                    this.markedDates.Add(newValue);
+                }
+                this.OnMarkedDatesChanged(this.markedDates);
+            }
+        }
+    }
+    private List<DateTime> markedDates = new List<DateTime>();
+
+    [Parameter]
+    public List<DateTime> MarkedDates
+    {
+        get => markedDates; set
+        {
+            markedDates = value;
+        }
+    }
+
+    [Parameter]
+    public EventCallback<List<DateTime>> MarkedDatesChanged { get; set; }
+
+    private async Task OnMarkedDatesChanged(List<DateTime> dates)
+    {
+        await MarkedDatesChanged.InvokeAsync(dates);
+    }
+
+
+    [Parameter]
+    public string Label { get; set; } = "Dates";
+
+    [Parameter]
+    public string MarkedDayColor { get; set; } = "red";
+
+    private string CheckDate(DateTime date)
+    {
+        // compare only the date portion to find a match
+        return this.markedDates.Contains(date.Date) ? "marked-day" : String.Empty;
+    }
+
+    private void OnClick(DateTime date)
+    {
+        this.markedDates.Add(date);
+    }
+}
+
+<style>
+    .marked-day {
+        color: @MarkedDayColor !important;
+    }
+</style>
