@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
@@ -24,7 +24,7 @@ namespace ProfiraClinic.Models.Core
         public string NomorAppointment { get; set; }
 
         public DateTime? TanggalAppointment { get; set; }
-        public DateTime? JamAppointment { get; set; }
+        public TimeSpan? JamAppointment { get; set; }
 
         [Column(TypeName = "nchar(10)")]
         public string? KodeKaryawan { get; set; }

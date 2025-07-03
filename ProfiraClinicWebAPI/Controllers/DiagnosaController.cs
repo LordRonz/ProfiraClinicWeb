@@ -85,11 +85,12 @@ namespace ProfiraClinicWebAPI.Controllers
                 }
             };
 
-            await _context.Database
-                .ExecuteSqlRawAsync("EXEC dbo.usp_TRM_Diagnosa_Add @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_Diagnosa_Add @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
                 "@KodeCustomer, @KodeKaryawan, @KodeDiagnosa, @KategoriDiagnosa, @KeteranganDiagnosa, " +
-                "@USRID, @INPMD, @NOFAK Output"
-                , sqlParameters);
+                "@USRID, @INPMD, @NOFAK OUTPUT",
+                sqlParameters
+            );
 
             var noFak = sqlParameters.Last().Value?.ToString();
 
