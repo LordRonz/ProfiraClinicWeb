@@ -27,8 +27,19 @@ namespace ProfiraClinicWebAPI.Controllers
             => q.OrderBy(d => d.KodePaket);
 
         [NonAction]
-        public override Task<ActionResult<IEnumerable<PaketHeader>>> GetItems(string last = null)
+        public override Task<ActionResult> GetItems(string last = null, [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
             => base.GetItems(last);
+
+        [HttpGet("GetList")]
+        public async Task<IActionResult> GetList()
+        {
+            var list = await _context.PaketHeaderList
+                .FromSqlRaw("EXEC dbo.usp_PPaket_List")
+                .ToListAsync();
+
+            return Ok(list);
+        }
 
         [HttpGet("GetByCode/{code}")]
         public async Task<ActionResult<PaketHeader>> GetItemByCode(string code)

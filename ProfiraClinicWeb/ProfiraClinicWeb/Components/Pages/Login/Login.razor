@@ -136,7 +136,7 @@
         System.Diagnostics.Debug.WriteLine("Done");
         if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
         {
-            kliniks = apiResponse.Data;
+            kliniks = apiResponse.Data.Items;
         }
     }
 

@@ -1,12 +1,16 @@
 ﻿@page "/list-pasien"
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Helpers
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
 @inject CustomerApiService ApiService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <ProfiraClinicWeb.Components.Table.Table Config="PatientTableConfig" AddButtonText="Pasien Baru" />
+    <ProfiraClinicWeb.Components.Table.Table Config="PatientTableConfig"
+                                             AddButtonText="Pasien Baru"
+                                             UseServerData
+                                             ServerDataFunc="LoadPatientsAsync" />
 </MudCard>
 
 @code {
@@ -21,73 +25,83 @@
     // Holds the list of patients
     private List<MCustomer> Patients = new List<MCustomer>();
 
-    // This method sets up the page title.
+    // When the component is initialized, call the API service to retrieve patients.
     protected override void OnInitialized()
     {
         Layout.ChangeTitleAndRoute("Pasien", "List Pasien");
-    }
 
-    // When the component is initialized, call the API service to retrieve patients.
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender) {        
-            try {
-                System.Diagnostics.Debug.WriteLine("Loading patients...");
-                // Get the API response
-                var apiResponse = await ApiService.GetPatientsAsync();
-                // Check if status code indicates success
-                System.Diagnostics.Debug.WriteLine("Done");
-                if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
-                {
-                    Patients = apiResponse.Data;
-                }
-                else
-                {
-                    // Handle API error case appropriately (e.g., display an error message)
-                    // For example: show a notification, log the error etc.
-                }
-
-                System.Diagnostics.Debug.WriteLine("Parsing to table data");
-
-                // Prepare the table data source using the patient data retrieved from the API.
-                var dataSource = Patients.Select(el =>
-                    (object)new
-                    {
-                        view = $"pasien/{el.KodeCustomer}",
-                        edit = $"pasien/{el.KodeCustomer}/edit",
-                        memberId = el.KodeCustomer,
-                        namaPasien = el.NamaCustomer,
-                        // Assuming that PatientModel has properties that map to these columns.
-                        alamat = el.AlamatDomisili, // You can map the address property if available.
-                        noHp = el.NomorHP,
-                        tglLahir = el.TanggalLahir?.ToString("dd/MM/yyyy"),
-                        aktif = el.AKTIF == "1" ? "Ya" : "Tidak",
-                    }
-                ).ToList();
-
-                PatientTableConfig = new TableConfig(
-                    new List<TableColumn> {
-                        new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
-                        new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
-                        new TableColumn { Caption = "Kode Customer", DataField = "memberId" },
-                        new TableColumn { Caption = "Nama Pasien", DataField = "namaPasien" },
-                        new TableColumn { Caption = "Alamat", DataField = "alamat" },
-                        new TableColumn { Caption = "No. HP", DataField = "noHp" },
-                        new TableColumn { Caption = "Tgl Lahir", DataField = "tglLahir" },
-                        new TableColumn { Caption = "Aktif?", DataField = "aktif" },
-                        },
-                    dataSource,
-                    "/pasien/add"
-                );
-            }
-            catch (Exception ex)
+        PatientTableConfig = new TableConfig(
+            // columns
+            new List<TableColumn>
             {
-                // Handle exceptions (e.g., network errors, deserialization issues, etc.)
-                System.Diagnostics.Debug.WriteLine($"Error loading patients: {ex.Message}");
-            }
-            StateHasChanged();
-        }
+                new TableColumn { Caption="View",           DataField="view",      Type=ColumnType.View    },
+                new TableColumn { Caption="Edit",           DataField="edit",      Type=ColumnType.Edit    },
+                new TableColumn { Caption="Kode Customer",  DataField="memberId"                        },
+                new TableColumn { Caption="Nama Pasien",    DataField="namaPasien"                      },
+                new TableColumn { Caption="Alamat",         DataField="alamat"                         },
+                new TableColumn { Caption="No. HP",         DataField="noHp"                           },
+                new TableColumn { Caption="Tgl Lahir",      DataField="tglLahir"                       },
+                new TableColumn { Caption="Aktif?",         DataField="aktif"                          },
+            },
+            // no local data needed in server mode
+            dataSource: new List<object>(),
+            addRoute: "/pasien/add"
+        );
     }
+
+    private Task<ApiResponse<PagedResult<Dictionary<string, string>>>> LoadPatientsAsync(
+        int page,
+        int pageSize,
+        string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return ApiService.GetPatientsAsync(page, pageSize)
+                   .ContinueWith(t =>
+                       new ApiResponse<PagedResult<Dictionary<string, string>>>(
+                           t.Result.StatusCode,
+                           t.Result.Message,
+                           // map MCustomer -> Dictionary<string,string>
+                           new PagedResult<Dictionary<string, string>>
+                           {
+                               TotalCount = t.Result.Data.TotalCount,
+                               Page = t.Result.Data.Page,
+                               PageSize = t.Result.Data.PageSize,
+                               TotalPages = t.Result.Data.TotalPages,
+                               Items = t.Result.Data.Items.Select(el => ToDict(el)).ToList()
+                           }
+                       )
+                   );
+        else
+            return ApiService.SearchPatientsAsync(searchTerm, page, pageSize)
+                   .ContinueWith(t =>
+                       new ApiResponse<PagedResult<Dictionary<string, string>>>(
+                           t.Result.StatusCode,
+                           t.Result.Message,
+                           new PagedResult<Dictionary<string, string>>
+                           {
+                               TotalCount = t.Result.Data.TotalCount,
+                               Page = t.Result.Data.Page,
+                               PageSize = t.Result.Data.PageSize,
+                               TotalPages = t.Result.Data.TotalPages,
+                               Items = t.Result.Data.Items.Select(el => ToDict(el)).ToList()
+                           }
+                       )
+                   );
+    }
+
+    // helper to convert your MCustomer into the Dictionary<string,string> shape your table expects
+    private Dictionary<string, string> ToDict(MCustomer el) =>
+        new Dictionary<string, string>
+        {
+            ["view"] = $"pasien/{el.KodeCustomer}",
+            ["edit"] = $"pasien/{el.KodeCustomer}/edit",
+            ["memberId"] = el.KodeCustomer,
+            ["namaPasien"] = el.NamaCustomer,
+            ["alamat"] = el.AlamatDomisili,
+            ["noHp"] = el.NomorHP,
+            ["tglLahir"] = el.TanggalLahir?.ToString("dd/MM/yyyy") ?? "",
+            ["aktif"] = el.AKTIF == "1" ? "Ya" : "Tidak"
+        };
 
     private int ChartIndex = -1; // default value cannot be 0 -> first selected index is 0.
 

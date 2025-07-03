@@ -110,7 +110,7 @@
     {
         var apiResponse = await GroupUserApiService.GetUserGroupsAsync();
         if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
-            UserGroups = apiResponse.Data;
+            UserGroups = apiResponse.Data.Items;
 
         Layout.ChangeTitleAndRoute("Pengguna", "Tambah Pengguna");
     }

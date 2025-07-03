@@ -71,10 +71,16 @@ namespace ProfiraClinicWebAPI.Controllers
         /// </summary>
         // GET /api/YourEntity/GetList?last=20250502062345
         [HttpGet("GetList")]
-        public virtual async Task<ActionResult<IEnumerable<TEntity>>> GetItems(
-            [FromQuery] string last = null)
+        public virtual async Task<ActionResult> GetItems(
+            [FromQuery] string last = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
         {
-            var query = DbSet.AsQueryable();
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 1;
+            if (pageSize > 100) pageSize = 100;
+
+            var query = DbSet.AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(last))
             {
@@ -88,11 +94,23 @@ namespace ProfiraClinicWebAPI.Controllers
                     return BadRequest($"`last` must be in yyyyMMddHHmmss format (you gave: '{last}')");
                 }
 
-                // delegate to the overridable hook:
                 query = ApplyLastFilter(query, lastDate);
             }
 
-            return Ok(await query.ToListAsync());
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                totalCount,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                items
+            });
         }
 
         [HttpGet("GetById/{id}")]
@@ -103,12 +121,33 @@ namespace ProfiraClinicWebAPI.Controllers
         }
 
         [HttpPost("GetListByString")]
-        public virtual async Task<ActionResult<List<TEntity>>> Search(
-            [FromBody] BaseBodyListOr body)
+        public virtual async Task<ActionResult> Search(
+            [FromBody] BaseBodyListOr body,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
         {
-            var q = ApplySearch(DbSet, body.GetParam);
-            q = ApplyOrder(q);
-            return await q.ToListAsync();
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 1;
+            if (pageSize > 100) pageSize = 100;
+
+            var query = ApplySearch(DbSet.AsNoTracking(), body.GetParam);
+            System.Diagnostics.Debug.WriteLine(body.GetParam);
+            query = ApplyOrder(query);
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(new
+            {
+                totalCount,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                items
+            });
         }
 
         /// <summary>

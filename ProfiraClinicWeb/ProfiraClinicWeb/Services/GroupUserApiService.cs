@@ -1,4 +1,9 @@
-﻿using ProfiraClinic.Models.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -12,59 +17,65 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<UserGroup>>> GetUserGroupsAsync()
+        public async Task<ApiResponse<PagedResult<UserGroup>>> GetUserGroupsAsync(
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<UserGroup>>>("api/UserGroup/GetList");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/UserGroup/GetList?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<UserGroup>>>(url)
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<UserGroup>> GetUserGroupByCodeAsync(String id)
+        public async Task<ApiResponse<PagedResult<UserGroup>>> SearchUserGroupsAsync(
+            string searchTerm,
+            int page = 1,
+            int pageSize = 20)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<UserGroup>>($"api/UserGroup/GetByCode/{id}");
-
-            if (response == null)
+            var url = $"api/UserGroup/GetListByString?Page={page}&PageSize={pageSize}";
+            var payload = new { GetParam = searchTerm ?? string.Empty };
+            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
+            if (!respMsg.IsSuccessStatusCode)
             {
-                throw new HttpRequestException("Failed to retrieve response from API.");
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<PagedResult<UserGroup>>((int)respMsg.StatusCode, $"Error: {err}");
             }
+            var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<UserGroup>>>();
+            return result!;
+        }
 
+        public async Task<ApiResponse<UserGroup>> GetUserGroupByCodeAsync(string id)
+        {
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<UserGroup>>($"api/UserGroup/GetByCode/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
         public async Task<ApiResponse<UserGroup>> CreateUserGroupAsync(UserGroup userGroup)
         {
-            // POST the userGroup object as JSON to the API.
             var responseMessage = await _httpClient.PostAsJsonAsync("api/UserGroup/add", userGroup);
-
             if (!responseMessage.IsSuccessStatusCode)
             {
-                // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<UserGroup>((int)responseMessage.StatusCode, $"Error creating user group: {errorMsg}");
+                return new ApiResponse<UserGroup>((int)responseMessage.StatusCode, $"Error creating UserGroup: {errorMsg}");
             }
-
-            // Deserialize the created userGroup.
-            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<UserGroup>>();
-            return createdUserGroupResponse;
+            var created = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<UserGroup>>();
+            return created!;
         }
 
-        public async Task<ApiResponse<object>> UpdateUserGroupAsync(string kodeGroup, UserGroup userGroup)
+        public async Task<ApiResponse<object>> UpdateUserGroupAsync(
+            string kodeGroup,
+            UserGroup userGroup)
         {
-            // The endpoint expects a PUT request with the userGroup identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/UserGroup/edit/{kodeGroup}", userGroup);
-
+            var responseMessage = await _httpClient
+                .PutAsJsonAsync($"api/UserGroup/edit/{kodeGroup}", userGroup);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating patient: {errorMsg}");
+                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating UserGroup: {errorMsg}");
             }
-
-            // If no content is returned from the update call, we can return a successful ApiResponse.
             return new ApiResponse<object>((int)responseMessage.StatusCode, "UserGroup updated successfully");
         }
     }
