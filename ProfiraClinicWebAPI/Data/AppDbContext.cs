@@ -4,7 +4,7 @@ using ProfiraClinic.Models;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data.Converters;
 using Customer = ProfiraClinic.Models.Core.Customer;
-using MKaryawan = ProfiraClinic.Models.Core.MKaryawan;
+using Karyawan = ProfiraClinic.Models.Core.Karyawan;
 
 namespace ProfiraClinicWebAPI.Data
 {
@@ -45,7 +45,7 @@ namespace ProfiraClinicWebAPI.Data
         }
 
         public DbSet<Customer> MCustomer { get; set; }
-        public DbSet<MKaryawan> MKaryawan { get; set; }
+        public DbSet<Karyawan> MKaryawan { get; set; }
         public DbSet<MKlinik> MKlinik { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
         public DbSet<PPerawatanH> PPerawatanH { get; set; }

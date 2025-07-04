@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
+    [Table("MKaryawan")]
     [Keyless]
-    public class MKaryawan
+    public class Karyawan
     {
         [Column(TypeName = "varchar(50)")]
         [MaxLength(50)]

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
-using ProfiraClinicWebAPI.Helper;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -175,7 +174,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 KodeUserGroup = user.KodeUserGroup,
                 KodeLokasi = user.KodeLokasi,
                 Klinik = clinic,
-                KodeKaryawan = karyawan?.KodeKaryawan,
+                Karyawan = karyawan,
             };
 
             return Ok(dto);

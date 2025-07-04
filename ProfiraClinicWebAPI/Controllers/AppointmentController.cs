@@ -63,7 +63,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 return NotFound();
 
 
-            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.UserName == user.UserName);
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
 
             if (appDto.KodeKaryawan == null && karyawan == null)
                 return NotFound();

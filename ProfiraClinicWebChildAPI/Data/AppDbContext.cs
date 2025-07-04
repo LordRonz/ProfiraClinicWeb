@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using ProfiraClinic.Models;
 using Customer = ProfiraClinic.Models.Core.Customer;
-using MKaryawan = ProfiraClinic.Models.Core.MKaryawan;
+using MKaryawan = ProfiraClinic.Models.Core.Karyawan;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebChildAPI.Data.Converters;
 
