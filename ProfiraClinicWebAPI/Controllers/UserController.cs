@@ -157,7 +157,10 @@ namespace ProfiraClinicWebAPI.Controllers
             user.Password = null;
 
             var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
-            karyawan.UserPassword = null;
+            if (karyawan != null)
+            {
+                karyawan.UserPassword = null;
+            }
 
             MKlinik? clinic = null;
             if (!string.IsNullOrEmpty(user.KodeLokasi))
