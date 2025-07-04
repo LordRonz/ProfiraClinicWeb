@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using ProfiraClinic.Models;
-using MCustomer = ProfiraClinic.Models.Core.MCustomer;
+using Customer = ProfiraClinic.Models.Core.Customer;
 using MKaryawan = ProfiraClinic.Models.Core.MKaryawan;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebChildAPI.Data.Converters;
@@ -44,7 +44,7 @@ namespace ProfiraClinicWebChildAPI.Data
             .ToView(null);
         }
 
-        public DbSet<MCustomer> MCustomer { get; set; }
+        public DbSet<Customer> MCustomer { get; set; }
 
     }
 }
