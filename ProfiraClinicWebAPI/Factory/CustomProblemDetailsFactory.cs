@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using ProfiraClinic.Models.Core;
 
 namespace ProfiraClinicWebAPI.Factory
 {
@@ -60,19 +61,19 @@ namespace ProfiraClinicWebAPI.Factory
                 Instance = instance ?? httpContext?.Request?.Path
             };
 
-            problemDetails.Extensions["errorType"] = MapErrorType(statusCode.Value);
+            problemDetails.Extensions["errorType"] = MapErrorType(statusCode.Value).ToString();
 
             return problemDetails;
         }
 
-        private string MapErrorType(int statusCode) => statusCode switch
+        private ErrorType MapErrorType(int statusCode) => statusCode switch
         {
-            400 => "WRONG_STRUCTURE",
-            401 => "UNAUTHORIZED",
-            403 => "FORBIDDEN",
-            404 => "NOT_FOUND",
-            500 => "INTERNAL_ERROR",
-            _ => "UNKNOWN"
+            400 => ErrorType.WRONG_STRUCTURE,
+            401 => ErrorType.UNAUTHORIZED,
+            403 => ErrorType.FORBIDDEN,
+            404 => ErrorType.NOT_FOUND,
+            500 => ErrorType.SERVER_ERROR,
+            _ => ErrorType.UNKNOWN
         };
     }
 
