@@ -38,6 +38,9 @@ namespace ProfiraClinic.Models.Core
         [Column(TypeName = "char(50)")]
         public string? NomorHP { get; set; }
 
+        [Column(TypeName = "char(50)")]
+        public string? NomorHPCustomer { get; set; }
+
         [Column(TypeName = "varchar(50)")]
         public string? KodeRuangan { get; set; }
 
