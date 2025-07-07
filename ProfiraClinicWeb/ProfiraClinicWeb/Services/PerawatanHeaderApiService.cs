@@ -13,9 +13,9 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<PPerawatanH>>> GetTindakansAsync()
+        public async Task<ApiResponse<PagedResult<PPerawatanH>>> GetTindakansAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<PPerawatanH>>>("api/Tindakan/GetList");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<PPerawatanH>>>("api/Tindakan/GetList");
 
             if (response == null)
             {

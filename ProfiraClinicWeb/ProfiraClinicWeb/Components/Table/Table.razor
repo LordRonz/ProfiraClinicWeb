@@ -1,4 +1,5 @@
-﻿@using ProfiraClinicWeb.Utils;
+﻿@using ProfiraClinicWeb.Helpers
+@using ProfiraClinicWeb.Utils;
 @using System.Linq;
 @using static MudBlazor.CategoryTypes
 
@@ -31,70 +32,137 @@
         </MudStack>
     </MudCard>
 </div>
-<MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="@Config.GetData()" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
-    <ColGroup>
-        @foreach (TableColumn col in Config.GetColumn())
-        {
-            // Pass the Dto properties to the component
-            @switch (col.Type)
+@if (!UseServerData || ServerDataFunc == null) {
+    <MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="@Config.GetData()" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
+        <ColGroup>
+            @foreach (TableColumn col in Config.GetColumn())
             {
-                case ColumnType.Data:
-                    <col />
-                    break;
-                case ColumnType.Edit:
-                case ColumnType.View:
-                case ColumnType.Delete:
-                    <col style="width:50px;" />
-                    break;
-                case null:
-                    <col />
-                    break;
-            }
-        }
-    </ColGroup>
-    <HeaderContent>
-        @foreach (TableColumn col in Config.GetColumn())
-        {
-            // Pass the Dto properties to the component
-            <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
-        }
-    </HeaderContent>
-    <RowTemplate>
-        @foreach (TableColumn col in Config.GetColumn())
-        {
-            @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
-            var cellClass = col.Align switch
-            {
-                ColumnAlign.Right => "text-end",
-                ColumnAlign.Center => "text-center",
-                _ => ""
-            };
-            <MudTd DataLabel="@col.Caption" Class="@cellClass">
+                // Pass the Dto properties to the component
                 @switch (col.Type)
                 {
                     case ColumnType.Data:
-                        @context.GetValueOrDefault(col.DataField)
+                        <col />
                         break;
                     case ColumnType.Edit:
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
-                        break;
                     case ColumnType.View:
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
-                        break;
                     case ColumnType.Delete:
-                        <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
+                        <col style="width:50px;" />
                         break;
-                    default:
-                        @context.GetValueOrDefault(col.DataField)
+                    case null:
+                        <col />
                         break;
                 }
-            </MudTd>
-        }
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 5, 10, 15, 25, 50, 100, int.MaxValue }" InfoFormat="@infoFormat" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" />
-    </PagerContent>
-</MudTable>
+            }
+        </ColGroup>
+        <HeaderContent>
+            @foreach (TableColumn col in Config.GetColumn())
+            {
+                // Pass the Dto properties to the component
+                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+            }
+        </HeaderContent>
+        <RowTemplate>
+            @foreach (TableColumn col in Config.GetColumn())
+            {
+                @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
+                var cellClass = col.Align switch
+                {
+                    ColumnAlign.Right => "text-end",
+                    ColumnAlign.Center => "text-center",
+                    _ => ""
+                };
+                <MudTd DataLabel="@col.Caption" Class="@cellClass">
+                    @switch (col.Type)
+                    {
+                        case ColumnType.Data:
+                            @context.GetValueOrDefault(col.DataField)
+                            break;
+                        case ColumnType.Edit:
+                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
+                            break;
+                        case ColumnType.View:
+                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                            break;
+                        case ColumnType.Delete:
+                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
+                            break;
+                        default:
+                            @context.GetValueOrDefault(col.DataField)
+                            break;
+                    }
+                </MudTd>
+            }
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 5, 10, 15, 25, 50, 100, int.MaxValue }" InfoFormat="@infoFormat" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" />
+        </PagerContent>
+    </MudTable>
+} else {
+    <MudTable HeaderClass="@GetHeaderClass()" ServerData="LoadServerData" Striped Bordered Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" @ref="table">
+        <ColGroup>
+            @foreach (TableColumn col in Config.GetColumn())
+            {
+                // Pass the Dto properties to the component
+                @switch (col.Type)
+                {
+                    case ColumnType.Data:
+                        <col />
+                        break;
+                    case ColumnType.Edit:
+                    case ColumnType.View:
+                    case ColumnType.Delete:
+                        <col style="width:50px;" />
+                        break;
+                    case null:
+                        <col />
+                        break;
+                }
+            }
+        </ColGroup>
+        <HeaderContent>
+            @foreach (TableColumn col in Config.GetColumn())
+            {
+                // Pass the Dto properties to the component
+                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+            }
+        </HeaderContent>
+        <RowTemplate>
+            @foreach (TableColumn col in Config.GetColumn())
+            {
+                @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
+                var cellClass = col.Align switch
+                {
+                    ColumnAlign.Right => "text-end",
+                    ColumnAlign.Center => "text-center",
+                    _ => ""
+                };
+                <MudTd DataLabel="@col.Caption" Class="@cellClass">
+                    @switch (col.Type)
+                    {
+                        case ColumnType.Data:
+                            @context.GetValueOrDefault(col.DataField)
+                            break;
+                        case ColumnType.Edit:
+                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.Edit)" Href="@context.GetValueOrDefault(col.DataField)" />
+                            break;
+                        case ColumnType.View:
+                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
+                            break;
+                        case ColumnType.Delete:
+                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
+                            break;
+                        default:
+                            @context.GetValueOrDefault(col.DataField)
+                            break;
+                    }
+                </MudTd>
+            }
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[] { 5, 10, 15, 25, 50, 100, int.MaxValue }" InfoFormat="@infoFormat" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" />
+        </PagerContent>
+    </MudTable>
+}
 
 @code {
     private bool _loading;
@@ -115,11 +183,13 @@
     private IEnumerable<string> options { get; set; } = [];
 
     private string value { get; set; } = "Nothing selected";
+    [Parameter] public bool UseServerData { get; set; } = false;
 
     [Parameter]
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
     [Parameter]
     public string? ClassOverride { get; set; }
+    [Parameter] public Func<int, int, string, Task<ApiResponse<PagedResult<Dictionary<string, string>>>>>? ServerDataFunc { get; set; }
 
     [Parameter]
     public bool? WithAdd { get; set; } = true;
@@ -179,6 +249,20 @@
                 .ToHashSet();
             StateHasChanged();
         }
+    }
+
+    private async Task<TableData<Dictionary<string, string>>> LoadServerData(TableState state, CancellationToken token)
+    {
+        _loading = true; 
+        StateHasChanged();
+        var resp = await ServerDataFunc!(state.Page + 1, state.PageSize, searchString1);
+        _loading = false;
+        StateHasChanged();
+        return new TableData<Dictionary<string, string>>
+        {
+            TotalItems = resp.Data?.TotalCount ?? 0,
+            Items = resp.Data?.Items ?? new List<Dictionary<string, string>>()
+        };
     }
 }
 

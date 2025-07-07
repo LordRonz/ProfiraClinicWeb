@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProfiraClinic.Models
 {
-    public class Appointment
+    public class AppointmentOld
     {
         [Column(TypeName = "nchar(10)")]
         public string? KdLok { get; set; }

@@ -41,7 +41,7 @@
                 System.Diagnostics.Debug.WriteLine("Done");
                 if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
                 {
-                    Pakets = apiResponse.Data;
+                    Pakets = apiResponse.Data.Items;
                 }
                 else
                 {

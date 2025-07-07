@@ -39,7 +39,8 @@ namespace ProfiraClinicWebAPI.Controllers
         }
 
         [NonAction]
-        public override Task<ActionResult<IEnumerable<Dokter>>> GetItems(string last = null)
+        public override Task<ActionResult> GetItems(string last = null, [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
             => base.GetItems(last);
 
         [HttpGet("GetList")]

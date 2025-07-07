@@ -1,4 +1,8 @@
-﻿using Azure;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
@@ -8,72 +12,71 @@ namespace ProfiraClinicWeb.Services
     {
         private readonly HttpClient _httpClient;
 
-        // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
         public CustomerRiwayatAsalService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        // Retrieves all patients.
-        public async Task<ApiResponse<List<CustomerRiwayatAsal>>> GetCustomerRiwayatAsalsAsync()
+        public async Task<ApiResponse<PagedResult<CustomerRiwayatAsal>>> GetCustomerRiwayatAsalsAsync(
+            int page = 1,
+            int pageSize = 20)
         {
-            // Replace the URL with your actual endpoint, e.g., "api/CustomerRiwayatAsal"
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<CustomerRiwayatAsal>>>("api/CustomerRiwayatAsal/GetList");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/CustomerRiwayatAsal/GetList?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<CustomerRiwayatAsal>>>(url)
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        public async Task<ApiResponse<CustomerRiwayatAsal>> GetCustomerRiwayatAsalByCodeAsync(String code)
+        public async Task<ApiResponse<PagedResult<CustomerRiwayatAsal>>> SearchCustomerRiwayatAsalsAsync(
+            string searchTerm,
+            int page = 1,
+            int pageSize = 20)
         {
-            ApiResponse<CustomerRiwayatAsal> response;
-            try { 
-            // Replace the URL with your actual endpoint, e.g., "api/CustomerRiwayatAsal"
-            response = await _httpClient.GetFromJsonAsync<ApiResponse<CustomerRiwayatAsal>>($"api/CustomerRiwayatAsal/GetByCode/{code}");
-            } catch
+            var url = $"api/CustomerRiwayatAsal/GetListByString?Page={page}&PageSize={pageSize}";
+            var payload = new { GetParam = searchTerm ?? string.Empty };
+            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
+            if (!respMsg.IsSuccessStatusCode)
             {
-                return null;
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<PagedResult<CustomerRiwayatAsal>>((int)respMsg.StatusCode, $"Error: {err}");
             }
+            var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<CustomerRiwayatAsal>>>();
+            return result!;
+        }
 
+        public async Task<ApiResponse<CustomerRiwayatAsal>> GetCustomerRiwayatAsalByCodeAsync(string code)
+        {
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<CustomerRiwayatAsal>>($"api/CustomerRiwayatAsal/GetByCode/{code}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
 
-        // Calls the create endpoint (POST: api/CustomerRiwayatAsal) to create a new CustomerRiwayatAsal.
         public async Task<ApiResponse<CustomerRiwayatAsal>> CreateCustomerRiwayatAsalAsync(CustomerRiwayatAsal customerRiwayatAsal)
         {
-            // POST the patient object as JSON to the API.
             var responseMessage = await _httpClient.PostAsJsonAsync("api/CustomerRiwayatAsal/add", customerRiwayatAsal);
-
             if (!responseMessage.IsSuccessStatusCode)
             {
-                // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
                 return new ApiResponse<CustomerRiwayatAsal>((int)responseMessage.StatusCode, $"Error creating CustomerRiwayatAsal: {errorMsg}");
             }
-
-            // Deserialize the created patient.
-            var createdCustomerRiwayatAsalResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<CustomerRiwayatAsal>>();
-            return createdCustomerRiwayatAsalResponse;
+            var created = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<CustomerRiwayatAsal>>();
+            return created!;
         }
 
-        // Calls the update endpoint (PUT: api/CustomerRiwayatAsal/{kode}) to update an existing CustomerRiwayatAsal.
-        public async Task<ApiResponse<object>> UpdateCustomerRiwayatAsalAsync(string kodeCustomer, CustomerRiwayatAsal customerRiwayatAsal)
+        public async Task<ApiResponse<object>> UpdateCustomerRiwayatAsalAsync(
+            string kodeCustomer,
+            CustomerRiwayatAsal customerRiwayatAsal)
         {
-            // The endpoint expects a PUT request with the CustomerRiwayatAsal identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/CustomerRiwayatAsal/edit/{kodeCustomer}", customerRiwayatAsal);
-
+            var responseMessage = await _httpClient
+                .PutAsJsonAsync($"api/CustomerRiwayatAsal/edit/{kodeCustomer}", customerRiwayatAsal);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating patient: {errorMsg}");
+                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating CustomerRiwayatAsal: {errorMsg}");
             }
-
-            // If no content is returned from the update call, we can return a successful ApiResponse.
-            return new ApiResponse<object>((int)responseMessage.StatusCode, "Patient updated successfully");
+            return new ApiResponse<object>((int)responseMessage.StatusCode, "CustomerRiwayatAsal updated successfully");
         }
     }
 }

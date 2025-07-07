@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
-
-    public class MCustomer
+    [Table("MCustomer")]
+    public class Customer
     {
         [Key]
         public long IDCustomer { get; set; }

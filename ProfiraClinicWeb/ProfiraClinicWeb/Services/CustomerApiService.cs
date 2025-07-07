@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -12,71 +7,66 @@ namespace ProfiraClinicWeb.Services
     {
         private readonly HttpClient _httpClient;
 
-        // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
         public CustomerApiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        // Retrieves all patients.
-        public async Task<ApiResponse<List<MCustomer>>> GetPatientsAsync()
+        public async Task<ApiResponse<PagedResult<Customer>>> GetPatientsAsync(int page = 1, int pageSize = 20)
         {
-            // Replace the URL with your actual endpoint, e.g., "api/Patient"
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<MCustomer>>>("api/Patient/GetList");
-
-            if (response == null)
-            {
-                throw new HttpRequestException("Failed to retrieve response from API.");
-            }
-
+            var url = $"api/Patient/GetList?Page={page}&PageSize={pageSize}";
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<Customer>>>(url)
+                           ?? throw new HttpRequestException("No response payload");
             return response;
         }
 
-        public async Task<ApiResponse<MCustomer>> GetPatientByCodeAsync(String code)
+        public async Task<ApiResponse<PagedResult<Customer>>> SearchPatientsAsync(
+            string searchTerm,
+            int page = 1,
+            int pageSize = 20)
         {
-            // Replace the URL with your actual endpoint, e.g., "api/Patient"
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<MCustomer>>($"api/Patient/GetByCode/{code}");
+            var url = $"api/Patient/GetListByString?Page={page}&PageSize={pageSize}";
+            var payload = new { Param = searchTerm ?? string.Empty };
+            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
 
-            if (response == null)
+            if (!respMsg.IsSuccessStatusCode)
             {
-                throw new HttpRequestException("Failed to retrieve response from API.");
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<PagedResult<Customer>>((int)respMsg.StatusCode, $"Error: {err}");
             }
 
+            var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<Customer>>>();
+            return result!;
+        }
+
+        public async Task<ApiResponse<Customer>> GetPatientByCodeAsync(string code)
+        {
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<Customer>>($"api/Patient/GetByCode/{code}")
+                           ?? throw new HttpRequestException("No response payload");
             return response;
         }
 
-        // Calls the create endpoint (POST: api/Patient) to create a new patient.
-        public async Task<ApiResponse<MCustomer>> CreatePatientAsync(MCustomer patient)
+        public async Task<ApiResponse<Customer>> CreatePatientAsync(Customer patient)
         {
-            // POST the patient object as JSON to the API.
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/Patient/add", patient);
-
-            if (!responseMessage.IsSuccessStatusCode)
+            var respMsg = await _httpClient.PostAsJsonAsync("api/Patient/add", patient);
+            if (!respMsg.IsSuccessStatusCode)
             {
-                // Retrieve the error message from the response.
-                var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<MCustomer>((int)responseMessage.StatusCode, $"Error creating patient: {errorMsg}");
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<Customer>((int)respMsg.StatusCode, $"Error: {err}");
             }
-
-            // Deserialize the created patient.
-            var createdPatientResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<MCustomer>>();
-            return createdPatientResponse;
+            var created = await respMsg.Content.ReadFromJsonAsync<ApiResponse<Customer>>();
+            return created!;
         }
 
-        // Calls the update endpoint (PUT: api/Patient/{kode}) to update an existing patient.
-        public async Task<ApiResponse<object>> UpdatePatientAsync(string kodeCustomer, MCustomer patient)
+        public async Task<ApiResponse<object>> UpdatePatientAsync(string kodeCustomer, Customer patient)
         {
-            // The endpoint expects a PUT request with the patient identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/Patient/edit/{kodeCustomer}", patient);
-
-            if (!responseMessage.IsSuccessStatusCode)
+            var respMsg = await _httpClient.PutAsJsonAsync($"api/Patient/edit/{kodeCustomer}", patient);
+            if (!respMsg.IsSuccessStatusCode)
             {
-                var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating patient: {errorMsg}");
+                var err = await respMsg.Content.ReadAsStringAsync();
+                return new ApiResponse<object>((int)respMsg.StatusCode, $"Error: {err}");
             }
-
-            // If no content is returned from the update call, we can return a successful ApiResponse.
-            return new ApiResponse<object>((int)responseMessage.StatusCode, "Patient updated successfully");
+            return new ApiResponse<object>((int)respMsg.StatusCode, "Patient updated successfully");
         }
     }
 }

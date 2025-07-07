@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using ProfiraClinicWebAPI.Data.Converters;
 using ProfiraClinic.Models;
-using MCustomer = ProfiraClinic.Models.Core.MCustomer;
-using MKaryawan = ProfiraClinic.Models.Core.MKaryawan;
 using ProfiraClinic.Models.Core;
+using ProfiraClinicWebAPI.Data.Converters;
+using Customer = ProfiraClinic.Models.Core.Customer;
+using Karyawan = ProfiraClinic.Models.Core.Karyawan;
 
 namespace ProfiraClinicWebAPI.Data
 {
@@ -44,8 +44,8 @@ namespace ProfiraClinicWebAPI.Data
             .ToView(null);
         }
 
-        public DbSet<MCustomer> MCustomer { get; set; }
-        public DbSet<MKaryawan> MKaryawan { get; set; }
+        public DbSet<Customer> MCustomer { get; set; }
+        public DbSet<Karyawan> MKaryawan { get; set; }
         public DbSet<MKlinik> MKlinik { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
         public DbSet<PPerawatanH> PPerawatanH { get; set; }
@@ -62,11 +62,14 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<DokterListDto> DokterList { get; set; }
 
         public DbSet<PaketHeader> PaketHeader { get; set; }
-
+        public DbSet<PaketDetail> PaketDetail { get; set; }
         public DbSet<PaketHeaderList> PaketHeaderList { get; set; }
         public DbSet<BarangHeaderList> BarangHeaderList { get; set; }
         public DbSet<BarangHeader> BarangHeader { get; set; }
         public DbSet<Barang> Barang { get; set; }
         public DbSet<BarangListDto> BarangListDto { get; set; }
+
+
+        public DbSet<TRMDiagnosa> TRMDiagnosa { get; set; }
     }
 }

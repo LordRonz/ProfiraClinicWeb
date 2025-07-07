@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProfiraClinicWebAPI.Config;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Factory;
 using ProfiraClinicWebAPI.Filters;
 using ProfiraClinicWebAPI.Helper;
 using ProfiraClinicWebAPI.Services;
@@ -30,6 +32,40 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+
+            var response = new
+            {
+                statusCode = 401,
+                message = "Unauthorized access. Token is missing or invalid.",
+                errorType = "UNAUTHORIZED"
+            };
+
+            return context.Response.WriteAsJsonAsync(response);
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = 403;
+            context.Response.ContentType = "application/json";
+
+            var response = new
+            {
+                statusCode = 403,
+                message = "Forbidden. You don't have access to this resource.",
+                errorType = "FORBIDDEN"
+            };
+
+            return context.Response.WriteAsJsonAsync(response);
+        }
     };
 });
 builder.Services.AddAuthorization();
@@ -90,6 +126,9 @@ builder.Services.Configure<List<Client>>(builder.Configuration.GetSection("Clien
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory>();
+builder.Services.AddControllers();
+
 builder.Services.AddHostedService<QueuedHostedService>();
 
 

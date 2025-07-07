@@ -94,6 +94,11 @@ builder.Services.AddHttpClient<PaketHeaderApiService>(client =>
     client.BaseAddress = new Uri(apiBaseAddress);
 }).AddHttpMessageHandler<BearerTokenHandler>()
     .AddHttpMessageHandler<AuthRedirectHandler>();
+builder.Services.AddHttpClient<PaketDetailApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+}).AddHttpMessageHandler<BearerTokenHandler>()
+    .AddHttpMessageHandler<AuthRedirectHandler>();
 
 builder.Services.AddHttpClient<PerawatanHeaderApiService>(client =>
 {

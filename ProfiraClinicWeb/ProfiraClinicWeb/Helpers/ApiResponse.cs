@@ -1,10 +1,11 @@
-﻿namespace ProfiraClinicWeb.Helpers
+﻿// ProfiraClinicWeb/Helpers/ApiResponse.cs
+namespace ProfiraClinicWeb.Helpers
 {
     public class ApiResponse<T>
     {
-        public int StatusCode { get; set; }
-        public string Message { get; set; }
-        public T Data { get; set; }
+        public int StatusCode { get; }
+        public string Message { get; }
+        public T Data { get; }
 
         public ApiResponse(int statusCode, string message, T data = default)
         {
@@ -14,4 +15,12 @@
         }
     }
 
+    public class PagedResult<T>
+    {
+        public int TotalCount { get; set; }
+        public int Page { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public List<T> Items { get; set; }
+    }
 }
