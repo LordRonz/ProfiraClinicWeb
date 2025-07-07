@@ -48,6 +48,7 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<Karyawan> MKaryawan { get; set; }
         public DbSet<MKlinik> MKlinik { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
+        public DbSet<TRMAppointment> AppointmentList { get; set; }
         public DbSet<PPerawatanH> PPerawatanH { get; set; }
         public DbSet<UserGroup> MUserGroup { get; set; }
         public DbSet<User> MUser { get; set; }
