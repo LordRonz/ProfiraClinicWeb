@@ -23,7 +23,7 @@
     public TableConfig PatientTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
     // Holds the list of patients
-    private List<MCustomer> Patients = new List<MCustomer>();
+    private List<Customer> Patients = new List<Customer>();
 
     // When the component is initialized, call the API service to retrieve patients.
     protected override void OnInitialized()
@@ -60,7 +60,7 @@
                        new ApiResponse<PagedResult<Dictionary<string, string>>>(
                            t.Result.StatusCode,
                            t.Result.Message,
-                           // map MCustomer -> Dictionary<string,string>
+                           // map Customer -> Dictionary<string,string>
                            new PagedResult<Dictionary<string, string>>
                            {
                                TotalCount = t.Result.Data.TotalCount,
@@ -89,8 +89,8 @@
                    );
     }
 
-    // helper to convert your MCustomer into the Dictionary<string,string> shape your table expects
-    private Dictionary<string, string> ToDict(MCustomer el) =>
+    // helper to convert your Customer into the Dictionary<string,string> shape your table expects
+    private Dictionary<string, string> ToDict(Customer el) =>
         new Dictionary<string, string>
         {
             ["view"] = $"pasien/{el.KodeCustomer}",

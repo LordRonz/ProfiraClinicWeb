@@ -9,27 +9,27 @@ using ProfiraClinicWebChildAPI.Data;
 namespace ProfiraClinicWebAPI.Controllers
 {
     public class PatientController
-    : BaseCrudController<MCustomer>
+    : BaseCrudController<Customer>
     {
         public PatientController(AppDbContext ctx) : base(ctx) { }
 
-        protected override DbSet<MCustomer> DbSet
+        protected override DbSet<Customer> DbSet
             => _context.MCustomer;
 
-        protected override IQueryable<MCustomer> ApplySearch(
-            IQueryable<MCustomer> q,
+        protected override IQueryable<Customer> ApplySearch(
+            IQueryable<Customer> q,
             string likeParam)
             => q.Where(d => (EF.Functions.Like(d.KodeCustomer, likeParam) ||
                              EF.Functions.Like(d.AlamatDomisili, likeParam) ||
                              EF.Functions.Like(d.NamaCustomer, likeParam) ||
                              EF.Functions.Like(d.NomorHP, likeParam)));
 
-        protected override IOrderedQueryable<MCustomer> ApplyOrder(
-            IQueryable<MCustomer> q)
+        protected override IOrderedQueryable<Customer> ApplyOrder(
+            IQueryable<Customer> q)
             => q.OrderBy(d => d.KodeCustomer);
 
-        protected override IQueryable<MCustomer> ApplyLastFilter(
-        IQueryable<MCustomer> q,
+        protected override IQueryable<Customer> ApplyLastFilter(
+        IQueryable<Customer> q,
         DateTime lastDate)
         {
             // Suppose your table actually uses  
@@ -42,7 +42,7 @@ namespace ProfiraClinicWebAPI.Controllers
         }
 
         [HttpGet("GetByCode/{code}")]
-        public async Task<ActionResult<MCustomer>> GetItemByCode(string code)
+        public async Task<ActionResult<Customer>> GetItemByCode(string code)
         {
             return await FindOne(c => c.KodeCustomer == code);
         }
@@ -50,7 +50,7 @@ namespace ProfiraClinicWebAPI.Controllers
         // POST: api/Patient
         // Create a new patient record by executing a stored procedure with error handling.
         [HttpPost("add")]
-        public async Task<ActionResult<MCustomer>> CreatePatient([FromBody] MCustomer newPatient)
+        public async Task<ActionResult<Customer>> CreatePatient([FromBody] Customer newPatient)
         {
             if (newPatient == null)
             {
@@ -124,7 +124,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // PUT: api/Patient/{kode}
         [HttpPut("edit/{kode}")]
-        public async Task<IActionResult> UpdatePatient(string kode, [FromBody] MCustomer updatedPatient)
+        public async Task<IActionResult> UpdatePatient(string kode, [FromBody] Customer updatedPatient)
         {
             if (updatedPatient == null)
             {

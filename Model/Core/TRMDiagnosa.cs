@@ -40,7 +40,7 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string? KodeCustomer { get; set; } // Relasi dengan Table MCustomer
+        public string? KodeCustomer { get; set; } // Relasi dengan Table Customer
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]

@@ -14,6 +14,7 @@ namespace ProfiraClinic.Models.Core
         public string? KodeUserGroup { get; set; }
         public string? KodeLokasi { get; set; }
         public MKlinik? Klinik { get; set; }
+        public Karyawan? Karyawan { get; set; }
     }
 
 }

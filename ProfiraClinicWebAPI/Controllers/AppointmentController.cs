@@ -15,9 +15,9 @@ namespace ProfiraClinicWebAPI.Controllers
 
         public class AppointmentListDto()
         {
-            public string KodeLokasi { get; set; }
+            public string? KodeLokasi { get; set; }
             public DateTime? TanggalAppointment { get; set; }
-            public string KodeKaryawan { get; set; }
+            public string? KodeKaryawan { get; set; }
         }
 
         public class EditStatusTindakanDto()
@@ -62,13 +62,19 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound();
 
+
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
+
+            if (appDto.KodeKaryawan == null && karyawan == null)
+                return NotFound();
+
             var sqlParameters = new[]
             {
-                new SqlParameter("@KodeLokasi", user.KodeLokasi ?? appDto.KodeLokasi ?? (object)DBNull.Value),
+                new SqlParameter("@KodeLokasi",  appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
 
                 new SqlParameter("@TanggalAppointment", appDto.TanggalAppointment ?? (object)DBNull.Value),
 
-                new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? (object)DBNull.Value),
+                new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
             };
 
             var list = await _context.Appointment
@@ -95,7 +101,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var sqlParameters = new[]
             {
-                new SqlParameter("@KodeLokasi", user.KodeLokasi ?? appDto.KodeLokasi ?? (object)DBNull.Value),
+                new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? user.KodeLokasi ??(object) DBNull.Value),
 
                 new SqlParameter("@TanggalAppointment", appDto.TanggalAppointment ?? (object)DBNull.Value),
 

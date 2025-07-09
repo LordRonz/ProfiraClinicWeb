@@ -1,16 +1,20 @@
-﻿namespace ProfiraClinicWebAPI.Model
+﻿using ProfiraClinic.Models.Core;
+
+namespace ProfiraClinicWebAPI.Model
 {
     public class ApiResponse<T>
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }
+        public ErrorType? ErrorType { get; set; }
 
-        public ApiResponse(int statusCode, string message, T data = default)
+        public ApiResponse(int statusCode, string message, T data = default, ErrorType? errorType = null)
         {
             StatusCode = statusCode;
             Message = message;
             Data = data;
+            ErrorType = errorType;
         }
     }
 
