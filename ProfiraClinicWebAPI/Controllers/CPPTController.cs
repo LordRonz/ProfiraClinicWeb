@@ -10,35 +10,38 @@ using System.Security.Claims;
 namespace ProfiraClinicWebAPI.Controllers
 {
     [Authorize]
-    public class DiagnosaController
-    : BaseCrudController<Diagnosa>
+    public class CPPTController
+     : BaseCrudController<CPPT>
     {
-        public class AddDiagnosaDto()
+        public class AddCPPTDto
         {
             public string? KodeLokasi { get; set; }
             public DateTime? TanggalTransaksi { get; set; }
             public string? NomorAppointment { get; set; }
             public string? KodeCustomer { get; set; }
             public string? KodeKaryawan { get; set; }
-            public string? KodeDiagnosa { get; set; }
-            public string? KategoriDiagnosa { get; set; }
-            public string? KeteranganDiagnosa { get; set; }
-            public string? USRID { get; set; }
-            public string? NOFAK { get; set; }
+            public string? SUBYEKTIF { get; set; }
+            public string? OBYEKTIF { get; set; }
+            public string? ASSESTMENT { get; set; }
+            public string? PLANNING { get; set; }
+            public string? INSTRUKSI { get; set; }
+            public string? INPMD { get; set; }  // e.g. 'A' or other code
         }
 
-        public class DiagnosaListDto()
+
+
+        public class CPPTListDto()
         {
             public string? KodeCustomer { get; set; }
         }
 
-        public DiagnosaController(AppDbContext ctx) : base(ctx) { }
+        public CPPTController(AppDbContext ctx) : base(ctx) { }
 
-        protected override DbSet<Diagnosa> DbSet
-            => _context.Diagnosa;
+        protected override DbSet<CPPT> DbSet
+            => _context.CPPT;
 
-        protected override IQueryable<Diagnosa> ApplySearch(
-            IQueryable<Diagnosa> q,
+        protected override IQueryable<CPPT> ApplySearch(
+            IQueryable<CPPT> q,
             string likeParam)
             => q.Where(d
                 => EF.Functions.Like(d.KodeKaryawan, likeParam)
@@ -46,29 +49,21 @@ namespace ProfiraClinicWebAPI.Controllers
             || EF.Functions.Like(d.KodeLokasi, likeParam)
             );
 
-        protected override IOrderedQueryable<Diagnosa> ApplyOrder(
-            IQueryable<Diagnosa> q)
+        protected override IOrderedQueryable<CPPT> ApplyOrder(
+            IQueryable<CPPT> q)
             => q.OrderBy(d => d.TanggalTransaksi);
 
-        [HttpPost("AddDiagnosa")]
-        public async Task<IActionResult> AddDiagnosa([FromBody] AddDiagnosaDto appDto)
+        [HttpPost("AddCPPT")]
+        public async Task<IActionResult> AddCPPT([FromBody] AddCPPTDto appDto)
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userName))
-                return Unauthorized();
+            if (string.IsNullOrEmpty(userName)) return Unauthorized();
 
-            // 2) look it up
-            var user = await _context.MUser
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
-
-            if (user == null)
-                return NotFound();
+            var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.UserName == userName);
+            if (user == null) return NotFound();
 
             var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
-
-            if (appDto.KodeKaryawan == null && karyawan == null)
-                return NotFound();
+            if (appDto.KodeKaryawan == null && karyawan == null) return NotFound();
 
             var sqlParameters = new[]
             {
@@ -77,10 +72,13 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
                 new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
                 new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
-                new SqlParameter("@KodeDiagnosa", appDto.KodeDiagnosa ?? (object)DBNull.Value),
-                new SqlParameter("@KategoriDiagnosa", appDto.KategoriDiagnosa ?? (object)DBNull.Value),
-                new SqlParameter("@KeteranganDiagnosa", appDto.KeteranganDiagnosa ?? (object)DBNull.Value),
+                new SqlParameter("@SUBYEKTIF", appDto.SUBYEKTIF ?? (object)DBNull.Value),
+                new SqlParameter("@OBYEKTIF", appDto.OBYEKTIF ?? (object)DBNull.Value),
+                new SqlParameter("@ASSESTMENT", appDto.ASSESTMENT ?? (object)DBNull.Value),
+                new SqlParameter("@PLANNING", appDto.PLANNING ?? (object)DBNull.Value),
+                new SqlParameter("@INSTRUKSI", appDto.INSTRUKSI ?? (object)DBNull.Value),
                 new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+                new SqlParameter("@INPMD", appDto.INPMD ?? (object)DBNull.Value),
                 new SqlParameter
                 {
                     ParameterName = "@NOFAK",
@@ -91,23 +89,22 @@ namespace ProfiraClinicWebAPI.Controllers
             };
 
             await _context.Database.ExecuteSqlRawAsync(
-                "EXEC dbo.usp_TRM_Diagnosa_Add @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                "@KodeCustomer, @KodeKaryawan, @KodeDiagnosa, @KategoriDiagnosa, @KeteranganDiagnosa, " +
-                "@USRID, @NOFAK OUTPUT",
+                "EXEC dbo.usp_TRM_CPPT_Add " +
+                "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, @KodeKaryawan, " +
+                "@SUBYEKTIF, @OBYEKTIF, @ASSESTMENT, @PLANNING, @INSTRUKSI, " +
+                "@USRID, @INPMD, @NOFAK OUTPUT",
                 sqlParameters
             );
 
             var noFak = sqlParameters.Last().Value?.ToString()?.Trim();
 
-            // Return the newly created patient. Adjust properties as needed.
-            var result = CreatedAtAction(nameof(GetItem),
-                             new { noFak = noFak });
-
-            return result;
+            return CreatedAtAction(nameof(GetItem), new { noFak });
         }
 
+
+
         [HttpPost("GetListTrm")]
-        public async Task<IActionResult> GetListTrm([FromBody] DiagnosaListDto diagDto)
+        public async Task<IActionResult> GetListTrm([FromBody] CPPTListDto diagDto)
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userName))
@@ -123,11 +120,11 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@KodeCustomer",  diagDto.KodeCustomer ?? (object)DBNull.Value),
             };
 
-            var list = await _context.TRMDiagnosa
-                .FromSqlRaw("EXEC dbo.usp_TRM_Diagnosa_List @KodeCustomer", sqlParameters)
+            var list = await _context.TRMCPPT
+                .FromSqlRaw("EXEC dbo.usp_TRM_CPPT_List @KodeCustomer", sqlParameters)
                 .ToListAsync();
 
-            var result = new Pagination<TRMDiagnosa>
+            var result = new Pagination<TRMCPPT>
             {
                 TotalCount = 0,
                 Page = 0,

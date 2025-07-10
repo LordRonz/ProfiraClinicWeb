@@ -1,13 +1,11 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models.Api;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
+using System.Globalization;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -103,14 +101,15 @@ namespace ProfiraClinicWebAPI.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            return Ok(new
+            var result = new Pagination<TEntity>
             {
-                totalCount,
-                page,
-                pageSize,
-                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                items
-            });
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                Items = items // List<MyDto>
+            };
+
+            return Ok(result);
         }
 
         [HttpGet("GetById/{id}")]

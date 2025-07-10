@@ -107,14 +107,14 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@UserID", updatedUser.UserID ?? (object)DBNull.Value),
-        // The stored procedure generates the customer code, so pass an empty string.
-        new SqlParameter("@UserName", updatedUser.UserName ?? (object)DBNull.Value),
-        new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
-        new SqlParameter("@KodeUserGroup", updatedUser.KodeUserGroup ?? (object)DBNull.Value),
-         new SqlParameter("@UserInput", updatedUser.UserInput ?? (object)DBNull.Value),
-         new SqlParameter("@KodeLokasi", updatedUser.KodeLokasi ?? (object)DBNull.Value)
-    };
+                new SqlParameter("@UserID", updatedUser.UserID ?? (object)DBNull.Value),
+                // The stored procedure generates the customer code, so pass an empty string.
+                new SqlParameter("@UserName", updatedUser.UserName ?? (object)DBNull.Value),
+                new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
+                new SqlParameter("@KodeUserGroup", updatedUser.KodeUserGroup ?? (object)DBNull.Value),
+                new SqlParameter("@UserInput", updatedUser.UserInput ?? (object)DBNull.Value),
+                new SqlParameter("@KodeLokasi", updatedUser.KodeLokasi ?? (object)DBNull.Value)
+            };
 
             try
             {

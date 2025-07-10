@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
-    public class TRMDiagnosa
+    [Table("TRM_Diagnosa")]
+    public class Diagnosa
     {
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]
@@ -67,10 +68,5 @@ namespace ProfiraClinic.Models.Core
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
         public string? USRID { get; set; } // User Input
-
-        public string? KETLK { get; set; }
-        public string? NamaCustomer { get; set; }
-
-        public string? NamaKaryawan { get; set; }
     }
 }

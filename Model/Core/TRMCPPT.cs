@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
-    [Table("TRM_CPPT")]
     public class TRMCPPT
     {
         [Key]
@@ -72,5 +71,10 @@ namespace ProfiraClinic.Models.Core
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
         public string USRID { get; set; } // User Input
+
+        public string? KETLK { get; set; }
+        public string? NamaCustomer { get; set; }
+
+        public string? NamaKaryawan { get; set; }
     }
 }
