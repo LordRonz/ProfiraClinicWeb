@@ -70,5 +70,7 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "char(10)")]
         public string? UsrId { get; set; }
+
+        public string? AlamatDomisili { get; set; }
     }
 }
