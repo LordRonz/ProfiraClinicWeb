@@ -4,12 +4,17 @@ using ProfiraClinicRME.Helpers;
 using ProfiraClinicRME.MessageHandlers;
 using ProfiraClinicRME.Services;
 using ProfiraClinicRME.Utils;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
 DotEnv.Load(dotenv);
+
+Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(Log.Logger);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
