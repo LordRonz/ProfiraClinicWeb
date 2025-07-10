@@ -1,12 +1,17 @@
 ﻿@page "/"
-@layout ProfiraClinicRME.Components.Layout.UnauthedLayout;
-@using System.Text.RegularExpressions;
-@using System.ComponentModel.DataAnnotations;
-@using ProfiraClinic.Models;
-@using Microsoft.EntityFrameworkCore;
+
+@layout ProfiraClinicRME.Components.Layout.UnauthedLayout
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@using BC = BCrypt.Net.BCrypt
+@using Color = MudBlazor.Color
+@using Microsoft.EntityFrameworkCore
+@using ProfiraClinic.Models
+@using ProfiraClinicRME.Infra
 @using ProfiraClinicRME.Services
-@using Color = MudBlazor.Color;
-@using BC = BCrypt.Net.BCrypt;
+
+@inject ApiService SvcApi
 
 <PageTitle>Login</PageTitle>
 
@@ -15,10 +20,10 @@
         <div class="d-flex justify-content-end">
             <MudImage Src="@GetLady()" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
         </div>
-        <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
+        <MudContainer MaxWidth="MaxWidth.Small"
+                      Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
             <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
-                    <MudSwitch Class="pl-4" @bind-Value="@isDoctor" />
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
 
@@ -57,11 +62,10 @@
 @inject ISnackbar Snackbar
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
-@inject AuthApiService AuthApiService
+@inject AuthService AuthApiService
 @inject ClinicApiService ClinicApiService
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
-    List<MKaryawan> customers = new List<MKaryawan>();
 
     List<MKlinik> kliniks = new List<MKlinik>();
 
@@ -156,7 +160,7 @@
 
             addSnackbar("Logged In", Severity.Success);
 
-            NavManager.NavigateTo("/appointment");
+            NavManager.NavigateTo("/dashboard");
         }
         catch (Exception ex)
         {

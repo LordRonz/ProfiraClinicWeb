@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@using ProfiraClinic.Models.Core
 @using Microsoft.EntityFrameworkCore;
+@using ProfiraClinic.Models.Core
 @using ProfiraClinicRME.Helpers
 @using ProfiraClinicRME.Services
 @inject UserApiService ApiService
@@ -157,7 +157,7 @@
        
         <MudMainContent Class="h-100" Style="@(_drawerOpen ? "" : "margin-left: 88px !important;")">
             @* <MudSwitch Class="pl-4" @bind-Value="@isDoctor" /> *@
-            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100 px-1 pb-4">
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100 px-2 pb-4">
                 @Body
             </MudContainer>
         </MudMainContent>
@@ -173,11 +173,11 @@
 @code {
     bool _drawerOpen = true;
 
-    bool isDoctor = false;
+    bool isDoctor = true;
 
     string path = "";
 
-    MKaryawan Kary;
+    Karyawan Kary;
 
     CurrentUser user;
 
@@ -343,7 +343,7 @@
     }
 
     protected override void OnInitialized() {
-        isDoctor = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("dokter");
+        // isDoctor = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("dokter");
         path = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
