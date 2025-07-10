@@ -10,6 +10,7 @@
 @using ProfiraClinic.Models
 @using ProfiraClinicRME.Infra
 @using ProfiraClinicRME.Services
+@using ProfiraClinicRME.Model
 
 @inject ApiService SvcApi
 
@@ -63,7 +64,7 @@
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject NavigationManager NavManager
 @inject AuthService AuthApiService
-@inject ClinicApiService ClinicApiService
+@inject IClinicService SvcClinic
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
 
@@ -134,11 +135,11 @@
     protected override async Task OnInitializedAsync()
     {
         // customers = await dbContext.MKaryawan.ToListAsync();
-        var apiResponse = await ClinicApiService.GetClinicsAsync();
+        var svcClinic = await SvcClinic.GetListClinicsAsync(0,10);
         System.Diagnostics.Debug.WriteLine("Done");
-        if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+        if (svcClinic.Status == ServiceResultEnum.FOUND)
         {
-            kliniks = apiResponse.Data.Items;
+            kliniks = svcClinic.Data.Items;
         }
     }
 

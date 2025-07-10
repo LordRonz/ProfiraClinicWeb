@@ -50,7 +50,7 @@ namespace ProfiraClinicRME.Infra
         }
 
         //
-        public async Task<Response<ReqType>> SendEmpty<ReqType>(string mode, string reqUrlPath)
+        public async Task<Response<ReqType?>> SendEmpty<ReqType>(string mode, string reqUrlPath)
         {
             string typeParam = $"{typeof(ReqType).Name}>";
             LogTrace.Info($"init", typeParam, _classPath);

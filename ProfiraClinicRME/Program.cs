@@ -40,6 +40,7 @@ builder.Services.AddHttpClient("std", httpClient =>
 
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IClinicService, ClinicService>();
 
 
 
@@ -48,13 +49,6 @@ builder.Services.AddHttpClient<UserApiService>(client =>
     client.BaseAddress = new Uri(apiBaseAddress);
 }).AddHttpMessageHandler<BearerTokenHandler>()
     .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<ClinicApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
 
 builder.Services.AddHttpClient<AuthService>(client =>
 {
