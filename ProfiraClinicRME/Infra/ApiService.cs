@@ -7,6 +7,7 @@ using System.Text.Json;
 using ProfiraClinicRME.Utils;
 using ProfiraClinic.Models.Core;
 using BootstrapBlazor.Components;
+using System.Text.Json.Serialization;
 
 namespace ProfiraClinicRME.Infra
 {
@@ -50,15 +51,14 @@ namespace ProfiraClinicRME.Infra
         }
 
         //
-        public async Task<Response<ReqType?>> SendEmpty<ReqType>(string mode, string reqUrlPath)
+        public async Task<Response<RespType?>> SendEmpty<RespType>(string mode, string reqUrlPath)
         {
-            string typeParam = $"{typeof(ReqType).Name}>";
+            string typeParam = $"{typeof(RespType).Name}>";
             LogTrace.Info($"init", typeParam, _classPath);
 
-            return await ExecRequest<ReqType>(mode, reqUrlPath, null, "std");
+            return await ExecRequest<RespType>(mode, reqUrlPath, null, "std");
 
         }
-
 
 
         /// <summary>
@@ -86,7 +86,9 @@ namespace ProfiraClinicRME.Infra
         protected virtual async Task<Response<RespType?>> ExecRequest<RespType>(string method, string reqUrlPath, HttpContent content, string clientName)
         {
             string message = "Unknown Error";
-            var apiResponse = new Response<RespType>(404, message);
+            var apiResponse = new Response<RespType>();
+            apiResponse.StatusCode = 404;
+            apiResponse.Message = message;
             apiResponse.ErrorType = ErrorType.UNKNOWN;
 
             LogTrace.Info("init", new { method, reqUrlPath, clientName }, _classPath);
@@ -113,42 +115,51 @@ namespace ProfiraClinicRME.Infra
 
                 serializedObj = await response.Content.ReadAsStringAsync();
 
-                LogTrace.Info("response", new { httpStat, serializedObj, reqUrlPath }, path: _classPath);
+                LogTrace.Info("serialize", new { httpStat, serializedObj, reqUrlPath }, path: _classPath);
 
                 if (httpStat != 200)
                 {
                     //apiResponse.Message = "Unknown Error";
                     //apiResponse.ErrorType = ErrorType.UNKNOWN;
-                    LogTrace.Info("fin", apiResponse, _classPath);
+                    LogTrace.Info("fin", new { apiResult = apiResponse, raw=serializedObj}, _classPath);
                     return apiResponse;
                 }
-                
+
 
                 //httpStat 200
 
 
                 //var responseData = Utility.DeserializeJson<ResponseData<Entity>>(serializedObj);
-                var responseData = JsonSerializer.Deserialize<ApiResponse<RespType>>(serializedObj);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    AllowTrailingCommas = true,
+                    ReadCommentHandling = JsonCommentHandling.Skip, 
+                    NumberHandling = JsonNumberHandling.AllowReadingFromString 
+                };
+
+                var responseData = JsonSerializer.Deserialize<Response<RespType>>(serializedObj, options );
                 //check for returnId and returnMessage
                 if (responseData == null || responseData.StatusCode != 200)
                 {
                     errCode = "AS.ER.01";
                     apiResponse.Message = StdFailMessage + errCode;
 
-                    LogTrace.Info("fin", apiResponse, _classPath);
+                    LogTrace.Error("fin: err",  responseData, _classPath);
                     return apiResponse;
                 }
-
-
+                LogTrace.Info("FIN: success", apiResponse, _classPath);
+                apiResponse.StatusCode = 200;
+                apiResponse.Message = responseData.Message;
+                apiResponse.Data = responseData.Data;
+                return apiResponse;
             }
             catch (JsonException ex)
             {
-                LogTrace.Error("JsonExc", serializedObj, _classPath);
                 apiResponse.Message = "Json Exception";
             }
             catch (AggregateException ex)
             {
-                LogTrace.Error(message, ex, _classPath);
                 apiResponse.Message = "Aggregate Exception";
 
             }
@@ -158,8 +169,6 @@ namespace ProfiraClinicRME.Infra
                 apiResponse.Message = $"{ex.Message} {errCode}";
                 
                 // Handle other exceptions
-                //Log.Debug("{src} {stat} {data}", logSource, message, ex.Message);
-                LogTrace.Error("err: " + errCode, ex.Message, _classPath);
 
             }
             catch (HttpRequestException ex)
@@ -176,7 +185,6 @@ namespace ProfiraClinicRME.Infra
                 }
                 //Log.Debug("{src} {stat} {data}", logSource, message, ex.Message);
                 apiResponse.Message = $"{message} {errCode}";
-                LogTrace.Error("err: " + errCode, apiResponse, _classPath);
             }
             catch (Exception ex)
             {
@@ -185,15 +193,14 @@ namespace ProfiraClinicRME.Infra
 
                 // Handle other exceptions
                 //Log.Debug("{src} {stat} {data}", logSource, message, ex.Message);
-                apiResponse.Message = $"{message} {errCode}";
-                LogTrace.Error("err: " + errCode, apiResponse, _classPath);
+                apiResponse.Message = $"{errCode} {message} ";
             }
             finally
             {
                 response?.Dispose();
             }
             //return for exception
-            LogTrace.Error("err: " + errCode, apiResponse, _classPath);
+            LogTrace.Error("FIN: ERR" + errCode, apiResponse, _classPath);
             return apiResponse;
         }
 

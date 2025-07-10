@@ -14,7 +14,7 @@ namespace ProfiraClinicRME.Infra
     {
         private readonly ApiService _svcApi;
 
-        private string _classPath = "ClinicService";
+        private string _classPath = "Infra::ClinicService";
 
         private BaseRepo<MKlinik> _repo;
         // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
@@ -29,7 +29,7 @@ namespace ProfiraClinicRME.Infra
         {
             // Replace the URL with your actual endpoint, e.g., "api/Patient"
 
-            Response<PagedList<MKlinik>?> apiResponse = await _svcApi.SendEmpty<PagedList<MKlinik>>("post", $"api/Klinik/GetList/page={pageNum}&pageSize={pageSize}");
+            Response<PagedList<MKlinik>?> apiResponse = await _svcApi.SendEmpty<PagedList<MKlinik>>("get", $"api/Klinik/GetList?page={pageNum}&pageSize={pageSize}");
 
             ServiceResult<PagedList<MKlinik>> svcResult = _repo.ProcessResult<PagedList<MKlinik>>(apiResponse, RepoProcessEnum.GET);
 
