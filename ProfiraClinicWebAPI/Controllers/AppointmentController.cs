@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using System.Security.Claims;
@@ -77,11 +78,19 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
             };
 
-            var list = await _context.Appointment
+            var list = await _context.AppointmentList
                 .FromSqlRaw("EXEC dbo.usp_TRM_Appointment_List @KodeLokasi, @TanggalAppointment, @KodeKaryawan", sqlParameters)
                 .ToListAsync();
 
-            return Ok(list);
+            var result = new Pagination<TRMAppointment>
+            {
+                TotalCount = 0,
+                Page = 0,
+                PageSize = 0,
+                Items = list
+            };
+
+            return Ok(result);
         }
 
         [HttpPost("EditStatusTindakan")]
