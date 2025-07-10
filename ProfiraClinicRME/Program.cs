@@ -1,6 +1,7 @@
 using MudBlazor.Services;
 using ProfiraClinicRME.Components;
 using ProfiraClinicRME.Helpers;
+using ProfiraClinicRME.Infra;
 using ProfiraClinicRME.MessageHandlers;
 using ProfiraClinicRME.Services;
 using ProfiraClinicRME.Utils;
@@ -23,25 +24,24 @@ builder.Services.AddMudServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<BrowserService>();
 
-builder.Services.AddSingleton<INavigationRedirector, NavigationRedirector>();
-builder.Services.AddSingleton<ITokenProvider, TokenProvider>();
+builder.Services.AddScoped<INavigationRedirector, NavigationRedirector>();
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<AuthRedirectHandler>();
 builder.Services.AddTransient<BearerTokenHandler>();
 
+
 var apiBaseAddress = builder.Configuration["ApiSettings:BaseAddress"];
 
-builder.Services.AddHttpClient<CustomerApiService>(client =>
+builder.Services.AddHttpClient("std", httpClient =>
 {
-    client.BaseAddress = new Uri(apiBaseAddress);
-})
-    .AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
+    httpClient.Timeout = TimeSpan.FromSeconds(15);
 
-builder.Services.AddHttpClient<GroupUserApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
+}).AddHttpMessageHandler<AuthRedirectHandler>(); 
+
+builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
+
 
 builder.Services.AddHttpClient<UserApiService>(client =>
 {
@@ -55,66 +55,8 @@ builder.Services.AddHttpClient<ClinicApiService>(client =>
 }).AddHttpMessageHandler<BearerTokenHandler>()
     .AddHttpMessageHandler<AuthRedirectHandler>();
 
-builder.Services.AddHttpClient<CustomerRiwayatAsalService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
 
-builder.Services.AddHttpClient<GroupPaketApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<GroupPerawatanApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<GroupBarangApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<DokterApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<PaketHeaderApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-builder.Services.AddHttpClient<PaketDetailApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<PerawatanHeaderApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<BarangHeaderApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<ImagesApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
-
-builder.Services.AddHttpClient<AuthApiService>(client =>
+builder.Services.AddHttpClient<AuthService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
 });
