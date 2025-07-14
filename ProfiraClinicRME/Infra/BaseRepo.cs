@@ -86,7 +86,7 @@ namespace ProfiraClinicRME.Infra
         /// <param name="mode"></param>
         /// <param name="msgSuccess"></param>
         /// <returns></returns>
-        public ServiceResult<RespType> ProcessResult<RespType>(Response<RespType?> apiResponse, RepoProcessEnum mode = RepoProcessEnum.ACTION, string msgSuccess = "")
+        public ServiceResult<RespType> ProcessResult<RespType>(Response<RespType?> apiResponse, RepoProcessEnum mode, string msgSuccess = "")
         {
             //check based on statusCode
             //process response

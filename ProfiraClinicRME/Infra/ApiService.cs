@@ -148,14 +148,15 @@ namespace ProfiraClinicRME.Infra
                     LogTrace.Error("fin: err",  responseData, _classPath);
                     return apiResponse;
                 }
-                LogTrace.Info("FIN: success", apiResponse, _classPath);
                 apiResponse.StatusCode = 200;
                 apiResponse.Message = responseData.Message;
                 apiResponse.Data = responseData.Data;
+                LogTrace.Info("FIN: success", apiResponse, _classPath);
                 return apiResponse;
             }
             catch (JsonException ex)
             {
+                LogTrace.Error("JsonException", new { type=typeof(RespType).Name, path= ex.Path, BytePos = ex.BytePositionInLine, line = ex.LineNumber }, _classPath);
                 apiResponse.Message = "Json Exception";
             }
             catch (AggregateException ex)

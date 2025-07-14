@@ -36,19 +36,15 @@ builder.Services.AddHttpClient("std", httpClient =>
 {
     httpClient.Timeout = TimeSpan.FromSeconds(15);
 
-}).AddHttpMessageHandler<AuthRedirectHandler>(); 
+}).AddHttpMessageHandler<AuthRedirectHandler>();
 
+builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IClinicService, ClinicService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
-
-
-builder.Services.AddHttpClient<UserApiService>(client =>
-{
-    client.BaseAddress = new Uri(apiBaseAddress);
-}).AddHttpMessageHandler<BearerTokenHandler>()
-    .AddHttpMessageHandler<AuthRedirectHandler>();
 
 builder.Services.AddHttpClient<AuthService>(client =>
 {

@@ -10,6 +10,7 @@ namespace ProfiraClinicRME.Utils
         Edit,
         View,
         Delete,
+
     }
 
 
@@ -29,7 +30,7 @@ namespace ProfiraClinicRME.Utils
         public ColumnType? Type { get; set; } = ColumnType.Data;
         public string? CustomIcon { get; set; }
         public MudBlazor.Color? Color { get; set; }
-        public Func<object, Task>? Action { get; set; }
+        public Func<Dictionary<string, string>, Task>? Action { get; set; }
         public ColumnAlign Align { get; set; } = ColumnAlign.Left;
     }
 
