@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using System.Data;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -100,29 +101,58 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrEmpty(userName))
                 return Unauthorized();
 
-            // 2) look it up
+            // Look up the user
             var user = await _context.MUser
                             .AsNoTracking()
                             .FirstOrDefaultAsync(u => u.UserName == userName);
-
             if (user == null)
                 return NotFound();
 
+            // Validate required fields
+            if (appDto.TanggalAppointment == null)
+                return BadRequest("TanggalAppointment is required");
+
+            if (string.IsNullOrEmpty(appDto.NomorAppointment))
+                return BadRequest("NomorAppointment is required");
+
+            if (string.IsNullOrEmpty(appDto.KodeCustomer))
+                return BadRequest("KodeCustomer is required");
+
             var sqlParameters = new[]
             {
-                new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? user.KodeLokasi ??(object) DBNull.Value),
+        new SqlParameter("@KodeLokasi", SqlDbType.Char, 10)
+        {
+            Value = appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value
+        },
+        new SqlParameter("@NomorAppointment", SqlDbType.Char, 25)
+        {
+            Value = appDto.NomorAppointment
+        },
+        new SqlParameter("@TanggalAppointment", SqlDbType.Date)
+        {
+            Value = appDto.TanggalAppointment.Value.Date // Get only the date part
+        },
+        new SqlParameter("@KodeCustomer", SqlDbType.Char, 10)
+        {
+            Value = appDto.KodeCustomer
+        }
+    };
 
-                new SqlParameter("@TanggalAppointment", appDto.TanggalAppointment ?? (object)DBNull.Value),
+            System.Diagnostics.Debug.WriteLine($"TanggalAppointment: {appDto.TanggalAppointment.Value.Date}");
 
-                new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
+            try
+            {
+                await _context.Database
+                    .ExecuteSqlRawAsync("EXEC dbo.usp_TRM_Appointment_EditStatusTindakan @KodeLokasi, @NomorAppointment, @TanggalAppointment, @KodeCustomer", sqlParameters);
 
-                new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
-            };
-
-            await _context.Database
-                .ExecuteSqlRawAsync("EXEC dbo.usp_TRM_Appointment_EditStatusTindakan @KodeLokasi, @TanggalAppointment, @KodeCustomer, @NomorAppointment", sqlParameters);
-
-            return Ok();
+                return Ok();
+            }
+            catch (SqlException ex)
+            {
+                // Log the error details
+                System.Diagnostics.Debug.WriteLine($"SQL Error: {ex.Message}");
+                return StatusCode(500, "An error occurred while updating the appointment");
+            }
         }
     }
 }
