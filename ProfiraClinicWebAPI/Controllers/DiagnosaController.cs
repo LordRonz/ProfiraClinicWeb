@@ -13,20 +13,6 @@ namespace ProfiraClinicWebAPI.Controllers
     public class DiagnosaController
     : BaseCrudController<Diagnosa>
     {
-        public class AddDiagnosaDto()
-        {
-            public string? KodeLokasi { get; set; }
-            public DateTime? TanggalTransaksi { get; set; }
-            public string? NomorAppointment { get; set; }
-            public string? KodeCustomer { get; set; }
-            public string? KodeKaryawan { get; set; }
-            public string? KodeDiagnosa { get; set; }
-            public string? KategoriDiagnosa { get; set; }
-            public string? KeteranganDiagnosa { get; set; }
-            public string? USRID { get; set; }
-            public string? NOFAK { get; set; }
-        }
-
         public class DiagnosaListDto()
         {
             public string? KodeCustomer { get; set; }
