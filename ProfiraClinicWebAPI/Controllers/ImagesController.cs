@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -9,6 +8,7 @@ namespace ProfiraClinicWebAPI.Controllers
     public class ImagesController : ControllerBase
     {
         private readonly string _imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+        private readonly string _rmeFolder = Path.Combine(Directory.GetCurrentDirectory(), "assets", "rme");
         private const long MaxFileSize = 5 * 1024 * 1024; // 5MB
 
         public ImagesController()
@@ -62,6 +62,47 @@ namespace ProfiraClinicWebAPI.Controllers
             var fileBytes = System.IO.File.ReadAllBytes(filePath);
 
             return File(fileBytes, mimeType);
+        }
+
+
+        /// <summary>
+        /// Lists all filenames under /assets/rme and returns full URLs.
+        /// </summary>
+        [HttpGet("rme")]
+        public IActionResult GetAll()
+        {
+            if (!Directory.Exists(_rmeFolder))
+                return NotFound("RME assets folder not found.");
+
+            var files = Directory
+                .EnumerateFiles(_rmeFolder)
+                .Select(fullPath =>
+                {
+                    var fileName = Path.GetFileName(fullPath);
+                    // Build a URL like https://host/assets/rme/{fileName}
+                    var url = $"{Request.Scheme}://{Request.Host}/assets/rme/{Uri.EscapeDataString(fileName)}";
+                    return new { fileName, url };
+                })
+                .ToList();
+
+            return Ok(files);
+        }
+
+        /// <summary>
+        /// (Optional) If you want to stream via API instead of direct static serving.
+        /// GET /api/assets/rme/{fileName}
+        /// </summary>
+        [HttpGet("rme/{fileName}")]
+        public IActionResult GetFileRme(string fileName)
+        {
+            var safeName = Path.GetFileName(fileName);
+            var fullPath = Path.Combine(_rmeFolder, safeName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            // Let ASP.NET infer the content-type from the extension
+            return PhysicalFile(fullPath, contentType: null, enableRangeProcessing: true);
         }
 
         // Helper method to get the MIME type based on file extension

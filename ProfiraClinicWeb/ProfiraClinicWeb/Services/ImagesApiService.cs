@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace ProfiraClinicWeb.Services
 {
