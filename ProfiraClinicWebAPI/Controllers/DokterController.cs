@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
-using Microsoft.EntityFrameworkCore;
 using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -49,6 +50,14 @@ namespace ProfiraClinicWebAPI.Controllers
             var list = await _context.DokterList
                 .FromSqlRaw("EXEC dbo.usp_PDokter_List")
                 .ToListAsync();
+
+            var result = new Pagination<DokterListDto>
+            {
+                TotalCount = 0,
+                Page = 0,
+                PageSize = 0,
+                Items = list
+            };
 
             return Ok(list);
         }
