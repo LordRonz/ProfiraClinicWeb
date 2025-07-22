@@ -82,7 +82,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 {
                     var fileName = Path.GetFileName(fullPath);
                     // Build a URL like https://host/assets/rme/{fileName}
-                    var url = $"{Request.Scheme}://{Request.Host}/assets/rme/{Uri.EscapeDataString(fileName)}";
+                    var url = $"{Request.Scheme}://{Request.Host}/api/Images/rme/{Uri.EscapeDataString(fileName)}";
                     return new { fileName, url };
                 })
                 .ToList();
@@ -97,14 +97,17 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpGet("rme/{fileName}")]
         public IActionResult GetFileRme(string fileName)
         {
-            var safeName = Path.GetFileName(fileName);
+            var safeFileName = SanitizeFileName(fileName);
+            var safeName = Path.GetFileName(safeFileName);
             var fullPath = Path.Combine(_rmeFolder, safeName);
 
             if (!System.IO.File.Exists(fullPath))
-                return NotFound();
+                return NotFound("Image not found.");
 
-            // Let ASP.NET infer the content-type from the extension
-            return PhysicalFile(fullPath, contentType: null, enableRangeProcessing: true);
+            var mimeType = GetMimeType(fullPath);
+            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
+
+            return File(fileBytes, mimeType);
         }
 
         // Helper method to get the MIME type based on file extension
