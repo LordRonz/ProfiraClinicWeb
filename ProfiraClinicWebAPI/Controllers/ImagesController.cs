@@ -72,7 +72,9 @@ namespace ProfiraClinicWebAPI.Controllers
         public IActionResult GetAll()
         {
             if (!Directory.Exists(_rmeFolder))
-                return NotFound("RME assets folder not found.");
+            {
+                Directory.CreateDirectory(_rmeFolder);
+            }
 
             var files = Directory
                 .EnumerateFiles(_rmeFolder)

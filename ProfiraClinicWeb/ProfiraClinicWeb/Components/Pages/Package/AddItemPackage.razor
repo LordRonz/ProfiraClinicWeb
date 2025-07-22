@@ -197,10 +197,10 @@
                 // Save details
                 foreach (var d in details)
                 {
-                    // d.IDPaketHeader = await resultHeader..ReadFromJsonAsync<long>();
+                    d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
                     await PaketApiService.CreatePaketDetailAsync(d);
                 }
-                NavigationManager.NavigateTo("/paket");
+                NavigationManager.NavigateTo("/package-item");
             }
             else
             {
