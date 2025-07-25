@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using ProfiraClinicWebAPI.Model;
 
 namespace ProfiraClinicWebAPI.Filters
@@ -11,7 +11,35 @@ namespace ProfiraClinicWebAPI.Filters
             if (context.Result is ObjectResult objectResult)
             {
                 int statusCode = objectResult.StatusCode ?? 200;
-                var apiResponse = new ApiResponse<object>(statusCode, "Success", objectResult.Value);
+
+                string message = "Success";
+
+                if (statusCode >= 400)
+                {
+                    if (objectResult.Value is string str)
+                    {
+                        message = str;
+                    }
+                    else if (objectResult.Value is Exception ex)
+                    {
+                        message = ex.Message;
+                    }
+                    else if (objectResult.Value is IDictionary<string, object> dict && dict.TryGetValue("error", out var errorVal))
+                    {
+                        message = errorVal?.ToString() ?? "Error";
+                    }
+                    else if (objectResult.Value?.GetType().GetProperty("error") is not null)
+                    {
+                        var errorProp = objectResult.Value.GetType().GetProperty("error");
+                        message = (errorProp?.GetValue(objectResult.Value))?.ToString() ?? "Error";
+                    }
+                    else
+                    {
+                        message = "Error";
+                    }
+                }
+
+                var apiResponse = new ApiResponse<object>(statusCode, message, objectResult.Value);
                 context.Result = new ObjectResult(apiResponse)
                 {
                     StatusCode = statusCode
@@ -28,5 +56,7 @@ namespace ProfiraClinicWebAPI.Filters
 
             base.OnActionExecuted(context);
         }
+
+
     }
 }
