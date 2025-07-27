@@ -44,6 +44,9 @@ builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IClinicService, ClinicService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IMasterDiagnosaService, MasterDiagnosaService>();
+builder.Services.AddScoped<IDiagnosaService, DiagnosaService>();
+
 
 
 builder.Services.AddHttpClient<AuthService>(client =>

@@ -77,6 +77,14 @@ namespace ProfiraClinicRME.Infra
             return repoResult;
         }
 
+        public ServiceResult<string> ProcessEmptyResult(Response<string?> apiResponse, RepoProcessEnum mode, string msgSuccess = "")
+        {
+            var repoResult = ProcessResult<string>(apiResponse, mode, msgSuccess, true);
+            repoResult.Data = "";
+            return repoResult;
+        }
+
+
         // 
         /// <summary>
         /// used to process getById, getList
@@ -86,7 +94,7 @@ namespace ProfiraClinicRME.Infra
         /// <param name="mode"></param>
         /// <param name="msgSuccess"></param>
         /// <returns></returns>
-        public ServiceResult<RespType> ProcessResult<RespType>(Response<RespType?> apiResponse, RepoProcessEnum mode, string msgSuccess = "")
+        public ServiceResult<RespType> ProcessResult<RespType>(Response<RespType?> apiResponse, RepoProcessEnum mode, string msgSuccess = "", bool emptyResult = false)
         {
             //check based on statusCode
             //process response
@@ -98,23 +106,32 @@ namespace ProfiraClinicRME.Infra
              * UNAUTHORIZED - 401 , not auth --> FAIL
              * INV_STRUCT, FAIL --> FAIL
              */
-            ServiceResult<RespType> repoResult = new();
-            repoResult.Status = ServiceResultEnum.FAIL;
-            repoResult.Message = "Terjadi kesalahan sistem.";
+            //ServiceResult<RespType?> repoResult = new();
+            //repoResult.Status = ServiceResultEnum.FAIL;
+            //repoResult.Message = "Terjadi kesalahan sistem.";
+            var repoResult = new ServiceResult<RespType>();
 
             //four 404
             if (apiResponse.StatusCode != 200)
             {
+                repoResult = ServiceResult<RespType>.Fail();
                 LogTrace.Error("Fail", apiResponse, classPath);
                 return repoResult;
             }
 
             //for 200 
+            if (emptyResult)
+            {
+                repoResult = ServiceResult<RespType>.ActionEmpty(msgSuccess);
+                return repoResult;
+            }
+
             //for data not found
             if (apiResponse.Data is null)
             {
                 LogTrace.Error("Fail", apiResponse, classPath);
-                repoResult.Message = "Data tidak dapat ditemukan.";
+                repoResult = ServiceResult<RespType>.NotFound("Data tidak dapat ditemukan.");
+
                 return repoResult;
             }
 
@@ -123,31 +140,29 @@ namespace ProfiraClinicRME.Infra
             if(mode == RepoProcessEnum.GETLIST )
             {
                 var dataType = apiResponse.Data.GetType();
-
-                if (dataType.IsGenericType == false)
-                {
-                    LogTrace.Error("Fail: not list", apiResponse, classPath);
-
-                    return repoResult;
-                }
-
                 var genericName = dataType.IsGenericType ? dataType.GetGenericTypeDefinition().Name:"";
                 if (genericName.StartsWith("PagedList"))
                 {
+                    repoResult = ServiceResult<RespType>.Found(apiResponse.Data);
+                    return repoResult;
                     // apiResponse.Data is a PagedList<T>
-                    repoResult.Status = ServiceResultEnum.FOUND;
-                    repoResult.Message = msgSuccess == "" ? apiResponse.Message : msgSuccess;
-                    repoResult.Data = apiResponse.Data;
 
                 }
 
+                LogTrace.Error("Fail: not list", apiResponse, classPath);
+                repoResult = ServiceResult<RespType>.Fail("Data tidak dapat ditemukan.");
+                return repoResult;
+            } 
+            else
+            {
+
+                repoResult = ServiceResult<RespType>.Found(apiResponse.Data, msgSuccess);
+                return repoResult;
             }
             // for data found get by id
-            repoResult.Status = ServiceResultEnum.FOUND;
-            repoResult.Message = msgSuccess == "" ? apiResponse.Message : msgSuccess;
-            repoResult.Data = apiResponse.Data;
-
-            return repoResult;
+            //repoResult.Status = ServiceResultEnum.FOUND;
+            //repoResult.Message = msgSuccess == "" ? apiResponse.Message : msgSuccess;
+            //repoResult.Data = apiResponse.Data;
 
         }
     }

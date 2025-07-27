@@ -50,13 +50,14 @@ namespace ProfiraClinicRME.Infra
             LogTrace.Debug("fin: " + Bearer, path: _classPath);
         }
 
+        
         //
-        public async Task<Response<RespType?>> SendEmpty<RespType>(string mode, string reqUrlPath)
+        public async Task<Response<RespType?>> SendEmpty<RespType>(string method, string reqUrlPath)
         {
             string typeParam = $"{typeof(RespType).Name}>";
             LogTrace.Info($"init", typeParam, _classPath);
 
-            return await ExecRequest<RespType>(mode, reqUrlPath, null, "std");
+            return await ExecRequest<RespType>(method, reqUrlPath, null, false, "std");
 
         }
 
@@ -68,28 +69,37 @@ namespace ProfiraClinicRME.Infra
         /// <param name="method"></param>
         /// <param name="reqUrlPath">request url path </param>
         /// <param name="dataList"></param>
+        /// <param name="emptyResponse">is response should empty</param>
         /// <returns></returns>
-        public async Task<Response<RespType?>> Send<ReqType, RespType>(string method, string reqUrlPath, ReqType? reqType, long pageNum = 0, long pageSize = 0, string clientName = "std")
+        public async Task<Response<RespType?>> Send<ReqType, RespType>(string method, string reqUrlPath, ReqType? request, long pageNum = 0, long pageSize = 0, bool emptyResponse = false, string clientName = "std")
         {
             string typeParam = $"<{typeof(ReqType).Name},{typeof(RespType).Name}>";
             LogTrace.Info($"init", typeParam, _classPath);
             
-            var jsonContent = JsonSerializer.Serialize(reqType);
+            var jsonContent = JsonSerializer.Serialize(request);
             LogTrace.Info("request", new { reqUrlPath, jsonContent }, _classPath);
 
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            return await ExecRequest<RespType>(method, reqUrlPath, content, clientName);
+            return await ExecRequest<RespType>(method, reqUrlPath, content, emptyResponse, clientName);
 
         }
 
-        protected virtual async Task<Response<RespType?>> ExecRequest<RespType>(string method, string reqUrlPath, HttpContent content, string clientName)
+        /// <summary>
+        /// execute http request
+        /// </summary>
+        /// <typeparam name="RespType"></typeparam>
+        /// <param name="method"></param>
+        /// <param name="reqUrlPath"></param>
+        /// <param name="content"></param>
+        /// <param name="clientName"></param>
+        /// <param name="emptyResponse">wether response should be empty</param>
+        /// <returns></returns>
+        protected virtual async Task<Response<RespType?>> ExecRequest<RespType>(string method, string reqUrlPath, HttpContent content, bool emptyResponse, string clientName )
         {
             string message = "Unknown Error";
-            var apiResponse = new Response<RespType>();
-            apiResponse.StatusCode = 404;
-            apiResponse.Message = message;
-            apiResponse.ErrorType = ErrorType.UNKNOWN;
+            var apiResponse = new Response<RespType?>(404, message, default, ErrorType.UNKNOWN);
+
 
             LogTrace.Info("init", new { method, reqUrlPath, clientName }, _classPath);
             //check for http status
@@ -112,21 +122,28 @@ namespace ProfiraClinicRME.Infra
 
                 //Log.Debug("{src} {stat} {data}", logSource, 1, (response.ToString(), client.DefaultRequestHeaders));
                 var httpStat = (int)response.StatusCode;
+                apiResponse.StatusCode = httpStat;
+                if (httpStat != 200)
+                {
+                    //apiResponse.Message = "Unknown Error";
+                    //apiResponse.ErrorType = ErrorType.UNKNOWN;
+                    LogTrace.Error("fin", new { apiResult = apiResponse, raw = serializedObj }, _classPath);
+                    return apiResponse;
+                }
+
+
+
+                //httpStat 200
+                if (emptyResponse)
+                {
+
+                    return apiResponse;
+                }
 
                 serializedObj = await response.Content.ReadAsStringAsync();
 
                 LogTrace.Info("serialize", new { httpStat, serializedObj, reqUrlPath }, path: _classPath);
 
-                if (httpStat != 200)
-                {
-                    //apiResponse.Message = "Unknown Error";
-                    //apiResponse.ErrorType = ErrorType.UNKNOWN;
-                    LogTrace.Info("fin", new { apiResult = apiResponse, raw=serializedObj}, _classPath);
-                    return apiResponse;
-                }
-
-
-                //httpStat 200
 
 
                 //var responseData = Utility.DeserializeJson<ResponseData<Entity>>(serializedObj);
