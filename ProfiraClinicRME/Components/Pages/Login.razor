@@ -8,11 +8,13 @@
 @using Color = MudBlazor.Color
 @using Microsoft.EntityFrameworkCore
 @using ProfiraClinic.Models
+@using ProfiraClinic.Models.Api
 @using ProfiraClinicRME.Infra
 @using ProfiraClinicRME.Services
 @using ProfiraClinicRME.Model
 
 @inject ApiService SvcApi
+@inject IUserService SvcUser
 
 <PageTitle>Login</PageTitle>
 
@@ -22,21 +24,21 @@
             <MudImage Src="@GetLady()" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
         </div>
         <MudContainer MaxWidth="MaxWidth.Small"
-                      Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
+        Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
             <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
                     <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
 
                     <MudSelect T="string"
-                               @bind-Value="selectedKlinikCode"
-                               OuterClass="bg-transparent rounded-pill"
-                               InputClass="bg-transparent"
-                               Style="border-radius: 20px; background-color: #F1F5F9;"
-                               DisableUnderLine="true"
-                               Variant="Variant.Filled"
-                               Label="Pilih clinic"
-                               AnchorOrigin="Origin.BottomCenter">
+                    @bind-Value="selectedKlinikCode"
+                    OuterClass="bg-transparent rounded-pill"
+                    InputClass="bg-transparent"
+                    Style="border-radius: 20px; background-color: #F1F5F9;"
+                    DisableUnderLine="true"
+                    Variant="Variant.Filled"
+                    Label="Pilih clinic"
+                    AnchorOrigin="Origin.BottomCenter">
                         @if (kliniks == null || !kliniks.Any())
                         {
                             <MudSelectItem Value="@("")">Loading clinics...</MudSelectItem>
@@ -159,7 +161,17 @@
 
             await ProtectedSessionStore.SetAsync("token", token);
 
-            addSnackbar("Logged In", Severity.Success);
+            
+            // addSnackbar("Logged In", Severity.Success);
+
+            var resUser = await SvcUser.UpdateCurrentUserAsync();
+            if (resUser.Status != ServiceResultEnum.SUCCESS)
+            {
+                addSnackbar("Terjadi kesalahan sistem. (LP.OS.01)");
+                return;
+            }
+
+            var user = resUser.Data;
 
             NavManager.NavigateTo("/dashboard");
         }
@@ -169,6 +181,7 @@
 
         }
     }
+
 }
 
 <style>

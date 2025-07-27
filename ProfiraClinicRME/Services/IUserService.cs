@@ -13,10 +13,11 @@ namespace ProfiraClinicRME.Services
     public interface IUserService
     {
 
-        
-        // Retrieves all clinics.
-        //public Task<ServiceResult<PagedList<Appointment>>> GetListDokter(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan);
 
-        public Task<ServiceResult<CurrentUser>> GetCurrentUserAsync();
+        public CurrentUser? Current { get; }
+
+        public Task<ServiceResult<bool>> UpdateCurrentUserAsync();
+
+
     }
 }
