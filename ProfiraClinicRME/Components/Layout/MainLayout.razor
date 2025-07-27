@@ -1,12 +1,21 @@
 ﻿@inherits LayoutComponentBase
-@using Microsoft.EntityFrameworkCore;
+
+@using Microsoft.AspNetCore.Components.Sections
+@using Microsoft.EntityFrameworkCore
 @using ProfiraClinic.Models.Core
 @using ProfiraClinicRME.Helpers
-@using ProfiraClinicRME.Services
 @using ProfiraClinicRME.Model
+@using ProfiraClinicRME.Services
 @using ProfiraClinicRME.Utils
 
+@inject IDialogService DialogService
+@inject IJSRuntime JSRuntime
+@inject INavigationRedirector Redirector
+@inject ITokenProvider TokenProvider
 @inject IUserService SvcUser
+@inject NavigationManager Nav
+@inject NavigationManager NavigationManager;
+@inject ProtectedSessionStorage ProtectedSessionStore
 
 @* <div class="page">
     <div class="sidebar">
@@ -54,17 +63,7 @@
             @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" /> *@
             @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
             <div class="pa-4">
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
-                <MudText Typo="Typo.h5" Color="MudBlazor.Color.Surface">@Title</MudText>
-                @if (PasienName != "")
-                {
-                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">Pasien: @PasienName</MudText>
-                }
-
-                @if (PasienUsia != "")
-                {
-                    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">Usia: @PasienUsia</MudText>
-                }
+                <SectionOutlet SectionId="TitleBlock" />
             </div>
             <MudSpacer></MudSpacer>
             <div class="d-flex flex-column align-items-end">
@@ -84,7 +83,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
                 </MudBadge> *@
                     <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
-                        <MudText Typo="Typo.body2">@Kary?.NamaKaryawan</MudText>
+                        <MudText Typo="Typo.body2">@_user?.UserName</MudText>
                         <MudAvatar>
                             <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
                         </MudAvatar>
@@ -101,21 +100,9 @@
                         </MudPopover>
                     </div>
                 </div>
-                @if (NavigationManager.ToBaseRelativePath(NavigationManager.Uri) != "dokter/dashboard")
-                {
-                    <div class="d-flex gap-3">
-                        @if (ShowSave)
-                        {
-                            <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2">Simpan</MudButton>
-                        }
-                        @if(ShowBack)
-                        {
-                            
-                        <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
+                <SectionOutlet SectionId="TopbarButtonBlock" />
 
-                        }
-                    </div>
-                }
+                
             </div>
         </MudAppBar>
 
@@ -130,13 +117,12 @@
     </MudLayout>
 </CascadingValue>
 
-@inject NavigationManager NavigationManager;
-@inject IDialogService DialogService
-@inject IJSRuntime JSRuntime
-@inject ProtectedSessionStorage ProtectedSessionStore
-@inject ITokenProvider TokenProvider
-@inject INavigationRedirector Redirector
+
+
 @code {
+    public static SectionOutlet TitleBlock = new();
+    public static SectionOutlet TopbarButtonBlock = new();
+
     bool _drawerOpen = true;
 
     bool isDoctor = true;
@@ -145,7 +131,7 @@
 
     Karyawan Kary;
 
-    CurrentUser user;
+    private CurrentUser? _user;
 
     public string Search { get; set; }
 
@@ -178,7 +164,7 @@
             }
         };
 
-    private string _classPath = "Layout::Main";
+    private string _classPath = "App::Page::MainLayout";
 
     bool masterMenuExpanded = false;
 
@@ -193,12 +179,6 @@
         NavigationManager.NavigateTo(route);
     }
 
-    // Go back in browser using Javascript on a Razor Page
-    private void GoBack()
-    {
-        JSRuntime.InvokeVoidAsync("history.back");
-    }
-
     Boolean MasterModalOpen = false;
 
     public void CloseModal()
@@ -211,11 +191,15 @@
         MasterModalOpen = !MasterModalOpen;
     }
 
+
+    // public async Task ChangeTitleAndRoute(string newTitle, string newRoute)
     public void ChangeTitleAndRoute(string newTitle, string newRoute)
     {
         Title = newTitle;
         Route = newRoute;
+        // await InvokeAsync(() => StateHasChanged());
         StateHasChanged();
+        LogTrace.Debug("trace", $"Title changed to {newTitle} and route to {newRoute}", path: _classPath); 
     }
 
     public void ChangeBackRoute(string newRoute)
@@ -279,18 +263,13 @@
     protected override void OnInitialized()
     {
         LogTrace.Debug("trace", path: _classPath);
+        _user = SvcUser.Current;
 
         // isDoctor = NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("dokter");
         path = NavigationManager.Uri.Substring(NavigationManager.BaseUri.Length);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
 
-    protected override void OnParametersSet()
-    {
-        //_entPropChanged = false;
-        LogTrace.Debug("trace", path: _classPath);
-
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -310,14 +289,7 @@
             if (result.Success && !string.IsNullOrWhiteSpace(result.Value))
             {
                 TokenProvider.Token = result.Value;
-                var userResponse = await SvcUser.GetCurrentUserAsync();
-                if (userResponse.Status != ServiceResultEnum.FOUND)
-                {
-                    Redirector.ShouldRedirect = true;
-                    Redirector.TargetUrl = "/login";
-                    return;
-                }
-                user = userResponse.Data;
+                // _user = SvcUser.Current;
             }
         }
         // StateHasChanged();
@@ -327,8 +299,8 @@
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         ShowSave = false;
-        PasienName = "";
-        PasienUsia = "";
+        // PasienName = "";
+        // PasienUsia = "";
         
         LogTrace.Info("going to", e.Location , path: _classPath);
         StateHasChanged();

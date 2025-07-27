@@ -1,14 +1,57 @@
-﻿<div class="d-flex justify-content-around align-items-center my-4">
-    <MenuItem Src="/images/dokter/menu/diagnosis.png" Title="Diagnosa/ICD" Href="/dokter/diagnosa" Class="p-4"></MenuItem>
-    <MenuItem Src="/images/dokter/menu/anamnesis.png" Title="Anamnesis" Href="/dokter/anamnesis"></MenuItem>
+﻿@inject NavigationManager Nav
+
+<div class="d-flex justify-content-around align-items-center my-4">
+    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/diagnosis.png" Title="Diagnosa/ICD" Href="/diagnosa" Class="p-4"></MenuItem>
+    <MenuItem Click="GoToAnamnesis" Src="/images/dokter/menu/anamnesis.png" Title="Anamnesis" Href="/anamnesis"></MenuItem>
     @* <MenuItem Src="/images/dokter/menu/rekam-medis.png" Title="Rekam Medis"></MenuItem> *@
-    <MenuItem Src="/images/dokter/menu/stetoskop.png" Title="Pemeriksaan" Href="/dokter/pemeriksaan" Class="p-0"></MenuItem>
-    <MenuItem Src="/images/dokter/menu/pencil.png" Title="Penandaan Gambar" Href="/dokter/penandaan-gambar"></MenuItem>
-    <MenuItem Src="/images/dokter/menu/notes.png" Title="CPPT" Class="p-0" Href="/dokter/cppt"></MenuItem>
-    <MenuItem Src="/images/dokter/menu/palang-merah.png" Title="Kontrol" Href="/dokter/kontrol"></MenuItem>
-    <MenuItem Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/dokter/tindakan-perawatan" Class="p-0"></MenuItem>
+    <MenuItem Click="GoToPemeriksaan" Src="/images/dokter/menu/stetoskop.png" Title="Pemeriksaan" Href="/pemeriksaan" Class="p-0"></MenuItem>
+    <MenuItem Click="GoToPenandaanGambar" Src="/images/dokter/menu/pencil.png" Title="Penandaan Gambar" Href="/penandaan-gambar"></MenuItem>
+    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/notes.png" Title="CPPT" Class="p-0" Href="/cppt"></MenuItem>
+    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/palang-merah.png" Title="Kontrol" Href="/kontrol"></MenuItem>
+    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/tindakan-perawatan" Class="p-0"></MenuItem>
 </div>
 
 @code {
+    [CascadingParameter]
+    public ProfiraClinicRME.Components.Layout.MainLayout Layout { get; set; }
 
+    private async void GoToDiagnosa()
+    {
+        // Layout.ChangeTitleAndRoute("Diagnosa", "Perawatan Pasien / Diagnosa");
+
+        Nav.NavigateTo("/diagnosa");
+
+    }
+
+    private async void GoToAnamnesis()
+    {
+        // Layout.ChangeTitleAndRoute("Anamnesis", "Perawatan Pasien / Anamnesis");
+
+        Nav.NavigateTo("/anamnesis");
+
+    }
+
+    private async void GoToPemeriksaan()
+    {
+        // Layout.ChangeTitleAndRoute("Pemeriksaan", "Perawatan Pasien / Pemeriksaan");
+
+        Nav.NavigateTo("/pemeriksaan");
+
+    }
+
+    private async void GoToPenandaanGambar()
+    {
+        // Layout.ChangeTitleAndRoute("Penandaan Gambar", "Perawatan Pasien / Penandaan Gambar");
+
+        Nav.NavigateTo("/penandaan-gambar");
+
+    }
+
+    private async void GoToTindakanPerawatan()
+    {
+        // Layout.ChangeTitleAndRoute("Penandaan Gambar", "Perawatan Pasien / Penandaan Gambar");
+
+        Nav.NavigateTo("/penandaan-gambar");
+
+    }
 }

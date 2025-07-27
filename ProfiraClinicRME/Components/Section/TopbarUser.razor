@@ -1,0 +1,84 @@
+﻿@using ProfiraClinicRME.Components.Layout
+
+@inject NavigationManager Nav
+@inject IJSRuntime JSRuntime
+
+<SectionContent SectionId="MainLayout.TitleBlock">
+
+    <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">@Route</MudText>
+    <MudText Typo="Typo.h5" Color="MudBlazor.Color.Surface">@Title</MudText>
+    @if (_patientName != "" && ShowNameAge())
+    {
+        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">Pasien: @_patientName</MudText>
+    }
+
+    @if (_patientAge != "" && ShowNameAge())
+    {
+        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Surface">Usia: @_patientAge</MudText>
+    }
+</SectionContent>
+<SectionContent SectionId="MainLayout.TopbarButtonBlock">
+    <div class="d-flex gap-3">
+        @if (ShowSave)
+        {
+            <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-floppy-disk" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2" OnClick="DoSave">Simpan</MudButton>
+        }
+
+        @if (ShowBack)
+        {
+
+            <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-arrow-left" IconSize="@MudBlazor.Size.Small" Class="back-btn mt-2" OnClick="@GoBack">Kembali</MudButton>
+
+        }
+    </div>
+
+</SectionContent>
+
+@code {
+    [Parameter]
+    public string Route { get; set; } = "";
+
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public bool ShowSave { get; set; } = false;
+
+    [Parameter]
+    public bool ShowBack { get; set; } = false;
+
+    [Parameter]
+    public TRMAppointment? Appointment{get;set;}
+
+    [Parameter]
+    public EventCallback DoSave { get; set; }
+
+    private string _patientName = "";
+    private string _patientAge = "";
+    private string _classPath = "App::Section::TopbarUser";
+
+    protected void GoBack()
+    {
+        LogTrace.Info("start", path:_classPath);
+        JSRuntime.InvokeVoidAsync("history.back");
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Appointment is not null)
+        {
+            _patientAge = UIHelper.FormatAge(Appointment.TanggalLahir, DateTime.Now);
+            _patientName = Appointment.NamaCustomer;
+        }
+    }
+
+    private bool ShowNameAge()
+    {
+        // var relativeUri = Nav.ToBaseRelativePath(Nav.Uri).Split("/")[0];
+        var listOff = new List<string> { "dashboard", "perawatan" };
+
+        return listOff.Contains(Route) ? false : true;
+    }
+
+}
