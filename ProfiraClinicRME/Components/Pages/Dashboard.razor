@@ -1,4 +1,5 @@
 ﻿@page "/dashboard"
+@inherits BasePage
 
 @using Microsoft.EntityFrameworkCore
 @using ProfiraClinicRME.Utils
@@ -8,44 +9,38 @@
 @using ProfiraClinicRME.Infra
 @using ProfiraClinic.Models.Api
 @using System.Net.Http.Json
+@using ProfiraClinicRME.Helpers
+@using ProfiraClinicRME.Components.Layout
+@using ProfiraClinicRME.Components.Section
 
 @inject SessionService SvcSession
-@inject ISnackbar Snackbar
-@inject IAppointmentService SvcAppointment
 @inject NavigationManager Nav
+@inject IAppointmentService SvcAppointment
+
+<TopbarUser 
+Route="Dasboard"
+Title="Dashboard"/>
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <Table WithAdd="false" WithFilter="false" Config="_appointmentTblConf" />
+    <Table WithAdd="false" WithFilter="false" WithPaging="false" Config="_appointmentTblConf" />
 </MudCard>
+<MudButton OnClick="ShowSnack">Show</MudButton>
 
 @code {
-    [CascadingParameter]
-    public ProfiraClinicRME.Components.Layout.MainLayout Layout { get; set; }
 
     public TableConfig _appointmentTblConf { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
 
     private List<TRMAppointment> _listAppointment;
 
-    private string _classPath = "Page::Dashboard";
 
-    protected override void OnInitialized()
+    public Dashboard()
     {
-        LogTrace.Info("init", path: _classPath);
-        // Set the title and route for the main layout
-        // Layout.ChangeTitleAndRoute("Dashboard", "Dashboard");
-        // _appointmentTblConf = new TableConfig(
-        //     new List<TableColumn> {
-        //         new TableColumn { Caption="Edit", DataField="edit", Type=ColumnType.Edit},
-        //         new TableColumn { Caption="Member ID", DataField="KodeCustomer" },
-        //         new TableColumn { Caption = "Nama Pasien", DataField = "NamaCustomer" },
-        //         new TableColumn { Caption = "Alamat", DataField = "alamat" },
-        //         new TableColumn { Caption = "Kota", DataField = "kota" },
-        //         new TableColumn { Caption = "Telepon", DataField = "telepon" },
-        //         new TableColumn { Caption = "Nama PT", DataField = "namaPt" },
-        //     }, 
-        //     new List<Object>()
-        // );
+        _classPath = "App::Page::Dashboard";
+        LogTrace.Info("class init", path: _classPath);
+
+        _listAppointment = [];
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -54,34 +49,40 @@
         var resApo = await SvcAppointment.GetListOnWaitAsync("LOKASI1", new DateTime(2025, 7, 3), "DFM");
         // Check if status code indicates success
 
-
-        System.Diagnostics.Debug.WriteLine("Done");
-
         if (resApo.Status == ServiceResultEnum.FOUND)
         {
             _listAppointment = resApo.Data.Items;
-            var x = new { };
-            var tableData = _listAppointment.Select(apo =>  (object)new
+
+            var tableData = _listAppointment.Select(apo => (object)new
             {
                 view = "/Perawatan/" + apo.IDAppointment,
                 IDAppointment = apo.IDAppointment,
                 MemberID = apo.KodeCustomer,
                 NamaPasien = apo.NamaCustomer,
-                Alamat = apo.AlamatDomisili,
-                NoHP = apo.NomorHPCustomer,
-                TglLahir = apo.TanggalLahir
+                AlamatDomisili = apo.AlamatDomisili,
+                NomorHPCustomer = apo.NomorHPCustomer,
+                TglLahir = UIHelper.FormatDate(apo.TanggalLahir),
+                Usia = UIHelper.FormatAge(apo.TanggalLahir, DateTime.Now),
+                Tindakan = UIHelper.GetStatusTindakan(apo.StatusTindakan),
+                JanjiTemu = UIHelper.FormatTime(apo.JamAppointment)
+
             }).ToList();
+
+            LogTrace.Debug("table data", tableData, _classPath);
+
             _appointmentTblConf = new TableConfig(
                 new List<TableColumn> {
                     new TableColumn { 
                         Caption="Pilih", DataField="view", Type=ColumnType.View, CustomIcon="fa fa-hand-pointer", Action=SetCurrentAppointment
-
                     }, 
+                    new TableColumn { Caption = "Janji Temu", DataField = "JanjiTemu" },
                     new TableColumn { Caption="Member ID", DataField="MemberID" },
                     new TableColumn { Caption = "Nama Pasien", DataField = "NamaPasien" },
-                    new TableColumn { Caption = "Alamat", DataField = "Alamat" },
-                    new TableColumn { Caption = "No. HP", DataField = "NoHP" },
+                    new TableColumn { Caption = "Alamat", DataField = "AlamatDomisili" },
+                    new TableColumn { Caption = "No. HP", DataField = "NomorHPCustomer" },
                     new TableColumn { Caption = "Tgl Lahir", DataField = "TglLahir" },
+                    new TableColumn { Caption = "Usia", DataField = "Usia" },
+                    new TableColumn { Caption = "Tindakan", DataField = "Tindakan" },
                 },
                 tableData
             );
@@ -95,8 +96,10 @@
     }
 
 
-    private  Task SetCurrentAppointment(Dictionary<string,string> dct)
+
+    private Task SetCurrentAppointment(Dictionary<string,string> dct)
     {
+
         LogTrace.Info("init", dct, _classPath);
         string stIdApo = dct.GetValueOrDefault("IDAppointment")?? "";
         var res = long.TryParse(stIdApo, out long idApo);
@@ -116,28 +119,22 @@
         }
         // SvcSession.Title = 
         SvcAppointment.SetCurrent(apo);
-        Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
+
+
+        // await Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
+        // Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
+        // Layout.ChangePasien(apo.NamaCustomer, UIHelper.FormatAge(apo.TanggalLahir, DateTime.Now));
+        // _patientName = apo.NamaCustomer;
+        // _patientAge = UIHelper.FormatAge(apo.TanggalLahir, DateTime.Now);
         Nav.NavigateTo("/Perawatan/" + apo.IDAppointment );
         return Task.CompletedTask;
     }
-    
-    protected override void OnParametersSet()
+
+    private async Task ShowSnack()
     {
-        //_entPropChanged = false;
-        LogTrace.Info("trace", path: _classPath);
-
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-
-        LogTrace.Info("fin", firstRender, _classPath);
-    }
-
-    private void addSnackbar(string message, Severity severity = Severity.Error)
-    {
-        Snackbar.Clear();
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Add(message, severity);
+        addSnackbar("This is a test snackbar message.", Severity.Success);
+        await Task.Delay(2000);
+        addSnackbar("This is a test snackbar message with error severity.", Severity.Error);
+        return;
     }
 }

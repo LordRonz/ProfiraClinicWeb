@@ -1,0 +1,65 @@
+﻿@using ProfiraClinicRME.Components.Layout
+@using ProfiraClinicRME.Utils
+
+@inject IUserService SvcUser
+@inject IAppointmentService SvcAppointment
+@inject ISnackbar Snackbar
+
+
+@code {
+
+
+    protected string _classPath = "Page::BasePage";
+
+
+    protected CurrentUser? _currentUser;
+
+    protected void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        // Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
+        Snackbar.Add(message, severity);
+    }
+
+    protected override void OnInitialized()
+    {
+        LogTrace.Info("trace", path: _classPath);
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LogTrace.Info("trace", path: _classPath);
+        // Events.Add("2. OnInitializedAsync", path: _classPath);
+    }
+
+    protected override void OnParametersSet()
+    {
+        //_entPropChanged = false;
+        LogTrace.Info("trace", path: _classPath);
+        _currentUser = SvcUser.Current;
+        
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        LogTrace.Info("trace", path: _classPath);
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        LogTrace.Info($"trace: first render {firstRender}", path: _classPath);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+            LogTrace.Info($"trace: first render {firstRender}", path: _classPath);
+    }
+    
+
+}
