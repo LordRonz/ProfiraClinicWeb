@@ -1,7 +1,6 @@
-﻿using ProfiraClinic.Models;
-using ProfiraClinic.Models.Api;
+﻿using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
-using ProfiraClinicRME.Helpers;
+using StatusDTO = ProfiraClinicRME.Model.EditStatusTindakanDTO;
 using ProfiraClinicRME.Model;
 using ProfiraClinicRME.Services;
 using ProfiraClinicRME.Utils;
@@ -26,6 +25,11 @@ namespace ProfiraClinicRME.Infra
             _repo = new BaseRepo<Appointment>();
         }
 
+        /// <summary>
+        /// set current appointment on progress for the session
+        /// </summary>
+        /// <param name="apo"></param>
+        /// <returns></returns>
         public ServiceResult<bool> SetCurrent(TRMAppointment apo)
         {
             ServiceResult<bool> result = new ServiceResult<bool>();
@@ -38,6 +42,7 @@ namespace ProfiraClinicRME.Infra
         public ServiceResult<TRMAppointment> GetCurrent()
         {
             var result = new ServiceResult<TRMAppointment>();
+
             if (_current == null)
             {
                 result.Status = ServiceResultEnum.NOT_FOUND;
@@ -45,7 +50,7 @@ namespace ProfiraClinicRME.Infra
                 LogTrace.Error("Current appointment not set", _classPath);
                 return result;
             }
-            result.Status = ServiceResultEnum.SUCCESS;
+            result.Status = ServiceResultEnum.FOUND;
             result.Data = _current;
             LogTrace.Info("Fin", _current, _classPath);
             return result;
@@ -65,6 +70,23 @@ namespace ProfiraClinicRME.Infra
             Response<PagedList<TRMAppointment>?> apiResponse = await _svcApi.Send<AppointmentRequest,PagedList<TRMAppointment>>("post","api/Appointment/GetListDokter", request);
 
             ServiceResult<PagedList<TRMAppointment>> svcResult = _repo.ProcessResult<PagedList<TRMAppointment>>(apiResponse, RepoProcessEnum.GET);
+            LogTrace.Info("fin", svcResult, _classPath);
+            return svcResult;
+        }
+
+        public async Task<ServiceResult<string>> SetAppointmentOnProgress(Appointment apo)
+        {
+            var request = new StatusDTO
+            {
+                
+                NomorAppointment = apo.NomorAppointment,
+                Status = "2"
+            };
+
+            Response<string?> apiResponse = await _svcApi.Send<StatusDTO, string>("post", "api/Appointment/EditStatusTindakan", request);
+
+            var svcResult = _repo.ProcessEmptyResult(apiResponse, RepoProcessEnum.GET);
+            LogTrace.Info("fin", svcResult, _classPath);
 
             return svcResult;
         }
