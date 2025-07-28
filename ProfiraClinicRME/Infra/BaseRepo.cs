@@ -112,10 +112,11 @@ namespace ProfiraClinicRME.Infra
             var repoResult = new ServiceResult<RespType>();
 
             //four 404
-            if (apiResponse.StatusCode != 200)
+            List<int> allowedStat = [200, 201];
+            if (!allowedStat.Contains(apiResponse.StatusCode))
             {
                 repoResult = ServiceResult<RespType>.Fail();
-                LogTrace.Error("Fail", apiResponse, classPath);
+                LogTrace.Error("Fail: error response", apiResponse, classPath);
                 return repoResult;
             }
 
@@ -129,7 +130,7 @@ namespace ProfiraClinicRME.Infra
             //for data not found
             if (apiResponse.Data is null)
             {
-                LogTrace.Error("Fail", apiResponse, classPath);
+                LogTrace.Error("Fail: data is null", apiResponse, classPath);
                 repoResult = ServiceResult<RespType>.NotFound("Data tidak dapat ditemukan.");
 
                 return repoResult;

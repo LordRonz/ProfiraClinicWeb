@@ -1,0 +1,234 @@
+﻿@page "/diagnosa"
+@inherits BasePage
+
+@using System.Net.Http.Json
+@using ProfiraClinicRME.Model
+@using ProfiraClinicRME.Utils
+@using ProfiraClinicRME.Components.Layout
+@using ProfiraClinicRME.Components.Section
+@using ProfiraClinicRME.Components.Widget
+
+@inject IMasterDiagnosaService SvcMasterDiagnosa
+@inject IDiagnosaService SvcDiagnosa
+@inject ProtectedLocalStorage LocalStore
+@inject HttpClient httpClient
+@inject IAppointmentService SvcAppointment
+
+<TopbarUser Route="DIAGNOSA / ICD"
+    Title="Perawatan Pasien / Diagnosa"
+    Appointment="_apo"
+    ShowBack="true"
+    ShowSave="true"
+    OnSave="DoSave" />
+
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
+    <MudCard Class="px-4 py-8">
+        <MudGrid Class="gap-y-2" Style="max-width: 85%;">
+            <MudItem xs="4" Class="p-1">
+                <MudSelect @bind-Value="@_selMasterDiagnosa"
+                Adornment="Adornment.End"
+                AdornmentIcon="@Icons.Material.Filled.Search"
+                AnchorOrigin="Origin.BottomCenter"
+                Clearable=true
+                Label="Kode ICD"
+                ShrinkLabel
+                T="MasterDiagnosa"
+                Variant="Variant.Outlined">
+                    @foreach (var item in _listMasterDiagnosa)
+                    {
+                        <MudSelectItem Value="@item">
+                            @item.KodeDiagnosa
+                        </MudSelectItem>
+
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="8" Class="p-1">
+                <MudTextField Value="@(_selMasterDiagnosa?.NamaDiagnosa)"
+                Disabled=true
+                ShrinkLabel
+                T="string"
+                Label="Deskripsi" Variant="Variant.Outlined" />
+
+            </MudItem>
+            <MudItem xs="5" Class="p-1">
+                <MudSelect 
+                @bind-Value="@_trmDiagnosaInForm.KategoriDiagnosa"
+                T="string" 
+                Label="Kategori"
+                AnchorOrigin="Origin.BottomCenter" 
+                ShrinkLabel 
+                Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("Primary")" />
+                    <MudSelectItem Value="@("Secondary")" />
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" Class="p-1">
+                <MudTextField @bind-Value="@_trmDiagnosaInForm.KeteranganDiagnosa" 
+                ShrinkLabel 
+                T="string" 
+                Label="Diagnosa" 
+                Variant="Variant.Outlined" Lines="10" />
+            </MudItem>
+        </MudGrid>
+    </MudCard>
+    <MudCard Class="mt-8">
+        <Note EntityType="@TRMDiagnosa" ListData="@_listRekamMedis">
+            <NoteContent>
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    Kunjungan: @context.NomorAppointment
+                </MudText>
+                <br />
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    ICD: @context.KodeDiagnosa
+                </MudText>
+                <br />
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    Kategori: @context.KategoriDiagnosa
+                </MudText>
+                <br />
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    Diagnosa: @context.KeteranganDiagnosa
+                </MudText>
+                <br />
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    @context.UPDDT
+                </MudText>
+            </NoteContent>
+        </Note>
+    </MudCard>
+</MudCard>
+
+
+
+@code {
+
+
+
+    [CascadingParameter]
+    public ProfiraClinicRME.Components.Layout.MainLayout Layout { get; set; }
+
+    private bool _hidePosition;
+    private bool _loading;
+    private TRMAppointment? _apo = null;
+    private MasterDiagnosa? _selMasterDiagnosa;
+    private List<MasterDiagnosa> _listMasterDiagnosa = [];
+    private List<TRMDiagnosa> _listRekamMedis = [];
+    private TRMDiagnosa _trmDiagnosaInForm = new TRMDiagnosa();
+
+
+    public Diagnosa()
+    {
+        _classPath = "App::Page::Diagnosa";
+
+        LogTrace.Info("init", path: _classPath);
+
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var resApo = SvcAppointment.GetCurrent();
+
+        _apo = resApo.Data;
+        _trmDiagnosaInForm.NomorAppointment = _apo.NomorAppointment;
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LogTrace.Info("start", path: _classPath);
+        var resMasterDiagnosa = await SvcMasterDiagnosa.GetListAsync(1, 15);
+        if (resMasterDiagnosa.Status == ServiceResultEnum.FOUND)
+        {
+            _listMasterDiagnosa = resMasterDiagnosa.Data.Items;
+        }
+        else
+        {
+            addSnackbar("Gagal memuat data ICD.", Severity.Error);
+        }
+
+        var resAppointment = SvcAppointment.GetCurrent();
+        if (resAppointment.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
+            return;
+        }
+        ;
+        _apo = resAppointment.Data;
+
+        var resDiagnosa = await SvcDiagnosa.GetListAsync(_apo.KodeCustomer);
+        if (resDiagnosa.Status == ServiceResultEnum.FOUND)
+        {
+            _listRekamMedis = resDiagnosa.Data.Items;
+
+            // _displayTRMDiagnosa = _listTRMDiagnosa.FirstOrDefault();
+        }
+        else
+        {
+            addSnackbar("Gagal memuat data Diagnosa.", Severity.Error);
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void DoUpdateDiagnosaICD(MasterDiagnosa? item)
+    {
+        _trmDiagnosaInForm.KeteranganDiagnosa = item?.NamaDiagnosa ?? "";
+        _trmDiagnosaInForm.KodeDiagnosa = item?.KodeDiagnosa ?? "";
+    }
+
+    private async Task DoSave()
+    {
+        LogTrace.Info("start", path: _classPath);
+        _trmDiagnosaInForm.KodeLokasi = _apo?.KodeLokasi??"-";
+        _trmDiagnosaInForm.TanggalTransaksi = DateTime.Now;
+        _trmDiagnosaInForm.NomorAppointment = _apo?.NomorAppointment;
+        _trmDiagnosaInForm.KodeCustomer = _apo?.KodeCustomer;
+        _trmDiagnosaInForm.KodeKaryawan = _apo?.KodeKaryawan;
+        _trmDiagnosaInForm.KodeDiagnosa = _selMasterDiagnosa?.KodeDiagnosa ?? "";
+        //kategori binded
+        //keterangan binded
+        var resAdd = await SvcDiagnosa.AddDiagnosa(_trmDiagnosaInForm);
+        LogTrace.Info("Result Save", resAdd, _classPath);
+        if (resAdd.Status == ServiceResultEnum.SUCCESS)
+        {
+            addSnackbar("Penyimpanan berhasil dilakukan", Severity.Info);
+        } else
+        {
+            addSnackbar("Penyimpanan gagal dilakukan", Severity.Error);
+
+        }
+
+    }
+
+
+    // protected override async Task OnAfterRenderAsync(bool firstrender)
+    // {
+    //     await base.OnAfterRenderAsync(firstrender);
+    //     var age = await LocalStore.GetAsync<string>("age");
+    //     var name = await LocalStore.GetAsync<string>("name");
+
+
+    // }
+}
+
+<style>
+    .pemeriksaan-input .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label-outlined {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .pemeriksaan-input .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>

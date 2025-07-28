@@ -74,10 +74,10 @@ namespace ProfiraClinicRME.Infra
         public async Task<Response<RespType?>> Send<ReqType, RespType>(string method, string reqUrlPath, ReqType? request, long pageNum = 0, long pageSize = 0, bool emptyResponse = false, string clientName = "std")
         {
             string typeParam = $"<{typeof(ReqType).Name},{typeof(RespType).Name}>";
-            LogTrace.Info($"init", typeParam, _classPath);
+            LogTrace.Info($"init", new { typeParam, reqUrlPath}, _classPath);
             
-            var jsonContent = JsonSerializer.Serialize(request);
-            LogTrace.Info("request", new { reqUrlPath, jsonContent }, _classPath);
+            string jsonContent = JsonSerializer.Serialize<ReqType>(request);
+            LogTrace.Info("request json", jsonContent , _classPath);
 
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -142,7 +142,7 @@ namespace ProfiraClinicRME.Infra
 
                 serializedObj = await response.Content.ReadAsStringAsync();
 
-                LogTrace.Info("serialize", new { httpStat, serializedObj, reqUrlPath }, path: _classPath);
+                LogTrace.Info("response json", new { httpStat, serializedObj, reqUrlPath }, path: _classPath);
 
 
 
