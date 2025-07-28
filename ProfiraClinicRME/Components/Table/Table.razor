@@ -35,7 +35,9 @@
         </MudCard>
     </div>
 }
-<MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="@Config.GetData()" Dense  Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
+<MudTable HeaderClass="@GetHeaderClass()" Striped 
+Bordered RowsPerPage="@_rowPerPage"
+Items="@Config.GetData()" Dense  Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
     <ColGroup>
         @foreach (TableColumn col in Config.GetColumn())
         {
@@ -85,8 +87,8 @@
                     case ColumnType.View:
                         var s = "fsef";
                         <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)"
-                            OnClick="@(() => col.Action.Invoke(context))"
-                             />
+                        OnClick="@(() => col.Action.Invoke(context))"
+                        />
                         break;
 
                     case ColumnType.Delete:
@@ -99,9 +101,11 @@
             </MudTd>
         }
     </RowTemplate>
+
     <PagerContent>
         <MudTablePager PageSizeOptions="new int[] { 5, 10, 15, 25, 50, 100, int.MaxValue }" InfoFormat="@infoFormat" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" />
     </PagerContent>
+    
 </MudTable>
 
 @code {
@@ -110,6 +114,8 @@
 
     private string _classPath = "Widget::Table";
 
+    private int _rowPerPage = 10;
+    
     private string searchString1 = "";
 
     private MudTable<Dictionary<string, string>> table;
@@ -136,6 +142,12 @@
 
     [Parameter]
     public bool WithFilter { get; set; } = true;
+
+    [Parameter]
+    public bool WithPaging { 
+        get => _rowPerPage < 10000;
+        set => _rowPerPage = value ? 10 : 10000;
+    }
 
     [Parameter]
     public string? AddButtonText { get; set; } = "Tambah";
