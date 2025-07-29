@@ -39,7 +39,9 @@ namespace ProfiraClinicWebAPI.Filters
                     }
                 }
 
-                var apiResponse = new ApiResponse<object>(statusCode, message, objectResult.Value);
+                var responseStatusCode = statusCode > 299 ? 1 : 0;
+
+                var apiResponse = new ApiResponse<object>(responseStatusCode, message, objectResult.Value);
                 context.Result = new ObjectResult(apiResponse)
                 {
                     StatusCode = statusCode
@@ -47,7 +49,7 @@ namespace ProfiraClinicWebAPI.Filters
             }
             else if (context.Result is EmptyResult)
             {
-                var apiResponse = new ApiResponse<object>(204, "Success");
+                var apiResponse = new ApiResponse<object>(0, "Success");
                 context.Result = new ObjectResult(apiResponse)
                 {
                     StatusCode = 204
