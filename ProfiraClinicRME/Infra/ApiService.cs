@@ -55,7 +55,7 @@ namespace ProfiraClinicRME.Infra
         public async Task<Response<RespType?>> SendEmpty<RespType>(string method, string reqUrlPath)
         {
             string typeParam = $"{typeof(RespType).Name}>";
-            LogTrace.Info($"init", typeParam, _classPath);
+            LogTrace.Info($"init", new { typeParam, reqUrlPath}, _classPath);
 
             return await ExecRequest<RespType>(method, reqUrlPath, null, false, "std");
 
@@ -71,7 +71,7 @@ namespace ProfiraClinicRME.Infra
         /// <param name="dataList"></param>
         /// <param name="emptyResponse">is response should empty</param>
         /// <returns></returns>
-        public async Task<Response<RespType?>> Send<ReqType, RespType>(string method, string reqUrlPath, ReqType? request, long pageNum = 0, long pageSize = 0, bool emptyResponse = false, string clientName = "std")
+        public async Task<Response<RespType?>> Send<ReqType, RespType>(string method, string reqUrlPath, ReqType? request, bool emptyResponse = false, string clientName = "std")
         {
             string typeParam = $"<{typeof(ReqType).Name},{typeof(RespType).Name}>";
             LogTrace.Info($"init", new { typeParam, reqUrlPath}, _classPath);
@@ -98,7 +98,7 @@ namespace ProfiraClinicRME.Infra
         protected virtual async Task<Response<RespType?>> ExecRequest<RespType>(string method, string reqUrlPath, HttpContent content, bool emptyResponse, string clientName )
         {
             string message = "Unknown Error";
-            var apiResponse = new Response<RespType?>(404, message, default, ErrorType.UNKNOWN);
+            var apiResponse = new Response<RespType?>(1, message, default, ErrorType.UNKNOWN);
 
 
             LogTrace.Info("init", new { method, reqUrlPath, clientName }, _classPath);
@@ -122,7 +122,6 @@ namespace ProfiraClinicRME.Infra
 
                 //Log.Debug("{src} {stat} {data}", logSource, 1, (response.ToString(), client.DefaultRequestHeaders));
                 var httpStat = (int)response.StatusCode;
-                apiResponse.StatusCode = 1;
                 if (httpStat != 200)
                 {
                     //apiResponse.Message = "Unknown Error";
@@ -134,9 +133,11 @@ namespace ProfiraClinicRME.Infra
 
 
                 //httpStat 200
+                apiResponse.StatusCode = 1;
+
                 if (emptyResponse)
                 {
-
+                    apiResponse.StatusCode = 0;
                     return apiResponse;
                 }
 
