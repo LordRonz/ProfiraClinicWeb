@@ -4,7 +4,6 @@
 @using Microsoft.EntityFrameworkCore
 @using ProfiraClinicRME.Utils
 @using ProfiraClinicRME.Components.Table
-@using ProfiraClinicRME.Data
 @using ProfiraClinicRME.Model
 @using ProfiraClinicRME.Infra
 @using ProfiraClinic.Models.Api
@@ -97,7 +96,7 @@ Title="Dashboard"/>
 
 
 
-    private Task SetCurrentAppointment(Dictionary<string,string> dct)
+    private async Task SetCurrentAppointment(Dictionary<string,string> dct)
     {
 
         LogTrace.Info("init", dct, _classPath);
@@ -107,7 +106,7 @@ Title="Dashboard"/>
         if(!res)
         {
             addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
-            return Task.CompletedTask;
+            return;
         }
 
         var apo = _listAppointment.FirstOrDefault(item => item.IDAppointment == idApo);
@@ -115,19 +114,24 @@ Title="Dashboard"/>
         if(apo is null)
         {
             addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
-            return Task.CompletedTask;
+            return;
         }
         // SvcSession.Title = 
         SvcAppointment.SetCurrent(apo);
 
+        //update status tindakan
+        var resSetStatus = await SvcAppointment.SetAppointmentOnProgress(apo);
 
-        // await Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
-        // Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
-        // Layout.ChangePasien(apo.NamaCustomer, UIHelper.FormatAge(apo.TanggalLahir, DateTime.Now));
-        // _patientName = apo.NamaCustomer;
-        // _patientAge = UIHelper.FormatAge(apo.TanggalLahir, DateTime.Now);
+        if (resSetStatus.Status != ServiceResultEnum.SUCCESS)
+        {
+            addSnackbar("Gagal mengupdate status tindakan.", Severity.Error);
+            LogTrace.Error("Gagal mengupdate status tindakan", resSetStatus, _classPath);
+            return;
+        }
+
+       
         Nav.NavigateTo("/Perawatan/" + apo.IDAppointment );
-        return Task.CompletedTask;
+        return;
     }
 
     private async Task ShowSnack()

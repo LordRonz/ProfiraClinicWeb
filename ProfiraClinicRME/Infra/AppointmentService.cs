@@ -17,12 +17,12 @@ namespace ProfiraClinicRME.Infra
 
         private TRMAppointment? _current; 
 
-        private BaseRepo<Appointment> _repo;
+        private BaseRepo<TRMAppointment> _repo;
         // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
         public AppointmentService(ApiService svcApi)
         {
             _svcApi = svcApi;
-            _repo = new BaseRepo<Appointment>();
+            _repo = new BaseRepo<TRMAppointment>();
         }
 
         /// <summary>
@@ -74,16 +74,15 @@ namespace ProfiraClinicRME.Infra
             return svcResult;
         }
 
-        public async Task<ServiceResult<string>> SetAppointmentOnProgress(Appointment apo)
+        public async Task<ServiceResult<string>> SetAppointmentOnProgress(TRMAppointment apo)
         {
             var request = new StatusDTO
             {
-                
                 NomorAppointment = apo.NomorAppointment,
                 Status = "2"
             };
 
-            Response<string?> apiResponse = await _svcApi.Send<StatusDTO, string>("post", "api/Appointment/EditStatusTindakan", request);
+            Response<string?> apiResponse = await _svcApi.Send<StatusDTO, string>("post", "api/Appointment/EditStatusTindakan", request, true);
 
             var svcResult = _repo.ProcessEmptyResult(apiResponse, RepoProcessEnum.GET);
             LogTrace.Info("fin", svcResult, _classPath);
