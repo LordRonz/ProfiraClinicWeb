@@ -74,7 +74,7 @@ namespace ProfiraClinicRME.Infra
                 throw new HttpRequestException($"Registration failed: {response.StatusCode} - {error}");
             }
 
-            var authResult = await response.Content.ReadFromJsonAsync<ApiResponse<AuthResponse>>();
+            var authResult = await response.Content.ReadFromJsonAsync<Response<AuthResponse>>();
             if (authResult == null || string.IsNullOrEmpty(authResult.Data.Token))
             {
                 throw new HttpRequestException("Registration succeeded but token was not returned.");

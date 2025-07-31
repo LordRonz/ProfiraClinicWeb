@@ -122,12 +122,12 @@ namespace ProfiraClinicRME.Infra
 
                 //Log.Debug("{src} {stat} {data}", logSource, 1, (response.ToString(), client.DefaultRequestHeaders));
                 var httpStat = (int)response.StatusCode;
-                apiResponse.StatusCode = httpStat;
+                apiResponse.StatusCode = 1;
                 if (httpStat != 200)
                 {
                     //apiResponse.Message = "Unknown Error";
                     //apiResponse.ErrorType = ErrorType.UNKNOWN;
-                    LogTrace.Error("fin", new { apiResult = apiResponse, raw = serializedObj }, _classPath);
+                    LogTrace.Error("fin: sys err", new { httpStat, response.Content}, _classPath);
                     return apiResponse;
                 }
 
@@ -157,15 +157,15 @@ namespace ProfiraClinicRME.Infra
 
                 var responseData = JsonSerializer.Deserialize<Response<RespType>>(serializedObj, options );
                 //check for returnId and returnMessage
-                if (responseData == null || responseData.StatusCode != 200)
+                if (responseData == null)
                 {
                     errCode = "AS.ER.01";
-                    apiResponse.Message = StdFailMessage + errCode;
+                    apiResponse.Message = "Should not empty {errCode}";
 
-                    LogTrace.Error("fin: err",  responseData, _classPath);
+                    LogTrace.Error("fin err: should not empty",  new { responseData, apiResponse }, _classPath);
                     return apiResponse;
                 }
-                apiResponse.StatusCode = 200;
+                apiResponse.StatusCode = 0;
                 apiResponse.Message = responseData.Message;
                 apiResponse.Data = responseData.Data;
                 LogTrace.Info("FIN: success", apiResponse, _classPath);

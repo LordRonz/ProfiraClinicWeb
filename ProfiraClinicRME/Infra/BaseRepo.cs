@@ -111,8 +111,8 @@ namespace ProfiraClinicRME.Infra
             //repoResult.Message = "Terjadi kesalahan sistem.";
             var repoResult = new ServiceResult<RespType>();
 
-            //four 404
-            List<int> allowedStat = [200, 201];
+            //for app error 
+            List<int> allowedStat = [0];
             if (!allowedStat.Contains(apiResponse.StatusCode))
             {
                 repoResult = ServiceResult<RespType>.Fail();
