@@ -51,7 +51,7 @@
                 Label="Deskripsi" Variant="Variant.Outlined" />
 
             </MudItem>
-            <MudItem xs="5" Class="p-1">
+            <MudItem xs="5" Class="p-1">ho
                 <MudSelect 
                 @bind-Value="@_trmDiagnosaInForm.KategoriDiagnosa"
                 T="string" 
@@ -80,7 +80,7 @@
                 </MudText>
                 <br />
                 <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    ICD: @context.KodeDiagnosa
+                    ICD: @context.KodeDiagnosa @context.NamaDiagnosa
                 </MudText>
                 <br />
                 <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
@@ -89,6 +89,10 @@
                 <br />
                 <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
                     Diagnosa: @context.KeteranganDiagnosa
+                </MudText>
+                <br />
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    Dokter: @context.NamaKaryawan
                 </MudText>
                 <br />
                 <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
