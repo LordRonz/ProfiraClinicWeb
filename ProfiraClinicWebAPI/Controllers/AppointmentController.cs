@@ -133,7 +133,7 @@ namespace ProfiraClinicWebAPI.Controllers
                     sqlParameters);
 
 
-                return Ok();
+                return Ok(new { message = "Edit status tindakan berhasil" });
             }
             catch (SqlException ex)
             {

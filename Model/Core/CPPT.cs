@@ -56,7 +56,7 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string Assessment { get; set; } // Penjelasan Assessment
+        public string Assestment { get; set; } // Penjelasan Assessment
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]

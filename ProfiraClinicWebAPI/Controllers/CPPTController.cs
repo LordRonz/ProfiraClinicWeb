@@ -98,7 +98,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var nomorTransaksi = sqlParameters.Last().Value?.ToString()?.Trim();
 
-            return CreatedAtAction(nameof(GetItem), new { nomorTransaksi });
+            return Ok(new { nomorTransaksi });
         }
 
 
