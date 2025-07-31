@@ -36,7 +36,7 @@ namespace ProfiraClinicWebAPI.Factory
             };
 
             problemDetails.Extensions["errorType"] = MapErrorType(statusCode.Value);
-            problemDetails.Extensions["statusCode"] = statusCode;
+            problemDetails.Extensions["statusCode"] = 1;
 
             return problemDetails;
         }
@@ -61,7 +61,7 @@ namespace ProfiraClinicWebAPI.Factory
             };
 
             problemDetails.Extensions["errorType"] = MapErrorType(statusCode.Value).ToString();
-            problemDetails.Extensions["statusCode"] = statusCode;
+            problemDetails.Extensions["statusCode"] = 1;
 
             return problemDetails;
         }

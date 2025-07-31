@@ -123,5 +123,22 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("GetByNomorTransaksi")]
+        public async Task<IActionResult> GetByNomorTransaksi([FromBody] GetByNomorTransaksiDto dto)
+        {
+            var nomorTransaksi = dto.NomorTransaksi;
+            if (string.IsNullOrWhiteSpace(nomorTransaksi))
+                return BadRequest(new { message = "NomorTransaksi is required." });
+
+            var diagnosa = await _context.Diagnosa
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.NomorTransaksi == nomorTransaksi);
+
+            if (diagnosa == null)
+                return Ok(new { message = "Diagnosa not found." });
+
+            return Ok(diagnosa);
+        }
     }
 }
