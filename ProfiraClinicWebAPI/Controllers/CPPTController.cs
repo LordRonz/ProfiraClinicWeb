@@ -134,5 +134,22 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("GetByNomorAppointment")]
+        public async Task<IActionResult> GetByNomorAppointment([FromBody] GetByNomorAppointmentDto dto)
+        {
+            var nomorAppointment = dto.NomorAppointment;
+            if (string.IsNullOrWhiteSpace(nomorAppointment))
+                return BadRequest(new { message = "NomorAppointment is required." });
+
+            var diagnosa = await _context.CPPT
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
+
+            if (diagnosa == null)
+                return Ok(new { message = "CPPT not found." });
+
+            return Ok(diagnosa);
+        }
     }
 }
