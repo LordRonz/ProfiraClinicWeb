@@ -46,11 +46,11 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string KodeKaryawan { get; set; } // Kode Dokter / Terapis
 
-        [Column(TypeName = "varchar(1024)")]
+        [Column("Keadaan_Umum", TypeName = "varchar(1024)")]
         [MaxLength(1024)]
         public string KeadaanUmum { get; set; } // Penjelasan Keadaan Pasien secara umum
 
-        [Column(TypeName = "varchar(1024)")]
+        [Column("Tingkat_Kesadaran", TypeName = "varchar(1024)")]
         [MaxLength(1024)]
         public string TingkatKesadaran { get; set; } // Penjelasan Tingkat Kesadaran
 
@@ -62,7 +62,9 @@ namespace ProfiraClinic.Models.Core
         public int? Distolik { get; set; } // Tekanan darah Distolik
         public int? Suhu { get; set; } // Suhu Pasien
         public int? Saturasi { get; set; } // Saturasi Oksigen Pasien
+        [Column("Frekuensi_Nadi")]
         public int? FrekuensiNadi { get; set; } // Frekuensi Nadi Pasien
+        [Column("Frekuensi_Nafas")]
         public int? FrekuensiNapas { get; set; } // Frekuensi Napas Pasien
 
         [Column(TypeName = "numeric")]

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
-using ProfiraClinicWebAPI.Helper;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -59,7 +58,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 Items = list
             };
 
-            return Ok(list);
+            return Ok(result);
         }
     }
 }

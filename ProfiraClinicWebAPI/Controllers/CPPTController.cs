@@ -96,9 +96,9 @@ namespace ProfiraClinicWebAPI.Controllers
                 sqlParameters
             );
 
-            var noFak = sqlParameters.Last().Value?.ToString()?.Trim();
+            var nomorTransaksi = sqlParameters.Last().Value?.ToString()?.Trim();
 
-            return CreatedAtAction(nameof(GetItem), new { noFak });
+            return CreatedAtAction(nameof(GetItem), new { nomorTransaksi });
         }
 
 

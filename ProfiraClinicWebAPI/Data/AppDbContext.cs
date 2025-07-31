@@ -79,5 +79,7 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<TRMPemeriksaanUmum> TRMPemeriksaanUmum { get; set; }
         public DbSet<TRMCPPT> TRMCPPT { get; set; }
         public DbSet<MasterDiagnosa> MasterDiagnosa { get; set; }
+
+        public DbSet<TRMGambar> TRMGambar { get; set; }
     }
 }

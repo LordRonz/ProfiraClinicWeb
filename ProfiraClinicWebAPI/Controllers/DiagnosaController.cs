@@ -83,11 +83,11 @@ namespace ProfiraClinicWebAPI.Controllers
                 sqlParameters
             );
 
-            var noFak = sqlParameters.Last().Value?.ToString()?.Trim();
+            var nomorTransaksi = sqlParameters.Last().Value?.ToString()?.Trim();
 
             // Return the newly created patient. Adjust properties as needed.
             var result = CreatedAtAction(nameof(GetItem),
-                             new { noFak = noFak });
+                             new { nomorTransaksi = nomorTransaksi });
 
             return result;
         }
