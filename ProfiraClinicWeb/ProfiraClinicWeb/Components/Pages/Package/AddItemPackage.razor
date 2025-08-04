@@ -128,7 +128,7 @@
         if (firstRender)
         {
             var apiResponse = await ApiService.GetGroupPaketsAsync();
-            if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+            if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
                 groupPakets = apiResponse.Data.Items;
             StateHasChanged();
         }

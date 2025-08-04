@@ -591,7 +591,7 @@
 
         // Load patient data using the API.
         var response = await CustomerApiService.GetPatientByCodeAsync(Id);
-        if (response != null && response.StatusCode == 200)
+        if (response != null && response.StatusCode == 0)
         {
             patient = response.Data;
             // Map fields from the loaded patient to UI-bound properties.
@@ -605,7 +605,7 @@
         }
 
         var response2 = await CustomerRiwayatApiService.GetCustomerRiwayatAsalByCodeAsync(Id);
-        if (response2 != null && response2.StatusCode == 200)
+        if (response2 != null && response2.StatusCode == 0)
         {
             customerRiwayat = response2.Data;
             customerRiwayat.KodeCustomer = Id;

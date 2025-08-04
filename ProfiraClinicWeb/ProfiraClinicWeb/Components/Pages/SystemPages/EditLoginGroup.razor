@@ -60,7 +60,7 @@
     {
         Layout.ChangeTitleAndRoute("Login Group", "Edit Login Group");
         var response = await GroupUserApiService.GetUserGroupByCodeAsync(Id);
-        if (response.StatusCode == 200 && response.Data != null)
+        if (response.StatusCode == 0 && response.Data != null)
         {
             userGroup = response.Data;
         }
