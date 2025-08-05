@@ -112,6 +112,72 @@ namespace ProfiraClinicWebAPI.Controllers
             return Ok(new { nomorTransaksi });
         }
 
+        [HttpPost("EditPemeriksaanUmum")]
+        public async Task<IActionResult> EditPemeriksaanUmum([FromBody] EditPemeriksaanUmumDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.UserName == userName);
+
+            if (user == null)
+                return NotFound();
+
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
+
+            if (dto.KodeKaryawan == null && karyawan == null)
+                return NotFound();
+
+            // 1. Delete existing record
+            var delParams = new[]
+            {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_PemeriksaanUmum_Del @NomorTransaksi",
+                delParams
+            );
+
+            // 2. Insert new record (Edit = Delete + Insert)
+            var editParams = new[]
+            {
+        new SqlParameter("@KodeLokasi", dto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@TanggalTransaksi", dto.TanggalTransaksi ?? DateTime.Now),
+        new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
+        new SqlParameter("@KodeCustomer", dto.KodeCustomer ?? (object)DBNull.Value),
+        new SqlParameter("@KodeKaryawan", dto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+        new SqlParameter("@Keadaan_Umum", dto.Keadaan_Umum ?? (object)DBNull.Value),
+        new SqlParameter("@Tingkat_Kesadaran", dto.Tingkat_Kesadaran ?? (object)DBNull.Value),
+        new SqlParameter("@Sistolik", dto.Sistolik),
+        new SqlParameter("@Distolik", dto.Distolik),
+        new SqlParameter("@Suhu", dto.Suhu),
+        new SqlParameter("@Saturasi", dto.Saturasi),
+        new SqlParameter("@Frekuensi_Nadi", dto.Frekuensi_Nadi),
+        new SqlParameter("@Frekuensi_Nafas", dto.Frekuensi_Nafas),
+        new SqlParameter("@BeratBadan", dto.BeratBadan),
+        new SqlParameter("@TinggiBadan", dto.TinggiBadan),
+        new SqlParameter("@IndexTubuh", dto.IndexTubuh),
+        new SqlParameter("@LingkarKepala", dto.LingkarKepala),
+        new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_PemeriksaanUmum_Edit @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
+                "@KodeCustomer, @KodeKaryawan, @Keadaan_Umum, @Tingkat_Kesadaran, @Sistolik, @Distolik, " +
+                "@Suhu, @Saturasi, @Frekuensi_Nadi, @Frekuensi_Nafas, @BeratBadan, @TinggiBadan, " +
+                "@IndexTubuh, @LingkarKepala, @USRID, @NomorTransaksi",
+                editParams
+            );
+
+            return Ok(new { nomorTransaksi = dto.NomorTransaksi });
+        }
+
+
 
         [HttpPost("GetListTrm")]
         public async Task<IActionResult> GetListTrm([FromBody] PemeriksaanUmumListDto diagDto)
