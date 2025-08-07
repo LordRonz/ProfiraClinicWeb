@@ -94,7 +94,7 @@
     protected override async Task OnInitializedAsync()
     {
         var apiResponse = await GroupUserApiService.GetUserGroupsAsync();
-        if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+        if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
             UserGroups = apiResponse.Data.Items;
 
         Layout.ChangeTitleAndRoute("Pengguna", "Tambah Pengguna");

@@ -6,6 +6,7 @@
 @inject PaketDetailApiService PaketApiService
 @inject PaketHeaderApiService PaketHeaderApiService
 @inject NavigationManager NavigationManager
+@inject GroupPaketApiService ApiService
 
 <MudCard Class="p-4 h-100">
     <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
@@ -20,7 +21,13 @@
                 <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" />
             </MudItem>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Group Paket" @bind-Value="header.KodeGroupPaket" Variant="Variant.Outlined" />
+                <MudAutocomplete T="GroupPaket"
+                                 Label="Pilih Group Paket"
+                                 @bind-Value="selectedGroup"
+                                 SearchFunc="SearchGroup"
+                                 Clearable="true"
+                                 ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
+                                 Dense="true" />
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" />
@@ -98,6 +105,9 @@
     private PaketHeader header = new PaketHeader();
     private PaketDetail detail = new PaketDetail();
     private List<PaketDetail> details = new List<PaketDetail>();
+
+    private List<GroupPaket> groupPakets = new List<GroupPaket>();
+    private GroupPaket selectedGroup;
     private bool isActive;
     private bool isEditingDetail = false;
     private int editingIndex = -1;
@@ -111,6 +121,38 @@
     {
         header.Aktif = "1";
         isActive = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var apiResponse = await ApiService.GetGroupPaketsAsync();
+            if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
+                groupPakets = apiResponse.Data.Items;
+            StateHasChanged();
+        }
+    }
+
+    // Search function for MudAutocomplete
+    private Task<IEnumerable<GroupPaket>> SearchGroup(string value, CancellationToken cancelToken)
+    {
+        if (string.IsNullOrEmpty(value))
+            return Task.FromResult(groupPakets.AsEnumerable());
+        var result = groupPakets.Where(g =>
+            g.KodeGroupPaket.Contains(value, StringComparison.OrdinalIgnoreCase) ||
+            g.NamaGroupPaket.Contains(value, StringComparison.OrdinalIgnoreCase));
+        return Task.FromResult(result);
+    }
+
+    // When selectedGroup changes, update header
+    private void OnGroupChanged(GroupPaket gp)
+    {
+        if (gp != null)
+        {
+            header.KodeGroupPaket = gp.KodeGroupPaket;
+            header.NamaPaket = gp.NamaGroupPaket;
+        }
     }
 
     private async Task AddDetail()
@@ -197,10 +239,10 @@
                 // Save details
                 foreach (var d in details)
                 {
-                    // d.IDPaketHeader = await resultHeader..ReadFromJsonAsync<long>();
+                    d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
                     await PaketApiService.CreatePaketDetailAsync(d);
                 }
-                NavigationManager.NavigateTo("/paket");
+                NavigationManager.NavigateTo("/package-item");
             }
             else
             {

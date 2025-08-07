@@ -24,10 +24,8 @@ namespace ProfiraClinicWebAPI.Controllers
 
         public class EditStatusTindakanDto()
         {
-            public string KodeLokasi { get; set; }
-            public DateTime? TanggalAppointment { get; set; }
             public string NomorAppointment { get; set; }
-            public string KodeCustomer { get; set; }
+            public string Status { get; set; }
         }
 
         public AppointmentController(AppDbContext ctx) : base(ctx) { }
@@ -109,43 +107,33 @@ namespace ProfiraClinicWebAPI.Controllers
                 return NotFound();
 
             // Validate required fields
-            if (appDto.TanggalAppointment == null)
-                return BadRequest("TanggalAppointment is required");
-
             if (string.IsNullOrEmpty(appDto.NomorAppointment))
                 return BadRequest("NomorAppointment is required");
 
-            if (string.IsNullOrEmpty(appDto.KodeCustomer))
-                return BadRequest("KodeCustomer is required");
+            if (string.IsNullOrEmpty(appDto.Status))
+                return BadRequest("Status is required");
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", SqlDbType.Char, 10)
-        {
-            Value = appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value
-        },
-        new SqlParameter("@NomorAppointment", SqlDbType.Char, 25)
-        {
-            Value = appDto.NomorAppointment
-        },
-        new SqlParameter("@TanggalAppointment", SqlDbType.Date)
-        {
-            Value = appDto.TanggalAppointment.Value.Date // Get only the date part
-        },
-        new SqlParameter("@KodeCustomer", SqlDbType.Char, 10)
-        {
-            Value = appDto.KodeCustomer
-        }
-    };
-
-            System.Diagnostics.Debug.WriteLine($"TanggalAppointment: {appDto.TanggalAppointment.Value.Date}");
-
+                new SqlParameter("@Status", SqlDbType.Char, 1)
+                {
+                    Value = appDto.Status ?? (object)DBNull.Value
+                },
+                new SqlParameter("@NomorAppointment", SqlDbType.Char, 25)
+                {
+                    Value = appDto.NomorAppointment
+                },
+            };
             try
             {
-                await _context.Database
-                    .ExecuteSqlRawAsync("EXEC dbo.usp_TRM_Appointment_EditStatusTindakan @KodeLokasi, @NomorAppointment, @TanggalAppointment, @KodeCustomer", sqlParameters);
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_Appointment_EditStatusTindakan " +
+                    "@NomorAppointment = @NomorAppointment, " +
+                    "@Status           = @Status",
+                    sqlParameters);
 
-                return Ok();
+
+                return Ok(new { message = "Edit status tindakan berhasil" });
             }
             catch (SqlException ex)
             {

@@ -37,7 +37,7 @@
             var apiResponse = await ApiService.GetUsersAsync();
             // Check if status code indicates success
             System.Diagnostics.Debug.WriteLine("Done");
-            if (apiResponse.StatusCode == 200 && apiResponse.Data != null)
+            if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
             {
                 Users = apiResponse.Data;
             }

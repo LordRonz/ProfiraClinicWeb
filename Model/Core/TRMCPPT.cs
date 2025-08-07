@@ -12,11 +12,11 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
-        public string TRCD { get; set; } // Transaction Code
+        public string? TRCD { get; set; } // Transaction Code
 
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
-        public string TRSC { get; set; } // Transaction Source
+        public string? TRSC { get; set; } // Transaction Source
 
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
@@ -35,42 +35,42 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]
-        public string NomorAppointment { get; set; } // Nomor Appointment
+        public string? NomorAppointment { get; set; } // Nomor Appointment
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string KodeCustomer { get; set; } // Relasi dengan Table Customer
+        public string? KodeCustomer { get; set; } // Relasi dengan Table Customer
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string KodeKaryawan { get; set; } // Kode Dokter / Terapis
+        public string? KodeKaryawan { get; set; } // Kode Dokter / Terapis
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string Subyektif { get; set; } // Penjelasan Subyektif
+        public string? Subyektif { get; set; } // Penjelasan Subyektif
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string Obyektif { get; set; } // Penjelasan Obyektif
+        public string? Obyektif { get; set; } // Penjelasan Obyektif
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string Assessment { get; set; } // Penjelasan Assessment
+        public string? Assestment { get; set; } // Penjelasan Assessment
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string Planning { get; set; } // Penjelasan Planning
+        public string? Planning { get; set; } // Penjelasan Planning
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string Instruksi { get; set; } // Penjelasan Instruksi
+        public string? Instruksi { get; set; } // Penjelasan Instruksi
 
         [Column(TypeName = "datetime")]
         public DateTime? UPDDT { get; set; } // Date time input
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string USRID { get; set; } // User Input
+        public string? USRID { get; set; } // User Input
 
         public string? KETLK { get; set; }
         public string? NamaCustomer { get; set; }

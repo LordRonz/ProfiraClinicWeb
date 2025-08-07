@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -9,6 +8,7 @@ namespace ProfiraClinicWebAPI.Controllers
     public class ImagesController : ControllerBase
     {
         private readonly string _imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+        private readonly string _rmeFolder = Path.Combine(Directory.GetCurrentDirectory(), "assets", "rme");
         private const long MaxFileSize = 5 * 1024 * 1024; // 5MB
 
         public ImagesController()
@@ -60,6 +60,52 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var mimeType = GetMimeType(filePath);
             var fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            return File(fileBytes, mimeType);
+        }
+
+
+        /// <summary>
+        /// Lists all filenames under /assets/rme and returns full URLs.
+        /// </summary>
+        [HttpGet("rme")]
+        public IActionResult GetAll()
+        {
+            if (!Directory.Exists(_rmeFolder))
+            {
+                Directory.CreateDirectory(_rmeFolder);
+            }
+
+            var files = Directory
+                .EnumerateFiles(_rmeFolder)
+                .Select(fullPath =>
+                {
+                    var fileName = Path.GetFileName(fullPath);
+                    // Build a URL like https://host/assets/rme/{fileName}
+                    var url = $"{Request.Scheme}://{Request.Host}/api/Images/rme/{Uri.EscapeDataString(fileName)}";
+                    return new { fileName, url };
+                })
+                .ToList();
+
+            return Ok(files);
+        }
+
+        /// <summary>
+        /// (Optional) If you want to stream via API instead of direct static serving.
+        /// GET /api/assets/rme/{fileName}
+        /// </summary>
+        [HttpGet("rme/{fileName}")]
+        public IActionResult GetFileRme(string fileName)
+        {
+            var safeFileName = SanitizeFileName(fileName);
+            var safeName = Path.GetFileName(safeFileName);
+            var fullPath = Path.Combine(_rmeFolder, safeName);
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound("Image not found.");
+
+            var mimeType = GetMimeType(fullPath);
+            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
 
             return File(fileBytes, mimeType);
         }

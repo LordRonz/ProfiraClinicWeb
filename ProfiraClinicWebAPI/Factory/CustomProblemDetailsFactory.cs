@@ -29,7 +29,6 @@ namespace ProfiraClinicWebAPI.Factory
 
             var problemDetails = new ProblemDetails
             {
-                Status = statusCode,
                 Title = title ?? ReasonPhrases.GetReasonPhrase(statusCode.Value),
                 Type = type ?? $"https://tools.ietf.org/html/rfc9110#section-15.{statusCode}",
                 Detail = detail,
@@ -37,6 +36,7 @@ namespace ProfiraClinicWebAPI.Factory
             };
 
             problemDetails.Extensions["errorType"] = MapErrorType(statusCode.Value);
+            problemDetails.Extensions["statusCode"] = 1;
 
             return problemDetails;
         }
@@ -54,7 +54,6 @@ namespace ProfiraClinicWebAPI.Factory
 
             var problemDetails = new ValidationProblemDetails(modelStateDictionary)
             {
-                Status = statusCode,
                 Title = title ?? ReasonPhrases.GetReasonPhrase(statusCode.Value),
                 Type = type ?? $"https://tools.ietf.org/html/rfc9110#section-15.{statusCode}",
                 Detail = detail,
@@ -62,6 +61,7 @@ namespace ProfiraClinicWebAPI.Factory
             };
 
             problemDetails.Extensions["errorType"] = MapErrorType(statusCode.Value).ToString();
+            problemDetails.Extensions["statusCode"] = 1;
 
             return problemDetails;
         }

@@ -49,9 +49,9 @@ namespace ProfiraClinicWebAPI.Filters
             }
 
             var apiResponse = new ApiResponse<object>(
-                statusCode,
+                1,
                 message,
-                null,
+                new { innerException = exception.InnerException?.StackTrace, stackTrace = exception.StackTrace },
                 errorType
             );
 
