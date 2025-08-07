@@ -98,7 +98,74 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var nomorTransaksi = sqlParameters.Last().Value?.ToString()?.Trim();
 
-            return CreatedAtAction(nameof(GetItem), new { nomorTransaksi });
+            return Ok(new { nomorTransaksi });
+        }
+
+        [HttpPost("EditCPPT")]
+        public async Task<IActionResult> EditCPPT([FromBody] EditCPPTDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName)) return Unauthorized();
+
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.UserName == userName);
+
+            if (user == null) return NotFound();
+
+            var karyawan = await _context.MKaryawan
+                                .FirstOrDefaultAsync(k => k.USRID == user.UserID);
+
+            if (dto.KodeKaryawan == null && karyawan == null)
+                return NotFound();
+
+            var delParams = new[]
+            {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_CPPT_Del @NomorTransaksi",
+                delParams
+            );
+
+            try
+            {
+                var sqlParams = new[]
+                {
+            new SqlParameter("@KodeLokasi", dto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+            new SqlParameter("@TanggalTransaksi", dto.TanggalTransaksi ?? DateTime.Now),
+            new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
+            new SqlParameter("@KodeCustomer", dto.KodeCustomer ?? (object)DBNull.Value),
+            new SqlParameter("@KodeKaryawan", dto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+            new SqlParameter("@SUBYEKTIF", dto.SUBYEKTIF ?? (object)DBNull.Value),
+            new SqlParameter("@OBYEKTIF", dto.OBYEKTIF ?? (object)DBNull.Value),
+            new SqlParameter("@ASSESTMENT", dto.ASSESTMENT ?? (object)DBNull.Value),
+            new SqlParameter("@PLANNING", dto.PLANNING ?? (object)DBNull.Value),
+            new SqlParameter("@INSTRUKSI", dto.INSTRUKSI ?? (object)DBNull.Value),
+            new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+            new SqlParameter("@INPMD", dto.INPMD ?? (object)DBNull.Value),
+            new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value),
+        };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_CPPT_Edit " +
+                    "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, @KodeKaryawan, " +
+                    "@SUBYEKTIF, @OBYEKTIF, @ASSESTMENT, @PLANNING, @INSTRUKSI, " +
+                    "@USRID, @INPMD, @NomorTransaksi",
+                    sqlParams
+                );
+
+                return Ok(new { message = "CPPT updated successfully." });
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Failed to update CPPT",
+                    data = new { error = ex.Message }
+                });
+            }
         }
 
 
@@ -133,6 +200,23 @@ namespace ProfiraClinicWebAPI.Controllers
             };
 
             return Ok(result);
+        }
+
+        [HttpPost("GetByNomorAppointment")]
+        public async Task<IActionResult> GetByNomorAppointment([FromBody] GetByNomorAppointmentDto dto)
+        {
+            var nomorAppointment = dto.NomorAppointment;
+            if (string.IsNullOrWhiteSpace(nomorAppointment))
+                return BadRequest(new { message = "NomorAppointment is required." });
+
+            var diagnosa = await _context.CPPT
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
+
+            if (diagnosa == null)
+                return Ok(new { message = "CPPT not found." });
+
+            return Ok(diagnosa);
         }
     }
 }

@@ -14,6 +14,16 @@ namespace ProfiraClinicWebAPI.Filters
 
                 string message = "Success";
 
+                if (objectResult.Value is IDictionary<string, object> dictM && dictM.TryGetValue("message", out var messageVal))
+                {
+                    message = messageVal?.ToString() ?? "Success";
+                }
+                else if (objectResult.Value?.GetType().GetProperty("message") is not null)
+                {
+                    var msgProp = objectResult.Value.GetType().GetProperty("message");
+                    message = (msgProp?.GetValue(objectResult.Value))?.ToString() ?? "Success";
+                }
+
                 if (statusCode >= 400)
                 {
                     if (objectResult.Value is string str)

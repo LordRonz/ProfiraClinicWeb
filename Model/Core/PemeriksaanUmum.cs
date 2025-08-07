@@ -60,8 +60,10 @@ namespace ProfiraClinic.Models.Core
 
         public int? Sistolik { get; set; } // Tekanan darah Sistolik
         public int? Distolik { get; set; } // Tekanan darah Distolik
-        public int? Suhu { get; set; } // Suhu Pasien
-        public int? Saturasi { get; set; } // Saturasi Oksigen Pasien
+        [Column(TypeName = "numeric")]
+        public decimal? Suhu { get; set; } // Suhu Pasien
+        [Column(TypeName = "numeric")]
+        public decimal? Saturasi { get; set; } // Saturasi Oksigen Pasien
         [Column("Frekuensi_Nadi")]
         public int? FrekuensiNadi { get; set; } // Frekuensi Nadi Pasien
         [Column("Frekuensi_Nafas")]
@@ -73,8 +75,7 @@ namespace ProfiraClinic.Models.Core
         [Column(TypeName = "numeric")]
         public decimal? TinggiBadan { get; set; } // Tinggi Badan Pasien
 
-        [Column(TypeName = "numeric")]
-        public decimal? IndexTubuh { get; set; } // Index Tubuh Pasien
+        public int? IndexTubuh { get; set; } // Index Tubuh Pasien
 
         [Column(TypeName = "numeric")]
         public decimal? LingkarKepala { get; set; } // Lingkar Kepala Pasien
