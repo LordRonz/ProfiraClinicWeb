@@ -191,9 +191,6 @@ namespace ProfiraClinicWebAPI.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorTransaksi == nomorTransaksi);
 
-            if (diagnosa == null)
-                return Ok(new { message = "Diagnosa not found." });
-
             return Ok(diagnosa);
         }
 
@@ -207,9 +204,6 @@ namespace ProfiraClinicWebAPI.Controllers
             var diagnosa = await _context.Diagnosa
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
-
-            if (diagnosa == null)
-                return Ok(new { message = "Diagnosa not found." });
 
             return Ok(diagnosa);
         }

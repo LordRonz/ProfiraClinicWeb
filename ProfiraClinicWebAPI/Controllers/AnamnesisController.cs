@@ -207,9 +207,6 @@ namespace ProfiraClinicWebAPI.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
 
-            if (diagnosa == null)
-                return Ok(new { message = "Anamnesis not found." });
-
             return Ok(diagnosa);
         }
     }
