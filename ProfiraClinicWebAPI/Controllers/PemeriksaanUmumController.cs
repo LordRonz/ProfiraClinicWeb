@@ -222,9 +222,6 @@ namespace ProfiraClinicWebAPI.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
 
-            if (result == null)
-                return Ok(new { message = "Pemeriksaan Umum not found." });
-
             return Ok(result);
         }
     }

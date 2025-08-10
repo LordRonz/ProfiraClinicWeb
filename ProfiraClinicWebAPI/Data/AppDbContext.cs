@@ -81,5 +81,7 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<MasterDiagnosa> MasterDiagnosa { get; set; }
 
         public DbSet<TRMGambar> TRMGambar { get; set; }
+        public DbSet<TRMAnamnesis> TRMAnamnesis { get; set; }
+        public DbSet<Anamnesis> Anamnesis { get; set; }
     }
 }
