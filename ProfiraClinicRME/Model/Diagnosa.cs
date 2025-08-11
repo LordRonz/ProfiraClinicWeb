@@ -5,8 +5,13 @@
         public string KodeCustomer { get; set; } = "";
     }
 
-    public class AddDiagnosaResponseDTO
+    public class NomorTransaksiDTOStoreDiagnosaResponseDTO
     {
-        public string NoFak{get; set;} = "";
+        public string NomorTransaksi{get; set;} = "";
+    }
+
+    public class AppointmentNumberRequestDTO
+    {
+        public string NoAppointment { get; set; } = "";
     }
 }

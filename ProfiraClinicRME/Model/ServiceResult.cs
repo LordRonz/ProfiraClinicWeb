@@ -19,7 +19,7 @@
         public string Message = "";
         public T? Data = default;
 
-        public static ServiceResult<T> ActionEmpty(string message ="")
+        public static ServiceResult<T> SuccessEmpty(string message ="")
         {
             return new ServiceResult<T>
             {
@@ -28,6 +28,17 @@
                 Message = ""
             };
         }
+
+        public static ServiceResult<T> Success(T data, string message = "")
+        {
+            return new ServiceResult<T>
+            {
+                Status = ServiceResultEnum.SUCCESS,
+                Data = data,
+                Message = ""
+            };
+        }
+
 
         public static ServiceResult<T> Found(T data, string message = "")
         {

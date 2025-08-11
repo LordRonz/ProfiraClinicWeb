@@ -121,12 +121,14 @@ namespace ProfiraClinicRME.Infra
 
 
                 //Log.Debug("{src} {stat} {data}", logSource, 1, (response.ToString(), client.DefaultRequestHeaders));
+                serializedObj = await response.Content.ReadAsStringAsync();
+
                 var httpStat = (int)response.StatusCode;
                 if (httpStat != 200)
                 {
                     //apiResponse.Message = "Unknown Error";
                     //apiResponse.ErrorType = ErrorType.UNKNOWN;
-                    LogTrace.Error("fin: sys err", new { httpStat, response.Content}, _classPath);
+                    LogTrace.Error("fin: sys err", new { httpStat, serializedObj}, _classPath);
                     return apiResponse;
                 }
 
@@ -141,7 +143,6 @@ namespace ProfiraClinicRME.Infra
                     return apiResponse;
                 }
 
-                serializedObj = await response.Content.ReadAsStringAsync();
 
                 LogTrace.Info("response json", new { httpStat, serializedObj, reqUrlPath }, path: _classPath);
 
