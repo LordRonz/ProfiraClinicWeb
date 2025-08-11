@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProfiraClinic.Models.Api
 {
-    public class EditCPPTDto
+    public class AddCPPTDto
     {
         public string? KodeLokasi { get; set; }
         public DateTime? TanggalTransaksi { get; set; }
@@ -18,7 +18,6 @@ namespace ProfiraClinic.Models.Api
         public string? ASSESTMENT { get; set; }
         public string? PLANNING { get; set; }
         public string? INSTRUKSI { get; set; }
-        public string? INPMD { get; set; }
-        public string NomorTransaksi { get; set; } = "";
+        public string? INPMD { get; set; }  // e.g. 'A' or other code
     }
 }

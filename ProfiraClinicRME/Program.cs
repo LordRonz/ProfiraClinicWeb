@@ -46,6 +46,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IMasterDiagnosaService, MasterDiagnosaService>();
 builder.Services.AddScoped<IDiagnosaService, DiagnosaService>();
+builder.Services.AddScoped<IPemeriksaanUmumService, PemeriksaanUmumService>();
+builder.Services.AddScoped<ICPPTService, CPPTService>();
 
 
 
