@@ -16,8 +16,6 @@ namespace ProfiraClinicRME.Infra
 
         private string _classPath = "Infra::DiagnosaService";
 
-        private TRMAppointment? _current;
-
         private BaseRepo<TRMDiagnosa> _repo;
         // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
         public DiagnosaService(ApiService svcApi)
@@ -43,13 +41,39 @@ namespace ProfiraClinicRME.Infra
             return svcResult;
         }
 
-        public async Task<ServiceResult<AddDiagnosaResponseDTO>> AddDiagnosa(TRMDiagnosa diagnosa)
+        public async Task<ServiceResult<NomorTransaksiDto>> Add(TRMDiagnosa newEntity)
         {
-            LogTrace.Info($"init", diagnosa, _classPath);
+            LogTrace.Info($"init", newEntity, _classPath);
 
-            Response<AddDiagnosaResponseDTO?> apiResponse = await _svcApi.Send<TRMDiagnosa, AddDiagnosaResponseDTO>("post", "api/Diagnosa/AddDiagnosa", diagnosa);
+            Response<NomorTransaksiDto?> apiResponse = await _svcApi.Send<TRMDiagnosa, NomorTransaksiDto>("post", "api/Diagnosa/AddDiagnosa", newEntity);
 
-            ServiceResult<AddDiagnosaResponseDTO> svcResult = _repo.ProcessResult<AddDiagnosaResponseDTO>(apiResponse, RepoProcessEnum.ACTION);
+            ServiceResult<NomorTransaksiDto> svcResult = _repo.ProcessResult<NomorTransaksiDto>(apiResponse, RepoProcessEnum.ACTION);
+
+            return svcResult;
+        }
+
+        public async Task<ServiceResult<TRMDiagnosa>> GetByNomorAppointment(string nomorAppointment)
+        {
+            LogTrace.Info($"init", nomorAppointment, _classPath);
+
+            GetByNomorAppointmentDto dto = new()
+            {
+                NomorAppointment = nomorAppointment
+            };
+
+            Response<TRMDiagnosa?> apiResponse = await _svcApi.Send<GetByNomorAppointmentDto, TRMDiagnosa>("post", "api/Diagnosa/GetByNomorAppointment", dto);
+
+            ServiceResult<TRMDiagnosa> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.GET);
+            return svcResult;
+        }
+
+        public async Task<ServiceResult<NomorTransaksiDto>> Edit(TRMDiagnosa updatedEntity)
+        {
+            LogTrace.Info($"init", updatedEntity, _classPath);
+
+            Response<NomorTransaksiDto?> apiResponse = await _svcApi.Send<TRMDiagnosa, NomorTransaksiDto>("post", "api/Diagnosa/EditDiagnosa", updatedEntity);
+
+            ServiceResult<NomorTransaksiDto> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.ACTION);
 
             return svcResult;
         }

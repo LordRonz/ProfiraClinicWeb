@@ -18,6 +18,10 @@ namespace ProfiraClinicRME.Services
         public Task<ServiceResult<Pagination<TRMDiagnosa>>> GetListAsync(string kodeCustomer);
 
 
-        public Task<ServiceResult<AddDiagnosaResponseDTO>> AddDiagnosa(TRMDiagnosa item);
+        public Task<ServiceResult<NomorTransaksiDto>> Add(TRMDiagnosa item);
+
+        public Task<ServiceResult<TRMDiagnosa>> GetByNomorAppointment(string nomorAppointment);
+
+        public Task<ServiceResult<NomorTransaksiDto>> Edit(TRMDiagnosa item);
     }
 }
