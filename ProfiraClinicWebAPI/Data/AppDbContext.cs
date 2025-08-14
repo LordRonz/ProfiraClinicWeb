@@ -83,5 +83,8 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<TRMGambar> TRMGambar { get; set; }
         public DbSet<TRMAnamnesis> TRMAnamnesis { get; set; }
         public DbSet<Anamnesis> Anamnesis { get; set; }
+
+        public DbSet<TRMRiwayat> TRMRiwayat { get; set; }
+        public DbSet<Riwayat> Riwayat { get; set; }
     }
 }

@@ -12,13 +12,13 @@
     <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
 
     <!-- Header Form -->
-    <MudForm @ref="headerForm" Class="section-body">
+    <MudForm @ref="headerForm" Class="section-body table-form">
         <MudGrid>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" />
+                <MudTextField T="string" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" />
+                <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="GroupPaket"
@@ -27,22 +27,24 @@
                                  SearchFunc="SearchGroup"
                                  Clearable="true"
                                  ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
-                                 Dense="true" />
+                                 Dense="true"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" />
+                <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Harga" @bind-Value="header.HARGA" Variant="Variant.Outlined" />
+                <MudNumericField T="decimal" Label="Harga" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" />
+                <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" />
+                <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" />
+                <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
         </MudGrid>
     </MudForm>
@@ -53,10 +55,10 @@
     <MudForm @ref="detailForm" Class="table-form section-body">
         <MudGrid>
             <MudItem xs="12" sm="3">
-                <MudTextField T="string" Label="Kode Perawatan" @bind-Value="detail.KodePerawatan" Variant="Variant.Outlined" Required="true" />
+                <MudTextField T="string" Label="Kode Perawatan" @bind-Value="detail.KodePerawatan" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="3">
-                <MudNumericField T="int" Label="Jumlah Perawatan" @bind-Value="detail.JumlahPerawatan" Variant="Variant.Outlined" />
+                <MudNumericField T="int" Label="Jumlah Perawatan" @bind-Value="detail.JumlahPerawatan" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6" Class="d-flex align-end">
                 @if (isEditingDetail)
@@ -259,9 +261,9 @@
         text-transform: none;
     }
 
-        .save-btn:hover {
-            background: rgba(27, 153, 41, 1);
-        }
+    .save-btn:hover {
+        background: rgba(27, 153, 41, 1);
+    }
 
     .back-btn {
         background: rgba(156, 99, 5, 1);
@@ -270,9 +272,9 @@
         text-transform: none;
     }
 
-        .back-btn:hover {
-            background: rgba(126, 69, 2, 1);
-        }
+    .back-btn:hover {
+        background: rgba(126, 69, 2, 1);
+    }
 
     .table-form .mud-input-root {
         height: 30px !important;
@@ -291,6 +293,11 @@
 
     .table-form .mud-input-label-inputcontrol {
         top: -3px;
+    }
+
+    .table-form .mud-select-input.mud-input-slot {
+        transform: translate(5px, 7px);
+        top: -8px;
     }
 
     .active-tab {

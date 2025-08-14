@@ -18,7 +18,11 @@ namespace ProfiraClinicWebAPI.Controllers
             public string? KodeCustomer { get; set; }
         }
 
-        public DiagnosaController(AppDbContext ctx) : base(ctx) { }
+        private readonly string _kodePoli;
+        public DiagnosaController(AppDbContext ctx, IConfiguration configuration) : base(ctx)
+        {
+            _kodePoli = configuration["KodePoli"];
+        }
 
         protected override DbSet<Diagnosa> DbSet
             => _context.Diagnosa;
@@ -63,13 +67,14 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
                 new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
                 new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+                new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
                 new SqlParameter("@KodeDiagnosa", appDto.KodeDiagnosa ?? (object)DBNull.Value),
                 new SqlParameter("@KategoriDiagnosa", appDto.KategoriDiagnosa ?? (object)DBNull.Value),
                 new SqlParameter("@KeteranganDiagnosa", appDto.KeteranganDiagnosa ?? (object)DBNull.Value),
                 new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
                 new SqlParameter
                 {
-                    ParameterName = "@NOFAK",
+                    ParameterName = "@NomorTransaksi",
                     SqlDbType = System.Data.SqlDbType.Char,
                     Size = 25,
                     Direction = System.Data.ParameterDirection.Output
@@ -78,8 +83,8 @@ namespace ProfiraClinicWebAPI.Controllers
 
             await _context.Database.ExecuteSqlRawAsync(
                 "EXEC dbo.usp_TRM_Diagnosa_Add @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                "@KodeCustomer, @KodeKaryawan, @KodeDiagnosa, @KategoriDiagnosa, @KeteranganDiagnosa, " +
-                "@USRID, @NOFAK OUTPUT",
+                "@KodeCustomer, @KodeKaryawan, @KodePoli, @KodeDiagnosa, @KategoriDiagnosa, @KeteranganDiagnosa, " +
+                "@USRID, @NomorTransaksi OUTPUT",
                 sqlParameters
             );
 
@@ -129,6 +134,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
         new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
         new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+        new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
         new SqlParameter("@KodeDiagnosa", appDto.KodeDiagnosa ?? (object)DBNull.Value),
         new SqlParameter("@KategoriDiagnosa", appDto.KategoriDiagnosa ?? (object)DBNull.Value),
         new SqlParameter("@KeteranganDiagnosa", appDto.KeteranganDiagnosa ?? (object)DBNull.Value),
@@ -138,7 +144,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             await _context.Database.ExecuteSqlRawAsync(
                 "EXEC dbo.usp_TRM_Diagnosa_Edit @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                "@KodeCustomer, @KodeKaryawan, @KodeDiagnosa, @KategoriDiagnosa, @KeteranganDiagnosa, " +
+                "@KodeCustomer, @KodeKaryawan, @KodePoli, @KodeDiagnosa, @KategoriDiagnosa, @KeteranganDiagnosa, " +
                 "@USRID, @NomorTransaksi",
                 sqlParameters
             );

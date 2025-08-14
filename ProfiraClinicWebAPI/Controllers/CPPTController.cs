@@ -35,7 +35,12 @@ namespace ProfiraClinicWebAPI.Controllers
             public string? KodeCustomer { get; set; }
         }
 
-        public CPPTController(AppDbContext ctx) : base(ctx) { }
+        private readonly string _kodePoli;
+
+        public CPPTController(AppDbContext ctx, IConfiguration configuration) : base(ctx)
+        {
+            _kodePoli = configuration["KodePoli"];
+        }
 
         protected override DbSet<CPPT> DbSet
             => _context.CPPT;
@@ -72,16 +77,16 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
                 new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
                 new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+                new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
                 new SqlParameter("@SUBYEKTIF", appDto.SUBYEKTIF ?? (object)DBNull.Value),
                 new SqlParameter("@OBYEKTIF", appDto.OBYEKTIF ?? (object)DBNull.Value),
                 new SqlParameter("@ASSESTMENT", appDto.ASSESTMENT ?? (object)DBNull.Value),
                 new SqlParameter("@PLANNING", appDto.PLANNING ?? (object)DBNull.Value),
                 new SqlParameter("@INSTRUKSI", appDto.INSTRUKSI ?? (object)DBNull.Value),
                 new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
-                new SqlParameter("@INPMD", appDto.INPMD ?? (object)DBNull.Value),
                 new SqlParameter
                 {
-                    ParameterName = "@NOFAK",
+                    ParameterName = "@NomorTransaksi",
                     SqlDbType = System.Data.SqlDbType.Char,
                     Size = 25,
                     Direction = System.Data.ParameterDirection.Output
@@ -91,8 +96,8 @@ namespace ProfiraClinicWebAPI.Controllers
             await _context.Database.ExecuteSqlRawAsync(
                 "EXEC dbo.usp_TRM_CPPT_Add " +
                 "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, @KodeKaryawan, " +
-                "@SUBYEKTIF, @OBYEKTIF, @ASSESTMENT, @PLANNING, @INSTRUKSI, " +
-                "@USRID, @INPMD, @NOFAK OUTPUT",
+                "@KodePoli, @SUBYEKTIF, @OBYEKTIF, @ASSESTMENT, @PLANNING, @INSTRUKSI, " +
+                "@USRID, @NomorTransaksi OUTPUT",
                 sqlParameters
             );
 
@@ -138,21 +143,21 @@ namespace ProfiraClinicWebAPI.Controllers
             new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
             new SqlParameter("@KodeCustomer", dto.KodeCustomer ?? (object)DBNull.Value),
             new SqlParameter("@KodeKaryawan", dto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+            new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
             new SqlParameter("@SUBYEKTIF", dto.SUBYEKTIF ?? (object)DBNull.Value),
             new SqlParameter("@OBYEKTIF", dto.OBYEKTIF ?? (object)DBNull.Value),
             new SqlParameter("@ASSESTMENT", dto.ASSESTMENT ?? (object)DBNull.Value),
             new SqlParameter("@PLANNING", dto.PLANNING ?? (object)DBNull.Value),
             new SqlParameter("@INSTRUKSI", dto.INSTRUKSI ?? (object)DBNull.Value),
             new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
-            new SqlParameter("@INPMD", dto.INPMD ?? (object)DBNull.Value),
             new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value),
         };
 
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC dbo.usp_TRM_CPPT_Edit " +
                     "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, @KodeKaryawan, " +
-                    "@SUBYEKTIF, @OBYEKTIF, @ASSESTMENT, @PLANNING, @INSTRUKSI, " +
-                    "@USRID, @INPMD, @NomorTransaksi",
+                    "@KodePoli, @SUBYEKTIF, @OBYEKTIF, @ASSESTMENT, @PLANNING, @INSTRUKSI, " +
+                    "@USRID, @NomorTransaksi",
                     sqlParams
                 );
 
