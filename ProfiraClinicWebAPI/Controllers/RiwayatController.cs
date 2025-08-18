@@ -50,13 +50,13 @@ namespace ProfiraClinicWebAPI.Controllers
             // Look up user
             var user = await _context.MUser
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
 
             if (user == null)
                 return NotFound();
 
             var karyawan = await _context.MKaryawan
-                            .FirstOrDefaultAsync(k => k.USRID == user.UserID);
+                            .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
             if (appDto.KodeKaryawan == null && karyawan == null)
                 return NotFound();
@@ -78,7 +78,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KetAlergiMakanan", appDto.KetAlergiMakanan ?? (object)DBNull.Value),
         new SqlParameter("@chkResiko", appDto.chkResiko ?? (object)DBNull.Value),
         new SqlParameter("@KetResiko", appDto.KetResiko ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", user.KodeUser ?? (object)DBNull.Value),
         new SqlParameter
         {
             ParameterName = "@NomorTransaksi",
@@ -113,16 +113,26 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var user = await _context.MUser
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.UserName == userName);
+                .FirstOrDefaultAsync(u => u.USRID == userName);
 
             if (user == null)
                 return NotFound();
 
             var karyawan = await _context.MKaryawan
-                .FirstOrDefaultAsync(k => k.USRID == user.UserID);
+                .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
             if (appDto.KodeKaryawan == null && karyawan == null)
                 return NotFound();
+
+            var delParam = new[]
+            {
+        new SqlParameter("@NomorTransaksi", appDto.NomorTransaksi)
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_Riwayat_Del @NomorTransaksi",
+                delParam
+            );
 
             var sqlParameters = new[]
             {
@@ -140,7 +150,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KetAlergiMakanan", appDto.KetAlergiMakanan ?? (object)DBNull.Value),
         new SqlParameter("@chkResiko", appDto.chkResiko ?? (object)DBNull.Value),
         new SqlParameter("@KetResiko", appDto.KetResiko ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", user.KodeUser ?? (object)DBNull.Value),
         new SqlParameter("@NomorTransaksi", appDto.NomorTransaksi ?? (object)DBNull.Value)
     };
 
@@ -170,7 +180,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 2) look it up
             var user = await _context.MUser
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
 
             var sqlParameters = new[]
             {

@@ -82,7 +82,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 {
                     var fileName = Path.GetFileName(fullPath);
                     // Build a URL like https://host/assets/rme/{fileName}
-                    var url = $"{Request.Scheme}://{Request.Host}/api/Images/rme/{Uri.EscapeDataString(fileName)}";
+                    var url = $"{Request.Scheme}://{Request.Host}/api/Images/MasterGambar/{Uri.EscapeDataString(fileName)}";
                     return new { fileName, url };
                 })
                 .ToList();
