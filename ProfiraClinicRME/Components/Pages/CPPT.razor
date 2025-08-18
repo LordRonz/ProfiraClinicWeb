@@ -21,7 +21,8 @@
 />
 
 <MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
-    <MudGrid Class="gap-y-2" Style="max-width: 85%;">
+
+    <MudCard Class="px-4 py-8" Style="max-width: 85%;">
         <MudItem xs="12" Class="p-1">
             <MudTextField @bind-Value="@_trmCPPTInForm.Subyektif" ShrinkLabel T="string" Label="Subyektif" Variant="Variant.Outlined" Lines="10" />
         </MudItem>
@@ -37,7 +38,7 @@
         <MudItem xs="12" Class="p-1">
             <MudTextField ShrinkLabel @bind-Value="@_trmCPPTInForm.Instruksi" T="string" Label="Instruksi" Variant="Variant.Outlined" Lines="10" />
         </MudItem>
-    </MudGrid>
+    </MudCard>
     <MudCard Class="mt-8">
         <Note EntityType="@TRMCPPT" ListData="@_listRekamMedis">
             <NoteContent>
@@ -128,7 +129,7 @@
             addSnackbar("Gagal memuat Rekam Medis CPPT.", Severity.Error);
         }
 
-        //cek apakah sudah ada pemriksaan umum untuk appointment ini
+        //cek apakah sudah ada cppt untuk appointment ini
         var resCheck = await SvcCPPT.GetByNomorAppointment(_apo.NomorAppointment);
         if (resCheck.Status == ServiceResultEnum.FOUND)
         {

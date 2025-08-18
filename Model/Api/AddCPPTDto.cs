@@ -18,6 +18,5 @@ namespace ProfiraClinic.Models.Api
         public string? ASSESTMENT { get; set; }
         public string? PLANNING { get; set; }
         public string? INSTRUKSI { get; set; }
-        public string? INPMD { get; set; }  // e.g. 'A' or other code
     }
 }

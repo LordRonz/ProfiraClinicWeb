@@ -16,6 +16,7 @@
 
     protected void addSnackbar(string message, Severity severity = Severity.Error)
     {
+        LogTrace.Info("trace", message, _classPath);
         // Snackbar.Clear();
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
         Snackbar.Configuration.VisibleStateDuration = 3000;
