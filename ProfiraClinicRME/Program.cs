@@ -49,6 +49,7 @@ builder.Services.AddScoped<IDiagnosaService, DiagnosaService>();
 builder.Services.AddScoped<IPemeriksaanUmumService, PemeriksaanUmumService>();
 builder.Services.AddScoped<ICPPTService, CPPTService>();
 builder.Services.AddScoped<IAnamnesisService, AnamnesisService>();
+builder.Services.AddScoped<IRiwayatService, RiwayatService>();
 
 
 
