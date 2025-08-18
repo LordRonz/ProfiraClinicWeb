@@ -56,7 +56,7 @@ namespace ProfiraClinicWebAPI.Controllers
             {
         new SqlParameter("@UserID", newUser.KodeUser ?? (object)DBNull.Value),
         // The stored procedure generates the customer code, so pass an empty string.
-        new SqlParameter("@UserName", newUser.USRID ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", newUser.USRID ?? (object)DBNull.Value),
         new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
         new SqlParameter("@KodeUserGroup", newUser.KodeUserGroup ?? (object)DBNull.Value),
          new SqlParameter("@UserInput", newUser.UserInput ?? (object)DBNull.Value),

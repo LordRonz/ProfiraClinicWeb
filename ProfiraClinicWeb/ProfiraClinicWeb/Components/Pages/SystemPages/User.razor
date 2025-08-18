@@ -39,7 +39,7 @@
             System.Diagnostics.Debug.WriteLine("Done");
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
             {
-                Users = apiResponse.Data;
+                Users = apiResponse.Data.Items;
             }
             else
             {
