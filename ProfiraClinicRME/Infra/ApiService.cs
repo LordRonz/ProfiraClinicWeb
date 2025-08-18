@@ -158,6 +158,7 @@ namespace ProfiraClinicRME.Infra
                 };
 
                 var responseData = JsonSerializer.Deserialize<Response<RespType>>(serializedObj, options );
+
                 //check for returnId and returnMessage
                 if (responseData == null)
                 {
@@ -167,7 +168,20 @@ namespace ProfiraClinicRME.Infra
                     LogTrace.Error("fin err: should not empty",  new { responseData, apiResponse }, _classPath);
                     return apiResponse;
                 }
-                apiResponse.StatusCode = 0;
+
+                //check for statusCode
+                List<int> allowedStatusCode = [0, 1];
+                var statusCode = responseData.StatusCode;
+                if(!allowedStatusCode.Contains(statusCode) )
+                {
+                    errCode = "AS.ER.02";
+                    apiResponse.Message = "Unknown statusCode {statusCode}";
+                    apiResponse.StatusCode = 1;
+                    LogTrace.Error("Unknown status code", new { responseData, apiResponse }, _classPath);
+                    return apiResponse;
+                }
+
+                apiResponse.StatusCode = responseData.StatusCode;
                 apiResponse.Message = responseData.Message;
                 apiResponse.Data = responseData.Data;
                 LogTrace.Info("FIN: success", apiResponse, _classPath);

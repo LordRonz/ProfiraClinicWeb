@@ -15,7 +15,7 @@ namespace ProfiraClinicRME.Services
 
         
         // Retrieves all clinics.
-        public Task<ServiceResult<PagedList<TRMAppointment>>> GetListOnWaitAsync(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan);
+        public Task<ServiceResult<Pagination<TRMAppointment>>> GetListOnWaitAsync(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan);
 
         public Task<ServiceResult<string>> SetAppointmentOnProgress(TRMAppointment apo);
 

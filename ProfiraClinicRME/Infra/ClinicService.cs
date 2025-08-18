@@ -25,13 +25,13 @@ namespace ProfiraClinicRME.Infra
         }
 
         // Retrieves all clinics.
-        public async Task<ServiceResult<PagedList<MKlinik>>> GetListClinicsAsync(int pageNum, int pageSize)
+        public async Task<ServiceResult<Pagination<MKlinik>>> GetListClinicsAsync(int pageNum, int pageSize)
         {
             // Replace the URL with your actual endpoint, e.g., "api/Patient"
 
-            Response<PagedList<MKlinik>?> apiResponse = await _svcApi.SendEmpty<PagedList<MKlinik>>("get", $"api/Klinik/GetList?page={pageNum}&pageSize={pageSize}");
+            Response<Pagination<MKlinik>?> apiResponse = await _svcApi.SendEmpty<Pagination<MKlinik>>("get", $"api/Klinik/GetList?page={pageNum}&pageSize={pageSize}");
 
-            ServiceResult<PagedList<MKlinik>> svcResult = _repo.ProcessResult<PagedList<MKlinik>>(apiResponse, RepoProcessEnum.GET);
+            ServiceResult<Pagination<MKlinik>> svcResult = _repo.ProcessResult<Pagination<MKlinik>>(apiResponse, RepoProcessEnum.GET);
 
             return svcResult;
         }

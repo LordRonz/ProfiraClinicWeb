@@ -15,8 +15,8 @@ namespace ProfiraClinicRME.Services
 
         
         // Retrieves all clinics.
-        //public Task<ServiceResult<PagedList<Appointment>>> GetListDokter(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan);
+        //public Task<ServiceResult<Pagination<Appointment>>> GetListDokter(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan);
 
-        public Task<ServiceResult<PagedList<MKlinik>>> GetListClinicsAsync(int pageNum, int pageSize);
+        public Task<ServiceResult<Pagination<MKlinik>>> GetListClinicsAsync(int pageNum, int pageSize);
     }
 }

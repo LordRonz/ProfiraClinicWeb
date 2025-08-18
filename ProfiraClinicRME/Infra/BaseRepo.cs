@@ -109,13 +109,14 @@ namespace ProfiraClinicRME.Infra
             //ServiceResult<RespType?> repoResult = new();
             //repoResult.Status = ServiceResultEnum.FAIL;
             //repoResult.Message = "Terjadi kesalahan sistem.";
+            LogTrace.Info($"init: {mode}, {msgSuccess}", apiResponse, classPath);
             var repoResult = new ServiceResult<RespType>();
 
             //for app error 
             List<int> allowedStat = [0];
             if (!allowedStat.Contains(apiResponse.StatusCode))
             {
-                repoResult = ServiceResult<RespType>.Fail();
+                repoResult = ServiceResult<RespType>.Fail(apiResponse.Message);
                 LogTrace.Error("Fail: error response", apiResponse, classPath);
                 return repoResult;
             }
@@ -127,26 +128,19 @@ namespace ProfiraClinicRME.Infra
                 return repoResult;
             }
 
-            //for data not found
-            if (apiResponse.Data is null)
-            {
-                LogTrace.Error("Fail: data is null", apiResponse, classPath);
-                repoResult = ServiceResult<RespType>.NotFound("Data tidak dapat ditemukan.");
 
-                return repoResult;
-            }
 
-            //for data found  get list
+            //for  get list
 
             if (mode == RepoProcessEnum.GETLIST)
             {
                 var dataType = apiResponse.Data.GetType();
                 var genericName = dataType.IsGenericType ? dataType.GetGenericTypeDefinition().Name : "";
-                if (genericName.StartsWith("PagedList"))
+                if (genericName.StartsWith("Pagination"))
                 {
                     repoResult = ServiceResult<RespType>.Found(apiResponse.Data, msgSuccess);
                     return repoResult;
-                    // apiResponse.Data is a PagedList<T>
+                    // apiResponse.Data is a Pagination<T>
 
                 }
 
@@ -175,8 +169,17 @@ namespace ProfiraClinicRME.Infra
                 LogTrace.Error("Fail: data for this action is null", apiResponse, classPath);
                 return repoResult;
             }
+
+            if (apiResponse.StatusCode != 0)
+            {
+                repoResult = ServiceResult<RespType>.Fail(apiResponse.Message);
+                LogTrace.Error("Fail: error response", repoResult, classPath);
+                return repoResult;
+            }
+
             repoResult = ServiceResult<RespType>.Success(apiResponse.Data, msgSuccess);
 
+            LogTrace.Info("fin", repoResult, classPath);
             return repoResult;
 
         }

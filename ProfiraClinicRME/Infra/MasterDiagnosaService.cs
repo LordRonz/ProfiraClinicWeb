@@ -28,11 +28,11 @@ namespace ProfiraClinicRME.Infra
 
 
         // Retrieves all clinics.
-        public async Task<ServiceResult<PagedList<MasterDiagnosa>>> GetListAsync(int pageNum, int pageSize)
+        public async Task<ServiceResult<Pagination<MasterDiagnosa>>> GetListAsync(int pageNum, int pageSize)
         {
-            Response<PagedList<MasterDiagnosa>?> apiResponse = await _svcApi.SendEmpty<PagedList<MasterDiagnosa>>("get",$"api/MasterDiagnosa/GetList?page={pageNum}&pageSize={pageSize}");
+            Response<Pagination<MasterDiagnosa>?> apiResponse = await _svcApi.SendEmpty<Pagination<MasterDiagnosa>>("get",$"api/MasterDiagnosa/GetList?page={pageNum}&pageSize={pageSize}");
 
-            ServiceResult<PagedList<MasterDiagnosa>> svcResult = _repo.ProcessResult<PagedList<MasterDiagnosa>>(apiResponse, RepoProcessEnum.GET);
+            ServiceResult<Pagination<MasterDiagnosa>> svcResult = _repo.ProcessResult<Pagination<MasterDiagnosa>>(apiResponse, RepoProcessEnum.GET);
 
             return svcResult;
         }

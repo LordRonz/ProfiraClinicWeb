@@ -57,7 +57,7 @@ namespace ProfiraClinicRME.Infra
         }
 
         // Retrieves all clinics.
-        public async Task<ServiceResult<PagedList<TRMAppointment>>> GetListOnWaitAsync(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan)
+        public async Task<ServiceResult<Pagination<TRMAppointment>>> GetListOnWaitAsync(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan)
         {
             // Replace the URL with your actual endpoint, e.g., "api/Patient"
 
@@ -67,9 +67,9 @@ namespace ProfiraClinicRME.Infra
                 TanggalAppointment = tglAppointment,
                 KodeKaryawan = KodeKaryawan
             };
-            Response<PagedList<TRMAppointment>?> apiResponse = await _svcApi.Send<AppointmentRequest,PagedList<TRMAppointment>>("post","api/Appointment/GetListDokter", request);
+            Response<Pagination<TRMAppointment>?> apiResponse = await _svcApi.Send<AppointmentRequest,Pagination<TRMAppointment>>("post","api/Appointment/GetListDokter", request);
 
-            ServiceResult<PagedList<TRMAppointment>> svcResult = _repo.ProcessResult<PagedList<TRMAppointment>>(apiResponse, RepoProcessEnum.GET);
+            ServiceResult<Pagination<TRMAppointment>> svcResult = _repo.ProcessResult<Pagination<TRMAppointment>>(apiResponse, RepoProcessEnum.GET);
             LogTrace.Info("fin", svcResult, _classPath);
             return svcResult;
         }
