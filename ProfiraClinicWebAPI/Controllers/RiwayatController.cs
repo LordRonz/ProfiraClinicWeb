@@ -78,7 +78,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KetAlergiMakanan", appDto.KetAlergiMakanan ?? (object)DBNull.Value),
         new SqlParameter("@chkResiko", appDto.chkResiko ?? (object)DBNull.Value),
         new SqlParameter("@KetResiko", appDto.KetResiko ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", user.KodeUser ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
         new SqlParameter
         {
             ParameterName = "@NomorTransaksi",
@@ -150,7 +150,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KetAlergiMakanan", appDto.KetAlergiMakanan ?? (object)DBNull.Value),
         new SqlParameter("@chkResiko", appDto.chkResiko ?? (object)DBNull.Value),
         new SqlParameter("@KetResiko", appDto.KetResiko ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", user.KodeUser ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
         new SqlParameter("@NomorTransaksi", appDto.NomorTransaksi ?? (object)DBNull.Value)
     };
 

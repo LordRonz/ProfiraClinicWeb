@@ -156,7 +156,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 3) clear out anything you don’t want to return
             user.Password = null;
 
-            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.RefUserId == user.USRID);
 
             MKlinik? clinic = null;
             if (!string.IsNullOrEmpty(user.KodeLokasi))

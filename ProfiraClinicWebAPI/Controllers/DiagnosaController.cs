@@ -138,7 +138,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KodeDiagnosa", appDto.KodeDiagnosa ?? (object)DBNull.Value),
         new SqlParameter("@KategoriDiagnosa", appDto.KategoriDiagnosa ?? (object)DBNull.Value),
         new SqlParameter("@KeteranganDiagnosa", appDto.KeteranganDiagnosa ?? (object)DBNull.Value),
-        new SqlParameter("@USRID", user.KodeUser ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
         new SqlParameter("@NomorTransaksi", appDto.NomorTransaksi ?? (object)DBNull.Value)
     };
 
