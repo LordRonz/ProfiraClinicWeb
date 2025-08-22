@@ -13,7 +13,7 @@ namespace ProfiraClinicWebAPI.Filters
             System.Diagnostics.Debug.WriteLine(exception, "An unhandled exception occurred.");
 
             // Default values
-            var statusCode = 500;
+            var statusCode = 200;
             var errorType = ErrorType.SERVER_ERROR;
             var message = exception.Message;
 

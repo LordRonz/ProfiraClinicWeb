@@ -68,7 +68,7 @@ namespace ProfiraClinicWebAPI.Controllers
         /// <summary>
         /// Lists all filenames under /assets/rme and returns full URLs.
         /// </summary>
-        [HttpGet("rme")]
+        [HttpGet("MasterGambar/GetList")]
         public IActionResult GetAll()
         {
             if (!Directory.Exists(_rmeFolder))
@@ -82,7 +82,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 {
                     var fileName = Path.GetFileName(fullPath);
                     // Build a URL like https://host/assets/rme/{fileName}
-                    var url = $"{Request.Scheme}://{Request.Host}/api/Images/rme/{Uri.EscapeDataString(fileName)}";
+                    var url = $"{Request.Scheme}://{Request.Host}/api/Images/MasterGambar/{Uri.EscapeDataString(fileName)}";
                     return new { fileName, url };
                 })
                 .ToList();
@@ -94,7 +94,7 @@ namespace ProfiraClinicWebAPI.Controllers
         /// (Optional) If you want to stream via API instead of direct static serving.
         /// GET /api/assets/rme/{fileName}
         /// </summary>
-        [HttpGet("rme/{fileName}")]
+        [HttpGet("MasterGambar/{fileName}")]
         public IActionResult GetFileRme(string fileName)
         {
             var safeFileName = SanitizeFileName(fileName);

@@ -37,7 +37,7 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] LoginModel model)
         {
-            var existingUser = _context.MUser.FirstOrDefault(x => x.UserName == model.Username);
+            var existingUser = _context.MUser.FirstOrDefault(x => x.USRID == model.Username);
             if (existingUser != null)
                 return BadRequest("User already exists");
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
@@ -48,9 +48,9 @@ namespace ProfiraClinicWebAPI.Controllers
             System.Diagnostics.Debug.WriteLine(hashedPassword);
             var newUser = new User
             {
-                UserName = model.Username,
+                USRID = model.Username,
                 Password = hashedPassword,
-                UserID = shortId,
+                KodeUser = shortId,
             };
             await _context.MUser.AddAsync(newUser);
             await _context.SaveChangesAsync();

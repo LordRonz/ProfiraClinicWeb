@@ -39,7 +39,7 @@
             System.Diagnostics.Debug.WriteLine("Done");
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
             {
-                Users = apiResponse.Data;
+                Users = apiResponse.Data.Items;
             }
             else
             {
@@ -52,10 +52,10 @@
             var dataSource = Users.Select(el =>
                 (object)new
                 {
-                    view = $"login-user/{el.UserID}",
-                    edit = $"login-user/edit/{el.UserID}",
-                    memberId = el.UserID,
-                    namaPasien = el.UserName,
+                    view = $"login-user/{el.KodeUser}",
+                    edit = $"login-user/edit/{el.KodeUser}",
+                    memberId = el.KodeUser,
+                    namaPasien = el.USRID,
                     groupLogin = el.KodeUserGroup,
                 }
             ).ToList();

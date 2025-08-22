@@ -40,7 +40,11 @@ namespace ProfiraClinicWebAPI.Controllers
             public string? KodeCustomer { get; set; }
         }
 
-        public PemeriksaanUmumController(AppDbContext ctx) : base(ctx) { }
+        private readonly string _kodePoli;
+        public PemeriksaanUmumController(AppDbContext ctx, IConfiguration configuration) : base(ctx)
+        {
+            _kodePoli = configuration["KodePoli"] ?? "";
+        }
 
         protected override DbSet<PemeriksaanUmum> DbSet
             => _context.PemeriksaanUmum;
@@ -64,10 +68,10 @@ namespace ProfiraClinicWebAPI.Controllers
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userName)) return Unauthorized();
 
-            var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.UserName == userName);
+            var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.USRID == userName);
             if (user == null) return NotFound();
 
-            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
             if (appDto.KodeKaryawan == null && karyawan == null) return NotFound();
 
             var sqlParameters = new[]
@@ -77,6 +81,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
                 new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
                 new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+                new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
                 new SqlParameter("@Keadaan_Umum", appDto.Keadaan_Umum ?? (object)DBNull.Value),
                 new SqlParameter("@Tingkat_Kesadaran", appDto.Tingkat_Kesadaran ?? (object)DBNull.Value),
                 new SqlParameter("@Sistolik", appDto.Sistolik ?? (object)DBNull.Value),
@@ -89,7 +94,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@TinggiBadan", appDto.TinggiBadan ?? (object)DBNull.Value),
                 new SqlParameter("@IndexTubuh", appDto.IndexTubuh ?? (object)DBNull.Value),
                 new SqlParameter("@LingkarKepala", appDto.LingkarKepala ?? (object)DBNull.Value),
-                new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+                new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
                 new SqlParameter
                 {
                     ParameterName = "@NomorTransaksi",
@@ -101,7 +106,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             await _context.Database.ExecuteSqlRawAsync(
                 "EXEC dbo.usp_TRM_PemeriksaanUmum_Add " +
-                "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, @KodeKaryawan, " +
+                "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, @KodeKaryawan, @KodePoli, " +
                 "@Keadaan_Umum, @Tingkat_Kesadaran, @Sistolik, @Distolik, @Suhu, @Saturasi, " +
                 "@Frekuensi_Nadi, @Frekuensi_Nafas, @BeratBadan, @TinggiBadan, @IndexTubuh, @LingkarKepala, @USRID, @NomorTransaksi OUTPUT",
                 sqlParameters
@@ -121,12 +126,12 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var user = await _context.MUser
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
 
             if (user == null)
                 return NotFound();
 
-            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
             if (dto.KodeKaryawan == null && karyawan == null)
                 return NotFound();
@@ -150,6 +155,7 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
         new SqlParameter("@KodeCustomer", dto.KodeCustomer ?? (object)DBNull.Value),
         new SqlParameter("@KodeKaryawan", dto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+        new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
         new SqlParameter("@Keadaan_Umum", dto.Keadaan_Umum ?? (object)DBNull.Value),
         new SqlParameter("@Tingkat_Kesadaran", dto.Tingkat_Kesadaran ?? (object)DBNull.Value),
         new SqlParameter("@Sistolik", dto.Sistolik),
@@ -162,13 +168,13 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@TinggiBadan", dto.TinggiBadan),
         new SqlParameter("@IndexTubuh", dto.IndexTubuh),
         new SqlParameter("@LingkarKepala", dto.LingkarKepala),
-        new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
         new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
     };
 
             await _context.Database.ExecuteSqlRawAsync(
                 "EXEC dbo.usp_TRM_PemeriksaanUmum_Edit @KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                "@KodeCustomer, @KodeKaryawan, @Keadaan_Umum, @Tingkat_Kesadaran, @Sistolik, @Distolik, " +
+                "@KodeCustomer, @KodeKaryawan, @KodePoli, @Keadaan_Umum, @Tingkat_Kesadaran, @Sistolik, @Distolik, " +
                 "@Suhu, @Saturasi, @Frekuensi_Nadi, @Frekuensi_Nafas, @BeratBadan, @TinggiBadan, " +
                 "@IndexTubuh, @LingkarKepala, @USRID, @NomorTransaksi",
                 editParams
@@ -189,7 +195,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 2) look it up
             var user = await _context.MUser
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
 
             var sqlParameters = new[]
             {
@@ -221,9 +227,6 @@ namespace ProfiraClinicWebAPI.Controllers
             var result = await _context.PemeriksaanUmum
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
-
-            if (result == null)
-                return Ok(new { message = "Pemeriksaan Umum not found." });
 
             return Ok(result);
         }
