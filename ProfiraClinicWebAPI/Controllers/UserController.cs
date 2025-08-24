@@ -22,7 +22,7 @@ namespace ProfiraClinicWebAPI.Controllers
             IQueryable<User> q,
             string likeParam)
             => q.Where(d => (EF.Functions.Like(d.KodeUserGroup, likeParam) ||
-                             EF.Functions.Like(d.UserName, likeParam)));
+                             EF.Functions.Like(d.USRID, likeParam)));
 
         protected override IOrderedQueryable<User> ApplyOrder(
             IQueryable<User> q)
@@ -54,9 +54,9 @@ namespace ProfiraClinicWebAPI.Controllers
             // Prepare SQL parameters. For nullable fields, pass DBNull.Value.
             var sqlParameters = new[]
             {
-        new SqlParameter("@UserID", newUser.UserID ?? (object)DBNull.Value),
+        new SqlParameter("@UserID", newUser.KodeUser ?? (object)DBNull.Value),
         // The stored procedure generates the customer code, so pass an empty string.
-        new SqlParameter("@UserName", newUser.UserName ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", newUser.USRID ?? (object)DBNull.Value),
         new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
         new SqlParameter("@KodeUserGroup", newUser.KodeUserGroup ?? (object)DBNull.Value),
          new SqlParameter("@UserInput", newUser.UserInput ?? (object)DBNull.Value),
@@ -72,7 +72,7 @@ namespace ProfiraClinicWebAPI.Controllers
                     sqlParameters);
 
                 // Return the newly created patient. Adjust properties as needed.
-                return CreatedAtAction(nameof(GetItem), new { id = newUser.UserID }, newUser);
+                return CreatedAtAction(nameof(GetItem), new { id = newUser.KodeUser }, newUser);
             }
             catch (SqlException ex)
             {
@@ -107,9 +107,9 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var sqlParameters = new[]
             {
-                new SqlParameter("@UserID", updatedUser.UserID ?? (object)DBNull.Value),
+                new SqlParameter("@UserID", updatedUser.KodeUser ?? (object)DBNull.Value),
                 // The stored procedure generates the customer code, so pass an empty string.
-                new SqlParameter("@UserName", updatedUser.UserName ?? (object)DBNull.Value),
+                new SqlParameter("@UserName", updatedUser.USRID ?? (object)DBNull.Value),
                 new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
                 new SqlParameter("@KodeUserGroup", updatedUser.KodeUserGroup ?? (object)DBNull.Value),
                 new SqlParameter("@UserInput", updatedUser.UserInput ?? (object)DBNull.Value),
@@ -148,7 +148,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 2) look it up
             var user = await _context.MUser
                            .AsNoTracking()
-                           .FirstOrDefaultAsync(u => u.UserName == userName);
+                           .FirstOrDefaultAsync(u => u.USRID == userName);
 
             if (user == null)
                 return NotFound();
@@ -156,11 +156,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 3) clear out anything you don’t want to return
             user.Password = null;
 
-            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
-            if (karyawan != null)
-            {
-                karyawan.UserPassword = null;
-            }
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.RefUserId == user.USRID);
 
             MKlinik? clinic = null;
             if (!string.IsNullOrEmpty(user.KodeLokasi))
@@ -173,8 +169,8 @@ namespace ProfiraClinicWebAPI.Controllers
             // 4) map to DTO (and clear password)
             var dto = new CurrentUser
             {
-                UserID = user.UserID,
-                UserName = user.UserName,
+                UserID = user.KodeUser,
+                UserName = user.USRID,
                 KodeUserGroup = user.KodeUserGroup,
                 KodeLokasi = user.KodeLokasi,
                 Klinik = clinic,

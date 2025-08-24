@@ -64,10 +64,10 @@ namespace ProfiraClinicWebAPI.Controllers
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userName)) return Unauthorized();
 
-            var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.UserName == userName);
+            var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.USRID == userName);
             if (user == null) return NotFound();
 
-            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.UserID);
+            var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
             if (appDto.KodeKaryawan == null && karyawan == null) return NotFound();
 
             var sqlParameters = new[]
@@ -83,7 +83,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@ASSESTMENT", appDto.ASSESTMENT ?? (object)DBNull.Value),
                 new SqlParameter("@PLANNING", appDto.PLANNING ?? (object)DBNull.Value),
                 new SqlParameter("@INSTRUKSI", appDto.INSTRUKSI ?? (object)DBNull.Value),
-                new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+                new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
                 new SqlParameter
                 {
                     ParameterName = "@NomorTransaksi",
@@ -114,12 +114,12 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var user = await _context.MUser
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
 
             if (user == null) return NotFound();
 
             var karyawan = await _context.MKaryawan
-                                .FirstOrDefaultAsync(k => k.USRID == user.UserID);
+                                .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
             if (dto.KodeKaryawan == null && karyawan == null)
                 return NotFound();
@@ -149,7 +149,7 @@ namespace ProfiraClinicWebAPI.Controllers
             new SqlParameter("@ASSESTMENT", dto.ASSESTMENT ?? (object)DBNull.Value),
             new SqlParameter("@PLANNING", dto.PLANNING ?? (object)DBNull.Value),
             new SqlParameter("@INSTRUKSI", dto.INSTRUKSI ?? (object)DBNull.Value),
-            new SqlParameter("@USRID", user.UserID ?? (object)DBNull.Value),
+            new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
             new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value),
         };
 
@@ -185,7 +185,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 2) look it up
             var user = await _context.MUser
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
 
             var sqlParameters = new[]
             {

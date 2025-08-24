@@ -12,9 +12,9 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<List<User>>> GetUsersAsync()
+        public async Task<ApiResponse<PagedResult<User>>> GetUsersAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<User>>>("api/User/GetList");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<User>>>("api/User/GetList");
 
             if (response == null)
             {

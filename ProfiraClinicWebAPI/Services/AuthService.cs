@@ -26,7 +26,7 @@ namespace ProfiraClinicWebAPI.Services
         public LoginModel? Authenticate(string username, string password)
         {
             System.Diagnostics.Debug.WriteLine(username);
-            var user = _context.MUser.FirstOrDefault(x => x.UserName == username);
+            var user = _context.MUser.FirstOrDefault(x => x.USRID == username);
             if (user == null)
                 return null;
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.Password);
@@ -35,7 +35,7 @@ namespace ProfiraClinicWebAPI.Services
 
             return new LoginModel
             {
-                Username = user.UserName,
+                Username = user.USRID,
                 KodeLokasi = user.KodeLokasi,
             };
         }

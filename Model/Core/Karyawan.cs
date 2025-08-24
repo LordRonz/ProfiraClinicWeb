@@ -8,13 +8,9 @@ namespace ProfiraClinic.Models.Core
     [Keyless]
     public class Karyawan
     {
-        [Column(TypeName = "varchar(50)")]
+        [Column("Ref_USRID", TypeName = "varchar(50)")]
         [MaxLength(50)]
-        public string UserName { get; set; }
-
-        [Column(TypeName = "varchar(255)")]
-        [MaxLength(255)]
-        public string UserPassword { get; set; }
+        public string RefUserId { get; set; }
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
