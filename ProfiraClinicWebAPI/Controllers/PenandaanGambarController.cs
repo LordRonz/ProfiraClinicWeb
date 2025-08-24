@@ -64,7 +64,6 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
         new SqlParameter("@KodeKaryawan", appDto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
         new SqlParameter("@KodePoli", _kodePoli ?? (object)DBNull.Value),
-        new SqlParameter("@NomorUrut", appDto.NomorUrut),
         new SqlParameter("@Keterangan", appDto.Keterangan ?? (object)DBNull.Value),
         new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
         new SqlParameter
@@ -79,7 +78,7 @@ namespace ProfiraClinicWebAPI.Controllers
             await _context.Database.ExecuteSqlRawAsync(
                 "EXEC dbo.usp_TRM_PenandaanGambar_Header_Add " +
                 "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, " +
-                "@KodeKaryawan, @KodePoli, @NomorUrut, @Keterangan, @USRID, @NomorTransaksi OUTPUT",
+                "@KodeKaryawan, @KodePoli, @Keterangan, @USRID, @NomorTransaksi OUTPUT",
                 sqlParameters
             );
 

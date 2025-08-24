@@ -38,9 +38,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return item;
         }
-
-        // POST: api/Patient
-        // Create a new patient record by executing a stored procedure with error handling.
+        
         [HttpPost("add")]
         public async Task<ActionResult<User>> CreateUser([FromBody] User newUser)
         {
@@ -65,24 +63,19 @@ namespace ProfiraClinicWebAPI.Controllers
 
             try
             {
-                // Call the stored procedure using ExecuteSqlRawAsync.
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC dbo.usp_MUser_Add " +
                     "@UserID, @UserName, @Password, @KodeUserGroup, @UserInput, @KodeLokasi",
                     sqlParameters);
 
-                // Return the newly created patient. Adjust properties as needed.
                 return CreatedAtAction(nameof(GetItem), new { id = newUser.KodeUser }, newUser);
             }
             catch (SqlException ex)
             {
-                // This will catch SQL exceptions, including the errors raised from RAISERROR in the stored procedure.
-                // Return the error message provided by the stored procedure.
                 return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
-                // For other exceptions, return a 500 error.
                 return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
         }
@@ -96,8 +89,7 @@ namespace ProfiraClinicWebAPI.Controllers
             {
                 return BadRequest("User data is null.");
             }
-
-            // Ensure that the provided route parameter matches the patient record's key.
+            
             if (kode != updatedUser.KodeUserGroup)
             {
                 return BadRequest("KodeUser mismatch between route and body.");
@@ -108,7 +100,6 @@ namespace ProfiraClinicWebAPI.Controllers
             var sqlParameters = new[]
             {
                 new SqlParameter("@UserID", updatedUser.KodeUser ?? (object)DBNull.Value),
-                // The stored procedure generates the customer code, so pass an empty string.
                 new SqlParameter("@UserName", updatedUser.USRID ?? (object)DBNull.Value),
                 new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
                 new SqlParameter("@KodeUserGroup", updatedUser.KodeUserGroup ?? (object)DBNull.Value),
@@ -127,12 +118,10 @@ namespace ProfiraClinicWebAPI.Controllers
             }
             catch (SqlException ex)
             {
-                // This catch block handles SQL exceptions including those raised by RAISERROR in the stored procedure.
                 return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
-                // General exception catch block.
                 return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
         }
@@ -140,7 +129,6 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpGet("me")]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
-            // 1) grab the user ID from the JWT (must match whatever you set in your AuthService)
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userName))
                 return Unauthorized();
@@ -153,7 +141,6 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound();
 
-            // 3) clear out anything you don’t want to return
             user.Password = null;
 
             var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.RefUserId == user.USRID);
@@ -166,7 +153,6 @@ namespace ProfiraClinicWebAPI.Controllers
                                        .FirstOrDefaultAsync(k => k.KDLOK == user.KodeLokasi);
             }
 
-            // 4) map to DTO (and clear password)
             var dto = new CurrentUser
             {
                 UserID = user.KodeUser,
@@ -180,9 +166,6 @@ namespace ProfiraClinicWebAPI.Controllers
             return Ok(dto);
         }
 
-
-        // DELETE: api/Patient/{id}
-        // Delete a patient record.
         [HttpDelete("del/{id}")]
         public async Task<IActionResult> DeleteUser(long id)
         {
