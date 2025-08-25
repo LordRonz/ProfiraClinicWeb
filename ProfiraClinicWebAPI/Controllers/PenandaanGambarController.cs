@@ -8,6 +8,11 @@ using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
+    public class PenandaanGambarListDto()
+    {
+        public string? KodeCustomer { get; set; }
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class PenandaanGambarController : BaseCrudController<TRMPenandaanGambarHeader>
@@ -163,6 +168,38 @@ namespace ProfiraClinicWebAPI.Controllers
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "Detail updated successfully", data = existing });
+        }
+
+        [HttpPost("GetListTrm")]
+        public async Task<IActionResult> GetListTrm([FromBody] PenandaanGambarListDto penandaanGambarDto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            // 2) look it up
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
+
+            var sqlParameters = new[]
+            {
+                new SqlParameter("@KodeCustomer",  penandaanGambarDto.KodeCustomer ?? (object)DBNull.Value),
+            };
+
+            var list = await _context.TRMPenandaanGambar
+                .FromSqlRaw("EXEC dbo.usp_TRM_PenandaanGambar_List @KodeCustomer", sqlParameters)
+                .ToListAsync();
+
+            var result = new Pagination<TRMPenandaanGambar>
+            {
+                TotalCount = 0,
+                Page = 0,
+                PageSize = 0,
+                Items = list
+            };
+
+            return Ok(result);
         }
     }
 }
