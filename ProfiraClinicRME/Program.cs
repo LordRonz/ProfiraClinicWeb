@@ -6,6 +6,7 @@ using ProfiraClinicRME.MessageHandlers;
 using ProfiraClinicRME.Services;
 using ProfiraClinicRME.Utils;
 using Serilog;
+using ProfiraClinicRME.Test.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.AddHttpClient("std", httpClient =>
 
 }).AddHttpMessageHandler<AuthRedirectHandler>();
 
+builder.Services.AddScoped<DataService>();//for test only
+
+
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
@@ -50,8 +54,8 @@ builder.Services.AddScoped<IPemeriksaanUmumService, PemeriksaanUmumService>();
 builder.Services.AddScoped<ICPPTService, CPPTService>();
 builder.Services.AddScoped<IAnamnesisService, AnamnesisService>();
 builder.Services.AddScoped<IRiwayatService, RiwayatService>();
-
-
+builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IPenandaanGambarService, PenandaanGambarService>();
 
 
 builder.Services.AddHttpClient<AuthService>(client =>
@@ -70,7 +74,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
