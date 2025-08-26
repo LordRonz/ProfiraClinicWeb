@@ -107,29 +107,18 @@
 @inject ProtectedLocalStorage LocalStore
 @code {
 
-    int canvasHeight { get; set; } = 0;
-    int canvasWidth { get; set; } = 0;
-    private bool _hidePosition;
-    private bool _loading;
-    private bool mousedown = false;
 
-    private double last_mousex;
-    private double last_mousey;
-    private double mousex;
-    private double mousey;
-    private ElementReference container;
-    private Excubo.Blazor.Canvas.Canvas _canvas;
-    private Excubo.Blazor.Canvas.Contexts.Context2D _ctxCanvas;
+    private bool _hidePosition;
     private List<PenandaanGambarFull> _listRekaman = new List<PenandaanGambarFull>();
     private List<TemplateImageDto> _listTemplate = new List<TemplateImageDto>();
+    private bool _loading;
     private string _baseUrl;
     private string clr = "black";
     private TRMAppointment? _apo = null;
     private int Height { get; set; } = 0;
     private int Width { get; set; } = 0;
-    private List<MarkedImage> _listMarkedImage = [];
-
     private DrawingWidget _drawingWidget;
+    private List<MarkedImage> _listMarkedImage = [];
 
     private class MarkedImage
     {
@@ -145,37 +134,47 @@
 
 
     /* drawing prop & method */
+    private bool _mouseDown = false;
+    private bool _renderRequired = true;
+    private double _canvasX;
+    private double _canvasY;
+    private double _lastMouseX;
+    private double _lastMouseY;
+    private double _mouseX;
+    private double _mouseY;
+    private ElementReference _container;
+    private Excubo.Blazor.Canvas.Canvas _canvas;
+    private Excubo.Blazor.Canvas.Contexts.Context2D _ctxCanvas;
+    private int _canvasHeight { get; set; } = 0;
+    private int _canvasWidth { get; set; } = 0;
     private string _idCanvas;
-    private bool render_required = true;
-    private double _canvasx;
-    private double _canvasy;
 
     private void MouseDownCanvas(MouseEventArgs e)
     {
-        render_required = false;
-        this.last_mousex = mousex = e.ClientX - _canvasx;
-        this.last_mousey = mousey = e.ClientY - _canvasy;
-        this.mousedown = true;
+        _renderRequired = false;
+        this._lastMouseX = _mouseX= e.ClientX - _canvasX;
+        this._lastMouseY = _mouseY = e.ClientY - _canvasY;
+        this._mouseDown = true;
     }
 
     private void MouseUpCanvas(MouseEventArgs e)
     {
-        render_required = false;
-        mousedown = false;
+        _renderRequired = false;
+        _mouseDown = false;
     }
 
     async Task MouseMoveCanvasAsync(MouseEventArgs e)
     {
-        render_required = false;
-        if (!mousedown)
+        _renderRequired = false;
+        if (!_mouseDown)
         {
             return;
         }
-        mousex = e.ClientX - _canvasx;
-        mousey = e.ClientY - _canvasy;
-        await DrawCanvasAsync(mousex, mousey, last_mousex, last_mousey, clr);
-        last_mousex = mousex;
-        last_mousey = mousey;
+        _mouseX= e.ClientX - _canvasX;
+        _mouseY = e.ClientY - _canvasY;
+        await DrawCanvasAsync(_mouseX, _mouseY, _lastMouseX, _lastMouseY, clr);
+        _lastMouseX = _mouseX;
+        _lastMouseY = _mouseY;
     }
 
     private async Task DrawCanvasAsync(double prev_x, double prev_y, double x, double y, string clr)
@@ -192,9 +191,9 @@
 
     protected override bool ShouldRender()
     {
-        if (!render_required)
+        if (!_renderRequired)
         {
-            render_required = true;
+            _renderRequired = true;
             return false;
         }
         return base.ShouldRender();
@@ -202,8 +201,8 @@
 
     private async Task SetupCanvas()
     {
-        var p = await JS.InvokeAsync<Position>("eval", $"let e = document.querySelector('[_bl_{container.Id}=\"\"]'); e = e.getBoundingClientRect(); e = {{ 'Left': e.x, 'Top': e.y }}; e");
-        (_canvasx, _canvasy) = (p.Left, p.Top);
+        var p = await JS.InvokeAsync<Position>("eval", $"let e = document.querySelector('[_bl_{_container.Id}=\"\"]'); e = e.getBoundingClientRect(); e = {{ 'Left': e.x, 'Top': e.y }}; e");
+        (_canvasX, _canvasY) = (p.Left, p.Top);
     }
 
     private async Task DrawImage(string IdImage)
@@ -330,8 +329,8 @@
         Height = dimension.Height;
         Width = dimension.Width;
 
-        canvasWidth = Width * 47 / 100;
-        canvasHeight = Height * 4 / 5;
+        _canvasWidth = Width * 47 / 100;
+        _canvasHeight = Height * 4 / 5;
     }
 
 
@@ -346,8 +345,8 @@
         await JS.InvokeVoidAsync("eval", "myimage1 = document.getElementById('front_face')");
         await JS.InvokeVoidAsync("eval", "myimage2 = document.getElementById('right_face')");
 
-        var width = canvasWidth;
-        var height = canvasHeight;
+        var width = _canvasWidth;
+        var height = _canvasHeight;
 
         await _ctxCanvas.ClearRectAsync(0, 0, width, height);
         await _ctxCanvas.SetTransformAsync(1, 0, 0, 1, 0, 0);

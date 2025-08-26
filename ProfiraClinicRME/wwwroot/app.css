@@ -53,3 +53,129 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* misc */
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: rgb(234,228,228); /* your bg-dark bg-opacity-25 */
+}
+
+.minh-100 {
+    min-height: 100%;
+}
+
+
+
+.sidebar-container .mud-button-label {
+    color: #0D24EC !important;
+    text-transform: none;
+}
+
+
+.sidebar-divider {
+    border: 1px solid rgba(71, 71, 71, 1);
+}
+
+.master-modal {
+    position: absolute;
+    left: 1vw;
+    top: 10vh;
+    z-index: 696969;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 1);
+    border-radius: 15px;
+    overflow: hidden;
+    width: 20vw;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.master-modal-header {
+    background: rgba(255, 166, 34, 1);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    font-weight: 600;
+}
+
+.mud-drawer--closed.mud-drawer-mini {
+    width: 88px !important; /* 56 + 2 * 16 */
+    margin-right: 20px;
+}
+
+.save-btn {
+    background: rgba(47, 193, 71, 1);
+    color: white;
+    text-transform: none;
+}
+
+    .save-btn:hover {
+        background: rgba(27, 153, 41, 1);
+    }
+
+.back-btn {
+    background: rgba(156, 99, 5, 1);
+    color: white;
+    text-transform: none;
+}
+
+.back-btn:hover {
+    background: rgba(126, 69, 2, 1);
+}
+
+
+/* note component */
+.note-content {
+    background-color: rgba(250, 242, 242, 1);
+}
+
+
+.note-back-btn {
+    background: rgba(156, 99, 5, 1);
+    color: white;
+    text-transform: none;
+}
+
+.note-back-btn:hover {
+    background: rgba(126, 69, 2, 1);
+}
+
+.note-header {
+    background: rgba(210, 199, 199, 1);
+}
+
+/* drawing component */
+.dw-canvas {
+    border: 1px solid blue;
+    background-color: #eee;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+}
+
+/* mudBlazor Override*/
+
+
+.mud-nav-link-icon-default {
+    color: #0D24EC !important;
+}
+
+
+.mud-nav-link {
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.mud-nav-link-text {
+    letter-spacing: 0.5px !important;
+}
+
+.mud-toolbar-appbar {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.mud-main-content {
+    padding-top: 104px;
+}
