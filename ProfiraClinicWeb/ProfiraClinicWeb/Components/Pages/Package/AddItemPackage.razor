@@ -1,5 +1,6 @@
 ﻿@page "/package-item/add"
 
+@using ProfiraClinic.Models
 @using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Services
 @using MudBlazor
@@ -7,6 +8,7 @@
 @inject PaketHeaderApiService PaketHeaderApiService
 @inject NavigationManager NavigationManager
 @inject GroupPaketApiService ApiService
+@inject PerawatanHeaderApiService PerawatanApiService
 
 <MudCard Class="p-4 h-100">
     <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
@@ -55,7 +57,16 @@
     <MudForm @ref="detailForm" Class="table-form section-body">
         <MudGrid>
             <MudItem xs="12" sm="3">
-                <MudTextField T="string" Label="Kode Perawatan" @bind-Value="detail.KodePerawatan" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                <!-- Replaced text input with autocomplete for Perawatan -->
+                <MudAutocomplete T="PPerawatanH"
+                                 Label="Pilih Perawatan"
+                                 @bind-Value="selectedPerawatan"
+                                 SearchFunc="SearchPerawatan"
+                                 Clearable="true"
+                                 ToStringFunc="@(p => p == null ? null : $"{p.KodePerawatan} ({p.NamaPerawatan})")"
+                                 Dense="true"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="3">
                 <MudNumericField T="int" Label="Jumlah Perawatan" @bind-Value="detail.JumlahPerawatan" Variant="Variant.Outlined" Margin="Margin.Dense" />
@@ -109,7 +120,11 @@
     private List<PaketDetail> details = new List<PaketDetail>();
 
     private List<GroupPaket> groupPakets = new List<GroupPaket>();
+    private List<PPerawatanH> perawatans = new List<PPerawatanH>();
+
     private GroupPaket selectedGroup;
+    private PPerawatanH selectedPerawatan; // NEW: holds current perawatan selection
+
     private bool isActive;
     private bool isEditingDetail = false;
     private int editingIndex = -1;
@@ -129,60 +144,107 @@
     {
         if (firstRender)
         {
+            // Load Group Paket
             var apiResponse = await ApiService.GetGroupPaketsAsync();
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
-                groupPakets = apiResponse.Data.Items;
+                groupPakets = apiResponse.Data.Items ?? new List<GroupPaket>();
+
+            // Load Perawatan (Tindakan)
+            var perawatanApiResponse = await PerawatanApiService.GetTindakansAsync();
+            if (perawatanApiResponse.StatusCode == 0 && perawatanApiResponse.Data != null)
+                perawatans = perawatanApiResponse.Data.Items ?? new List<PPerawatanH>();
+
             StateHasChanged();
         }
     }
 
-    // Search function for MudAutocomplete
+    // --- Autocomplete: Group Paket ---
+
     private Task<IEnumerable<GroupPaket>> SearchGroup(string value, CancellationToken cancelToken)
     {
         if (string.IsNullOrEmpty(value))
             return Task.FromResult(groupPakets.AsEnumerable());
+
         var result = groupPakets.Where(g =>
-            g.KodeGroupPaket.Contains(value, StringComparison.OrdinalIgnoreCase) ||
-            g.NamaGroupPaket.Contains(value, StringComparison.OrdinalIgnoreCase));
+            (g.KodeGroupPaket?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (g.NamaGroupPaket?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+
         return Task.FromResult(result);
     }
 
-    // When selectedGroup changes, update header
     private void OnGroupChanged(GroupPaket gp)
     {
+        selectedGroup = gp;
         if (gp != null)
         {
             header.KodeGroupPaket = gp.KodeGroupPaket;
-            header.NamaPaket = gp.NamaGroupPaket;
+            // If you want NamaPaket to default from group name:
+            // Only set when user hasn't typed a custom name
+            if (string.IsNullOrWhiteSpace(header.NamaPaket))
+                header.NamaPaket = gp.NamaGroupPaket;
         }
     }
+
+    // --- Autocomplete: Perawatan ---
+
+    private Task<IEnumerable<PPerawatanH>> SearchPerawatan(string value, CancellationToken cancelToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(perawatans.AsEnumerable());
+
+        var result = perawatans.Where(p =>
+            (p.KodePerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.NamaPerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return Task.FromResult(result);
+    }
+
+    private void OnPerawatanChanged(PPerawatanH p)
+    {
+        selectedPerawatan = p;
+        detail.KodePerawatan = p?.KodePerawatan; // keep the saved code in sync with selection
+    }
+
+    // --- Detail CRUD ---
 
     private async Task AddDetail()
     {
         await detailForm.Validate();
-        if (detailForm.IsValid)
+        if (!detailForm.IsValid) return;
+
+        // ensure a perawatan is selected
+        if (string.IsNullOrWhiteSpace(detail.KodePerawatan))
         {
-            detail.NoUrut = details.Count + 1;
-            details.Add(new PaketDetail
-            {
-                NoUrut = detail.NoUrut,
-                KodePerawatan = detail.KodePerawatan,
-                JumlahPerawatan = detail.JumlahPerawatan
-            });
-            detail = new PaketDetail();
+            // optionally show a snackbar/toast here
+            return;
         }
+
+        detail.NoUrut = details.Count + 1;
+
+        details.Add(new PaketDetail
+        {
+            NoUrut = detail.NoUrut,
+            KodePerawatan = detail.KodePerawatan,
+            JumlahPerawatan = detail.JumlahPerawatan
+        });
+
+        ResetDetailForm();
     }
 
     private void EditDetail(PaketDetail item)
     {
         isEditingDetail = true;
         editingIndex = details.IndexOf(item);
+
         detail = new PaketDetail
         {
             NoUrut = item.NoUrut,
             KodePerawatan = item.KodePerawatan,
             JumlahPerawatan = item.JumlahPerawatan
         };
+
+        // sync the autocomplete selection to reflect current row
+        selectedPerawatan = perawatans.FirstOrDefault(p => p.KodePerawatan == item.KodePerawatan);
     }
 
     private void UpdateDetail()
@@ -213,6 +275,7 @@
         isEditingDetail = false;
         editingIndex = -1;
         detail = new PaketDetail();
+        selectedPerawatan = null; // clear perawatan picker
     }
 
     private async Task SubmitAll()
@@ -221,6 +284,7 @@
         if (headerForm.IsValid)
         {
             header.Aktif = isActive ? "1" : "0";
+
             var paket = new PaketHeader
             {
                 KodePaket = header.KodePaket,
@@ -234,7 +298,8 @@
                 Aktif = header.Aktif,
                 USRID = ""
             };
-            // API call for header
+
+            // Save header
             var resultHeader = await PaketHeaderApiService.CreatePaketHeaderAsync(paket);
             if (resultHeader.StatusCode < 300)
             {
@@ -244,11 +309,12 @@
                     d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
                     await PaketApiService.CreatePaketDetailAsync(d);
                 }
+
                 NavigationManager.NavigateTo("/package-item");
             }
             else
             {
-                // handle error
+                // TODO: handle error (snackbar/log)
             }
         }
     }
@@ -333,10 +399,10 @@
         font-weight: 500;
     }
 
-        .section-header .mud-icon-root {
-            margin-right: 0.5rem;
-            font-size: 1.25rem;
-        }
+    .section-header .mud-icon-root {
+        margin-right: 0.5rem;
+        font-size: 1.25rem;
+    }
 
     .section-body {
         padding: 1rem;
