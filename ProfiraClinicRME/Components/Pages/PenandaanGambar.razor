@@ -52,13 +52,15 @@
                             </CardHeaderActions>
                         </MudCardHeader>
                         <MudCardContent>
-                            <Canvas @ref="@_canvas" 
-                                    @onmousemove="MouseMoveCanvasAsync"
-                                    @onmouseup="MouseUpCanvas"
-                                    @onmousedown="MouseDownCanvas"
-                                    id="@_idCanvas"
-                                    height="400" width="400" class="dw-canvas">
-                            </Canvas>
+                            <div @ref="@_container">
+                                <Canvas @ref="@_canvas" 
+                                        @onmousemove="MouseMoveCanvasAsync"
+                                        @onmouseup="MouseUpCanvas"
+                                        @onmousedown="MouseDownCanvas"
+                                        id="@_idCanvas"
+                                        height="400" width="400" class="dw-canvas">
+                                </Canvas>
+                            </div>
                         </MudCardContent>
                         <MudCardActions Class="flex-row-reverse">
                             <MudIconButton Icon="@Icons.Material.Filled.Restore" Color="Color.Default" />
@@ -104,6 +106,11 @@
         border: solid 1px #469146;
     }
 </style>
+<script>
+    document.addEventListener('mousedown', (event) => {
+        console.log(`Mouse X: ${event.clientX}, Mouse Y: ${event.clientY}`);
+    });
+</script>
 @inject ProtectedLocalStorage LocalStore
 @code {
 
@@ -138,8 +145,8 @@
     private bool _renderRequired = true;
     private double _canvasX;
     private double _canvasY;
-    private double _lastMouseX;
-    private double _lastMouseY;
+    private double _prevMouseX;
+    private double _prevMouseY;
     private double _mouseX;
     private double _mouseY;
     private ElementReference _container;
@@ -152,9 +159,9 @@
     private void MouseDownCanvas(MouseEventArgs e)
     {
         _renderRequired = false;
-        this._lastMouseX = _mouseX= e.ClientX - _canvasX;
-        this._lastMouseY = _mouseY = e.ClientY - _canvasY;
-        this._mouseDown = true;
+        _prevMouseX = _mouseX = e.ClientX - _canvasX;
+        _prevMouseY = _mouseY = e.ClientY - _canvasY;
+        _mouseDown = true;
     }
 
     private void MouseUpCanvas(MouseEventArgs e)
@@ -163,7 +170,7 @@
         _mouseDown = false;
     }
 
-    async Task MouseMoveCanvasAsync(MouseEventArgs e)
+    private async Task MouseMoveCanvasAsync(MouseEventArgs e)
     {
         _renderRequired = false;
         if (!_mouseDown)
@@ -172,9 +179,9 @@
         }
         _mouseX= e.ClientX - _canvasX;
         _mouseY = e.ClientY - _canvasY;
-        await DrawCanvasAsync(_mouseX, _mouseY, _lastMouseX, _lastMouseY, clr);
-        _lastMouseX = _mouseX;
-        _lastMouseY = _mouseY;
+        await DrawCanvasAsync(_mouseX, _mouseY, _prevMouseX, _prevMouseY, clr);
+        _prevMouseX = _mouseX;
+        _prevMouseY = _mouseY;
     }
 
     private async Task DrawCanvasAsync(double prev_x, double prev_y, double x, double y, string clr)
@@ -307,6 +314,9 @@
     {
         await base.OnAfterRenderAsync(firstRender);
         _ctxCanvas = await _canvas.GetContext2DAsync();
+        var p = await JS.InvokeAsync<Position>("eval", $"let e = document.querySelector('[_bl_{_container.Id}=\"\"]'); e = e.getBoundingClientRect(); e = {{ 'Left': e.x, 'Top': e.y }}; e");
+        (_canvasX, _canvasY) = (p.Left, p.Top);
+        LogTrace.Debug("trace", p, _classPath);
 
     }
 
