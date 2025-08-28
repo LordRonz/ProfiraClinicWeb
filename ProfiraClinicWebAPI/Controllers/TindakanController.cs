@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ProfiraClinic.Models;
 using ProfiraClinicWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
-using ProfiraClinicWebAPI.Helper;
-using ProfiraClinic.Models.Core;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
