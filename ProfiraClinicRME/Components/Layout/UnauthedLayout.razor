@@ -5,9 +5,20 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 <MudDialogProvider @rendermode="InteractiveServer" />
 
-<MudLayout Class="min-vh-100">
+
+<style>
+#main_content{
+        align-items:center;
+        background-color: #BAE0F3;
+        display:flex;
+        height: 100vh;
+        justify-content: center; 
+        width: 100vw;
+}
+</style>
+<div id="main_content">
     @Body
-</MudLayout>
+</div>
 
 @code {
 }
