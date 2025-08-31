@@ -11,9 +11,7 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(25)]
         public string NomorTransaksi { get; set; } // RMPU/Tahun/Bulan/Nourut
 
-        [Column(TypeName = "char(25)")]
-        [MaxLength(25)]
-        public string NomorAppointment { get; set; } // Nomor Appointment
+        public int IDDetail { get; set; } // IDDetail
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]

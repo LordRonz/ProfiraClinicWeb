@@ -7,7 +7,6 @@
         public string? NomorAppointment { get; set; }
         public string? KodeCustomer { get; set; }
         public string? KodeKaryawan { get; set; }
-        public string? NomorUrut { get; set; }
         public string? Keterangan { get; set; }
     }
 }

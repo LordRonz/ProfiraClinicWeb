@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -23,5 +26,62 @@ namespace ProfiraClinicWebAPI.Controllers
         protected override IOrderedQueryable<GroupPaket> ApplyOrder(
             IQueryable<GroupPaket> q)
             => q.OrderBy(d => d.KodeGroupPaket);
+
+        public class AddGroupPaketDto
+        {
+            public string? KodeGroupPaket { get; set; }
+            public string? NamaGroupPaket { get; set; }
+        }
+
+        [HttpPost("Add")]
+        public async Task<IActionResult> AddGroupPaket([FromBody] AddGroupPaketDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            // Get user (match your usual pattern: by UserName)
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            // Validate required fields based on SP contract
+            if (string.IsNullOrWhiteSpace(dto.KodeGroupPaket))
+                return BadRequest("KodeGroupPaket is required");
+            if (string.IsNullOrWhiteSpace(dto.NamaGroupPaket))
+                return BadRequest("NamaGroupPaket is required");
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeGroupPaket", dto.KodeGroupPaket),
+        new SqlParameter("@NamaGroupPaket", dto.NamaGroupPaket),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_MGroupPaket_Add @KodeGroupPaket, @NamaGroupPaket, @USRID",
+                    sqlParameters
+                );
+
+                return Ok(new
+                {
+                    message = "Group paket added successfully",
+                    data = new { dto.KodeGroupPaket, dto.NamaGroupPaket }
+                });
+            }
+            catch (SqlException ex)
+            {
+                // Surface business-rule failures raised by RAISERROR from the SP
+                return BadRequest(new
+                {
+                    message = "Failed to add group paket",
+                    data = new { error = ex.Message }
+                });
+            }
+        }
     }
 }
