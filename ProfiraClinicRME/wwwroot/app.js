@@ -4,17 +4,16 @@ var hello = async function (name) {
 }
 
 var ImageService = {
-    baseUrl: 'http://116.68.252.26:2032',
+
     /**
      * upload blob in global variable to server
+     * @param {string} url upload url
      * @param {string} paramName
      * @param {string} blobName globally scoped blob name
      * @param {string} fileName
-    * @returns {
-    Promise<OpStatus>
-} Operation status object
+     * @returns {Promise<OpStatus>} Operation status object
      */
-    uploadBlob: async function (paramName, blobName, fileName) {
+    uploadBlob: async function (url, paramName, blobName, fileName) {
         console.log(`start upload {paramName} from {blobName}`);
         const blob = window[blobName];
         const opStatus = new OpStatus();
@@ -29,7 +28,7 @@ var ImageService = {
             const formData = new FormData();
             formData.append(paramName, blob, fileName);
 
-            const response = await fetch(this.baseUrl + '/api/images/upload', {
+            const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
             });
@@ -120,6 +119,43 @@ var DrawingService = {
             return opStatus;
         } catch (err) {
             opStatus.message = `Error generating blob: ${err.message}`;
+            console.error(opStatus);
+            return opStatus;
+        }
+    },
+
+    /**
+     * copy canvas content to image element
+     * @param {any} idWidget
+     * @param {any} idImage
+     * @returns
+     */
+    copyToImage: async function (idWidget, idImage) {
+        console.log(`Copy canvas from ${idWidget} to image ${idImage}`);
+        const canvas = document.querySelector(`#${idWidget} canvas`);
+        const img = document.getElementById(idImage);
+        const opStatus = new OpStatus();
+        opStatus.status = 1;
+        if (!canvas) {
+            opStatus.message = `Canvas not found for widget ${idWidget}`;
+            console.error(opStatus);
+            return opStatus;
+        }
+        if (!img) {
+            opStatus.message = `Image element not found: ${idImage}`;
+            console.error(opStatus);
+            return opStatus;
+        }
+
+        try {
+            const urlData = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg'));
+            img.src = urlData;
+            opStatus.status = 0;
+            opStatus.message = 'Image updated successfully';
+            console.log(opStatus);
+            return opStatus;
+        } catch (err) {
+            opStatus.message = `Error updating image: ${err.message}`;
             console.error(opStatus);
             return opStatus;
         }
