@@ -94,8 +94,20 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         [HttpPost("EditPenandaanGambarHeader")]
-        public async Task<IActionResult> EditPenandaanGambarHeader([FromBody] TRMPenandaanGambarHeader header)
+        public async Task<IActionResult> EditPenandaanGambarHeader([FromBody] EditPenandaanGambarHeaderDto header)
         {
+
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
+
+            if (user == null)
+                return NotFound("User not found");
+
             if (header == null || string.IsNullOrEmpty(header.NomorTransaksi))
                 return BadRequest("NomorTransaksi is required");
 
@@ -104,6 +116,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             _context.Entry(existing).CurrentValues.SetValues(header);
             existing.UPDDT = DateTime.Now;
+            existing.USRID = user.USRID;
 
             await _context.SaveChangesAsync();
             return Ok(new { message = "Header updated successfully", data = existing });
@@ -199,7 +212,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 Items = list
             };
 
-            return Ok(result);
+            return Ok(list);
         }
 
         [HttpPost("GetByNomorAppointment")]
@@ -209,11 +222,26 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrWhiteSpace(nomorAppointment))
                 return BadRequest(new { message = "NomorAppointment is required." });
 
-            var diagnosa = await _context.TRMPenandaanGambar
+            var header = await _context.TRMPenandaanGambarHeader
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
 
-            return Ok(diagnosa);
+            if (header == null)
+                return Ok(null);
+
+            var detail = await _context.TRMPenandaanGambarDetail
+                .AsNoTracking()
+                .Where(d => d.NomorTransaksi == header.NomorTransaksi).ToListAsync();
+
+            dynamic response = new System.Dynamic.ExpandoObject();
+
+            foreach (var prop in header.GetType().GetProperties())
+            {
+                ((IDictionary<string, object>)response)[prop.Name] = prop.GetValue(header);
+            }
+
+            response.detail = detail;
+            return Ok(response);
         }
     }
 }
