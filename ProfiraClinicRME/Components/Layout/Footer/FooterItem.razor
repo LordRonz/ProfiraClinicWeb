@@ -1,0 +1,19 @@
+﻿<li class="nav-item">
+    <NavLink class="d-flex flex-column justify-content-center align-items-center" href="@Href" ActiveClass="nav-active" Match="NavLinkMatch.All">
+        <i class="fa @Icon footer-i"></i>
+        <span class="d-block">
+            @ChildContent
+        </span>
+    </NavLink>
+ </li>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Href { get; set; } = "Home.html";
+
+    [Parameter]
+    public string Icon { get; set; } = "fa-home";
+}

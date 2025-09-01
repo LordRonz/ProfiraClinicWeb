@@ -1,0 +1,288 @@
+﻿@page "/pemeriksaan"
+@inherits BasePage
+
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Api
+@using ProfiraClinicRME.Utils;
+@using ProfiraClinicRME.Components.Layout
+@using ProfiraClinicRME.Components.Section
+@using ProfiraClinicRME.Components.Widget
+
+@inject HttpClient httpClient
+@inject IAppointmentService SvcAppointment
+@inject IPemeriksaanUmumService SvcPemeriksaanUmum
+@inject NavigationManager Nav
+
+<TopbarUser Title="Pemeriksaan"
+            Route="Perawatan Pasien / Pemeriksaan"
+            ShowBack="true"
+            ShowSave="true"
+            Appointment="_apo"
+            OnSave="@DoSave" />
+
+/>
+
+
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
+    @* <MudButton Class="m-4">Add</MudButton> *@
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+        <MudTabPanel Text="Umum">
+            <MudGrid Class="gap-2 mb-4" Style="max-width: 90%;">
+                <MudItem xs="12" md="12" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.KeadaanUmum"
+                                  ShrinkLabel T="string"
+                                  Label="Keadaan Umum"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="6" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.TingkatKesadaran"
+                                  ShrinkLabel
+                                  T="string"
+                                  Label="Tingkat Kesadaran" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" md="5" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.Kesadaran"
+                                  ShrinkLabel
+                                  T="string"
+                                  Label="Kesadaran"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+            <MudGrid Class="gap-2 mb-4" Style="max-width: 90%;">
+                <MudItem xs="6" md="3" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.Sistolik"
+                                  ShrinkLabel T="int?"
+                                  Label="Tekanan Darah Sistolik mm/hg"
+                                  Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="6" md="3" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.Distolik"
+                                  ShrinkLabel T="int?"
+                                  Label="Tekanan Darah Diastolik mm/hg" Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+            <MudGrid Class="gap-2 mb-4" Style="max-width: 90%;">
+                <MudItem xs="6" md="3" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.FrekuensiNapas"
+                                  ShrinkLabel
+                                  T="int?"
+                                  Label="Frekuensi Napas (X/Menit)" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="6" md="3" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.FrekuensiNadi"
+                                  ShrinkLabel T="int?" Label="Frekuensi Nadi (X/Menit)" Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+            <MudGrid Class="gap-2  mb-4" Style="max-width: 90%;">
+                <MudItem xs="6" md="3" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.Suhu"
+                                  ShrinkLabel T="decimal?"
+                                  Label="Suhu (C)" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="6" md="3" Class="p-1">
+                    <MudTextField @bind-Value="@_trmPemeriksaanUmumInForm.Saturasi"
+                                  ShrinkLabel T="decimal?"
+                                  Label="Saturasi O2" Variant="Variant.Outlined" />
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+        <MudTabPanel Text="Fisik">
+            <div style="max-width: 15%;" class="d-flex flex-column gap-y-2">
+                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.BeratBadan" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.TinggiBadan"  Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="int?" @bind-Value="@_trmPemeriksaanUmumInForm.IndexTubuh" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.LingkarKepala"  Label="Lingkar Kepala (cm)" Variant="Variant.Outlined" />
+            </div>
+        </MudTabPanel>
+    </MudTabs>
+
+    <MudCard Class="mt-8">
+        <Note EntityType="@TRMPemeriksaanUmum" ListData="@_listRekamMedis">
+            <NoteContent>
+                <ul>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Kunjungan: @context.NomorAppointment
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Keadaan Umum: @context.KeadaanUmum
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Tingkat Kesadaran: @context.TingkatKesadaran
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Kesadaran: @context.Kesadaran
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Sistolik: @context.Sistolik
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Diastolik: @context.Distolik
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Suhu: @context.Suhu C
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Saturasi O2: @context.Saturasi
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Frekuensi Nafas: (@context.FrekuensiNapas)x/Menist
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Frekuensi Nadi: (@context.FrekuensiNadi)x/Menit
+                        </MudText>
+                    </li>
+                    <li>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            Dokter: @context.NamaKaryawan
+                        </MudText>
+                    </li>
+                </ul>
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    @context.UPDDT
+                </MudText>
+            </NoteContent>
+        </Note>
+    </MudCard>
+</MudCard>
+
+@inject ProtectedLocalStorage LocalStore
+@code {
+
+    private bool _hidePosition;
+    private bool _loading;
+    private List<TRMPemeriksaanUmum> _listRekamMedis = [];
+    private string _saveMode = "add";
+    private TRMAppointment? _apo = null;
+    private TRMPemeriksaanUmum _trmPemeriksaanUmumInForm = new ();
+
+
+    public PemeriksaanUmum()
+    {
+        _classPath = "App::Page::PemeriksaanUmum";
+        LogTrace.Info("init", path: _classPath);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        //ambil data appointment
+        var resApo = SvcAppointment.GetCurrent();
+        if (resApo.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
+            return;
+        }
+        _apo = resApo.Data;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        //ambil rekam medis pemeriksaan umum
+        var resDiagnosa = await SvcPemeriksaanUmum.GetListAsync(_apo.KodeCustomer);
+        if (resDiagnosa.Status == ServiceResultEnum.FOUND)
+        {
+            _listRekamMedis = resDiagnosa.Data.Items;
+        }
+        else
+        {
+            addSnackbar("Gagal memuat Rekam Medis Pemeriksaan Umum.", Severity.Error);
+        }
+
+        //cek apakah sudah ada pemriksaan umum untuk appointment ini
+        var resCheck = await SvcPemeriksaanUmum.GetByNomorAppointment(_apo.NomorAppointment);
+        if (resCheck.Status == ServiceResultEnum.FOUND)
+        {
+            _saveMode = "edit";
+            _trmPemeriksaanUmumInForm = resCheck.Data!;
+            addSnackbar("Memuat ulang data Pemeriksaan Umum.", Severity.Info);
+
+        }
+        _trmPemeriksaanUmumInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
+        _trmPemeriksaanUmumInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
+        _trmPemeriksaanUmumInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
+        _trmPemeriksaanUmumInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DoSave()
+    {
+        LogTrace.Info("start", path: _classPath);
+        _trmPemeriksaanUmumInForm.KodeLokasi = _apo?.KodeLokasi ?? "-";
+        _trmPemeriksaanUmumInForm.TanggalTransaksi = DateTime.Now;
+        //keadaan umum binded
+        //tk kesadaran binded
+        //sistolik distlik suhu sturasi, frek napas, frek nadi, berat badan, tgg bdn, idx tubh , lngkr kepala
+
+        ServiceResult<NomorTransaksiDto> resSave;
+        string msg = "";
+        if (_saveMode == "add")
+        {
+            resSave = await SvcPemeriksaanUmum.Add(_trmPemeriksaanUmumInForm);
+            msg = "Penyimpanan Pemeriksaan Umum Berhasil Dilakukan";
+        }
+        else
+        {
+            resSave = await SvcPemeriksaanUmum.Edit(_trmPemeriksaanUmumInForm);
+            msg = "Perubahan Pemeriksaan Umum Berhasil Dilakukan";
+        }
+        LogTrace.Info("Result Save", resSave, _classPath);
+        if (resSave.Status == ServiceResultEnum.SUCCESS)
+        {
+            addSnackbar(msg, Severity.Info);
+            await Task.Delay(1000);
+            Nav.NavigateTo("/perawatan/" + _apo?.IDAppointment);
+        }
+        else
+        {
+            addSnackbar("Penyimpanan Pemeriksaan Umum gagal dilakukan", Severity.Error);
+
+        }
+
+    }
+
+
+}
+
+<style>
+    .pemeriksaan-input .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label-outlined {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .pemeriksaan-input .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>

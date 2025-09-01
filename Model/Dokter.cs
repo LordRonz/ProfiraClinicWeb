@@ -5,8 +5,7 @@ namespace ProfiraClinic.Models
     public class MKaryawan
     {
         [Key]
-        public string? UserName { get; set; }
-        public string? UserPassword { get; set; }
+        public string? Ref_USRID { get; set; }
         public string KodeKaryawan { get; set; }
         public string NamaKaryawan { get; set; }
         public DateTime? TanggalMasuk { get; set; }

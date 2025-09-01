@@ -19,7 +19,7 @@
         public decimal TinggiBadan { get; set; }
         public int IndexTubuh { get; set; }
         public decimal LingkarKepala { get; set; }
-        public string NomorTransaksi { get; set; } = string.Empty;
+        public string NomorTransaksi { get; set; } = "";
     }
 
 }
