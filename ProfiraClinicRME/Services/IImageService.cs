@@ -8,8 +8,7 @@ namespace ProfiraClinicRME.Services
     public interface IImageService
     {
 
-        // Retrieves all clinics.
-
+        public Task<ServiceResult<FileNameDto>> UploadBlob(string blobName, string fileName = "");
 
         public  Task<ServiceResult<List<TemplateImageDto>>> GetListTemplateAsync();
 

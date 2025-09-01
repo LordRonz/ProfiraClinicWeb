@@ -125,7 +125,20 @@ html, body {
     background: rgba(126, 69, 2, 1);
 }
 
+/* login */
 
+#login {
+    width: 90vw; /* Default width for small devices */
+    padding: 20px;
+    min-width: 600px;
+}
+
+@media (min-width: 960px) {
+    #login {
+        
+        max-width: 1024px;
+    }
+}
 /* note component */
 .note-content {
     background-color: rgba(250, 242, 242, 1);
@@ -152,6 +165,21 @@ html, body {
     background-color: #eee;
     width: 100%;
     aspect-ratio: 1 / 1;
+}
+
+/* table */
+.mud-table-cell:nth-child(odd){
+    background-color: #b5cbe2
+}
+
+.mud-table-row{
+    /* margin-bottom: 4px; */
+}
+
+@media (min-width: 960px) {
+    .mud-table-cell:nth-child(odd){
+        background-color: #f3f4f4
+    }
 }
 
 /* mudBlazor Override*/
