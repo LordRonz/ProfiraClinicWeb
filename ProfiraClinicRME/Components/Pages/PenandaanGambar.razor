@@ -35,7 +35,7 @@
                         @foreach(var markedImage in _listMarkedImage)
                         {
                             <MudItem xs="12">
-                                <img id="@markedImage.IdGambar" crossorigin="anonymous" class="pg-img" src="@markedImage.Url" @onclick="() => DrawImage(markedImage.IdGambar)" />
+                                <img id="@markedImage.IdElement" crossorigin="anonymous" class="pg-img" src="@markedImage.Url" @onclick="() => DrawImage(markedImage)" />
                             </MudItem>
                         }
                     </MudGrid>
@@ -99,10 +99,12 @@
     private int Width { get; set; } = 0;
     private DrawingWidget _drawingWidget;
     private List<MarkedImage> _listMarkedImage = [];
-    private string _openedImageId = "";
+    private MarkedImage? _openedImage;
 
     private class MarkedImage
     {
+        public string IdElement { get; set; } = "";
+
         public string IdGambar { get; set; } = "";
 
         public string KodeGambar { get; set; } = "";
@@ -155,14 +157,16 @@
         //get existing data by nomor appointment
 
 
-        //populate image 
+        //todo: populate image from the following source, highest proprty first: rekam medis, template
+        //assumption latest rekam medis is also the current appointment
         var _idCounter = 0;
         foreach(var item in _listTemplate)
         {
             _idCounter++;
             var newMarkedImage = new MarkedImage()
             {
-                IdGambar = $"img-{_idCounter:D2}",
+                IdElement = $"img-{_idCounter:D2}",
+                IdGambar = item.FileName,
                 KodeGambar = item.FileName,
                 Url = _baseUrl + item.Url
             };
@@ -209,20 +213,25 @@
 
 
 
-    private async Task DrawImage(string IdImage)
+    private async Task DrawImage(MarkedImage markedImage)
     {
         LogTrace.Info("start", path: _classPath);
-        _openedImageId = IdImage;
+        _openedImage = markedImage;
 
         // var result = await _drawingWidget.CallJsFunction();
         // await JS.InvokeVoidAsync("DrawingWidget.setTargetImage", "test", "left_face.jpg");
-        await _drawingWidget.DrawImage(IdImage);
+        await _drawingWidget.DrawImage(markedImage.IdElement);
         // addSnackbar($"helllo {result?.Message}", Severity.Info);
     }
 
     private async Task SaveImage()
     {
         LogTrace.Info("start", path: _classPath);
+
+        if(_openedImage is null)
+        {
+            return;
+        }
 
         string blobName = await _drawingWidget.GenBlob();
         if (blobName == "")
@@ -231,24 +240,36 @@
             return;
         }
 
+        StateHasChanged();
+
         var resUpload = await SvcImage.UploadBlob(blobName, "test.jpg");
         if(resUpload.Status != ServiceResultEnum.SUCCESS)
         {
             addSnackbar("Gagal mengunggah gambar.", Severity.Error);
             return;
         }
+        
 
-        await _drawingWidget.CopyToImage(_openedImageId)
+        await _drawingWidget.CopyToImage(_openedImage.IdGambar);
 
-
+        //update current marked image url
+        _openedImage.IdGambar = resUpload.Data.FileName;
+        _openedImage.Url = _baseUrl + resUpload.Data.FileName;
+        
+        
         addSnackbar("Gambar berhasil disimpan dengan id " + blobName, Severity.Success);
     }
 
-    
+
 
     private async Task SaveForm()
     {
-        await JS.InvokeVoidAsync("canvas2Image");
+        //save header
+        
+
+        //save detail for each markedImage
+
+
     }
 
 
