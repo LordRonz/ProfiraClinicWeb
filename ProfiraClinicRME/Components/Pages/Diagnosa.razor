@@ -78,29 +78,21 @@ OnSave="DoSave" />
     <MudCard Class="mt-8">
         <Note EntityType="@TRMDiagnosa" ListData="@_listRekamMedis">
             <NoteContent>
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    Kunjungan: @context.NomorAppointment
-                </MudText>
-                <br />
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    ICD: @context.KodeDiagnosa @context.NamaDiagnosa
-                </MudText>
-                <br />
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    Kategori: @context.KategoriDiagnosa
-                </MudText>
-                <br />
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    Diagnosa: @context.KeteranganDiagnosa
-                </MudText>
-                <br />
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    Dokter: @context.NamaKaryawan
-                </MudText>
-                <br />
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    @context.UPDDT
-                </MudText>
+                @{
+                    string[][] displayData = [[]];
+                    if (context is not null)
+                    {
+                        displayData = [
+                            ["Kunjungan", context.NomorAppointment ?? ""],
+                            ["ICD", $"{context.KodeDiagnosa}  {context.NamaDiagnosa}"],
+                            ["Kategori" , context.KategoriDiagnosa ?? ""],
+                            ["Diagnosa", context.KeteranganDiagnosa ?? ""],
+                            ["Dokter", context.NamaKaryawan ?? ""],
+                            [context.UPDDT?.ToString() ?? "", ""]
+                        ];
+                    }
+                }
+                <TableGen Data="@displayData" />
             </NoteContent>
         </Note>
     </MudCard>
