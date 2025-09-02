@@ -136,17 +136,37 @@ namespace ProfiraClinicRME.Infra
             {
                 var dataType = apiResponse.Data.GetType();
                 var genericName = dataType.IsGenericType ? dataType.GetGenericTypeDefinition().Name : "";
-                if (genericName.StartsWith("Pagination"))
+                if (!genericName.StartsWith("Pagination"))
                 {
-                    repoResult = ServiceResult<RespType>.Found(apiResponse.Data, msgSuccess);
+                    repoResult.Status = ServiceResultEnum.FAIL;
+                    repoResult.Message = "Terjadi kesalahan sistem.";
+                    LogTrace.Error("Fail: not pagination in response", apiResponse, classPath);
                     return repoResult;
-                    // apiResponse.Data is a Pagination<T>
-
                 }
 
-                LogTrace.Error("Fail: not list", apiResponse, classPath);
-                repoResult = ServiceResult<RespType>.NotFound("Data tidak dapat ditemukan.");
-                return repoResult;
+                //try acess items
+                var pagedList = apiResponse.Data as Pagination<ModelType>;
+                if (pagedList is null)
+                {
+                    repoResult.Status = ServiceResultEnum.FAIL;
+                    repoResult.Message = "Terjadi kesalahan sistem.";
+                    LogTrace.Error("Fail: could not cast to Paginarion<ModelType》。", apiResponse.Data, classPath);
+                    return repoResult;
+                }
+
+                if (pagedList.Items is null || pagedList.Items.Count == 0)
+                {
+                    LogTrace.Info("Fail: list empty", apiResponse, classPath);
+                    repoResult = ServiceResult<RespType>.NotFound("Data tidak dapat ditemukan.");
+                    return repoResult;
+
+                }
+                    
+                repoResult = ServiceResult<RespType>.Found(apiResponse.Data, msgSuccess);
+                 return repoResult;
+                    // apiResponse.Data is a Pagination<T>
+
+
             }
 
             if (mode == RepoProcessEnum.GET)
