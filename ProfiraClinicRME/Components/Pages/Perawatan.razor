@@ -1,0 +1,174 @@
+@page "/perawatan/{IdApo}"
+@inherits BasePage
+
+@using System.Net.Http.Json
+@using ProfiraClinic.Models
+@using ProfiraClinicRME.Utils
+@using Microsoft.EntityFrameworkCore
+@using ProfiraClinicRME.Helpers
+@using ProfiraClinicRME.Components.Layout
+@using ProfiraClinicRME.Components.Section
+
+@inject ProtectedLocalStorage LocalStore
+@inject ICustomerService SvcCustomer
+@inject IAppointmentService SvcAppointment
+
+<TopbarUser Route="Perawatan"
+            Title="Perawatan Pasien / Doctor on Duty: dr. Fifien"
+            ShowBack="true"
+            />
+
+<MudCard Class="p-4 minh-100 rounded-3">
+    @if (_customer != null) {
+        <div class="">
+            <div class="d-flex w-100 gap-x-8 mb-12">
+                <div class="border-1 justify-content-center align-items-center d-flex item-shadow" style="width: 150px; height: 150px;">
+                    <MudImage Src="/images/blank_profile1.png" Class="w-100" />
+                </div>
+                <div class="w-100  table-add-form">
+                    <MudGrid Class="flex-column" Style="max-width: 85%;">
+                        <MudItem xs="6" Class="p-1">
+                            <MudText Typo="Typo.h5" Color="MudBlazor.Color.Primary">@_customer.NamaCustomer</MudText>
+                        </MudItem>
+                        <MudItem xs="6" Class="p-1">
+                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@($"{_customer.KodeCustomer} // {_jnsKelamin} // {_age}")
+                            </MudText>
+                        </MudItem>
+                        <MudItem xs="6" Class="p-1">
+                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">
+                                @(UIHelper.FormatDate(_customer.TanggalLahir)) 
+                            </MudText>
+                        </MudItem>
+                        <MudGrid Class="flex-row">
+                            <MudItem xs="12" md="6" >
+                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Alamat Rumah</MudText>
+                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.AlamatDomisili</MudText>
+                            </MudItem>
+                            <MudItem xs="12" md="3">
+                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Nomor KTP</MudText>
+                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.NIK</MudText>
+                            </MudItem>
+                            <MudItem xs="12" md="3">
+                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Nomor HP</MudText>
+                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.NomorHP</MudText>
+                            </MudItem>
+                        </MudGrid>
+                        <MudGrid Class="flex-row">
+                            <MudItem xs="12" md="6">
+                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">No Appointment</MudText>
+                                    <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_apo?.NomorAppointment</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudGrid>
+                </div>
+            </div>
+            <div class="h-100 justify-content-center align-items-center mt-5">
+                <ProfiraClinicRME.Components.Menu.Menu />
+            </div>
+        </div>
+    }
+</MudCard>
+
+@code {
+    [Parameter]
+    public string IdApo { get; set; } = "";
+
+    private bool _hidePosition;
+    private bool _loading;
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+    private TRMAppointment? _apo = null;
+    private Customer? _customer;
+    private string _age { get; set; } = "-";
+    private string _jnsKelamin = "-";
+    private string _prettyTglLahir = "-";
+    private string tgTrx { get; set; } = "0";
+    private string noTrx { get; set; } = "TRX001";
+
+
+    public Perawatan()
+    {
+
+        _classPath = "App::Page::Perawatan";
+        LogTrace.Info("class init", path: _classPath);
+
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _customer = new Customer();
+        var resApo = SvcAppointment.GetCurrent();
+        if (resApo.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
+            return; 
+        }
+        _apo = resApo.Data;
+
+    }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        LogTrace.Info("start", path: _classPath);
+
+        var resApo = SvcAppointment.GetCurrent();
+        if (resApo.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
+            return;
+        }
+
+        ///todo: temporary inject , wait api correction
+        var apo = resApo.Data;
+
+        var resCust = await SvcCustomer.GetByCodeAsync(apo.KodeCustomer);
+
+        if (resCust.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Data pasien tidak ditemukan.", Severity.Error);
+            return;
+        }
+        _customer = resCust.Data;
+        _jnsKelamin = UIHelper.GetJenisKelamin(_customer.JenisKelamin);
+        _age = UIHelper.FormatAge(_customer.TanggalLahir, DateTime.Now);
+
+    }
+
+
+    // protected override async Task OnAfterRenderAsync(bool firstrender)
+    // {
+    //     if (firstrender && _customer != null) {
+    //         await LocalStore.SetAsync("age", _age);
+    //         await LocalStore.SetAsync("name", _customer.NamaCustomer);
+    //     }
+    //     Layout.ChangePasien("", "");
+    //     Layout.ChangeTitleAndRoute("REKAM MEDIS", "Perawatan Pasien / Doctor on Duty : dr. Fifien");
+    //     Layout.ChangeShowSave(false);
+    // }
+
+
+}
+
+
+<style>
+    .table-add-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-add-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-add-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-add-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>
