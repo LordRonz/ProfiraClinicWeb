@@ -13,6 +13,36 @@ namespace ProfiraClinicWebAPI.Controllers
         public string? KodeCustomer { get; set; }
     }
 
+    public class PenandaanGambarListItemDto
+    {
+        public string NomorTransaksi { get; set; }
+        public string? TRCD { get; set; }
+        public string? TRSC { get; set; }
+        public string KodeLokasi { get; set; }
+        public string TahunTransaksi { get; set; }
+        public string BulanTransaksi { get; set; }
+        public DateTime TanggalTransaksi { get; set; }
+        public string? NomorAppointment { get; set; }
+        public string? KodeCustomer { get; set; }
+        public string? KodeKaryawan { get; set; }
+        public string? KodePoli { get; set; }
+        public string? Keterangan { get; set; }
+        public DateTime? UPDDT { get; set; }
+        public string? USRID { get; set; }
+        public List<PenandaanGambarListDetailDto> Detail { get; set; } = new();
+    }
+
+    public class PenandaanGambarListDetailDto
+    {
+        public int IDDetail { get; set; }
+        public string KodeGambar { get; set; }
+        public string IDGambar { get; set; }
+        public string? KETLK { get; set; }
+        public string? NamaCustomer { get; set; }
+        public string? NamaKaryawan { get; set; }
+    }
+
+
     [ApiController]
     [Route("api/[controller]")]
     public class PenandaanGambarController : BaseCrudController<TRMPenandaanGambarHeader>
@@ -204,15 +234,50 @@ namespace ProfiraClinicWebAPI.Controllers
                 .FromSqlRaw("EXEC dbo.usp_TRM_PenandaanGambar_List @KodeCustomer", sqlParameters)
                 .ToListAsync();
 
-            var result = new Pagination<TRMPenandaanGambar>
+            var items = list
+    .GroupBy(h => h.NomorTransaksi)
+    .Select(g =>
+    {
+        var h = g.First();
+        return new PenandaanGambarListItemDto
+        {
+            NomorTransaksi = h.NomorTransaksi,
+            TRCD = h.TRCD,
+            TRSC = h.TRSC,
+            KodeLokasi = h.KodeLokasi,
+            TahunTransaksi = h.TahunTransaksi,
+            BulanTransaksi = h.BulanTransaksi,
+            TanggalTransaksi = h.TanggalTransaksi,
+            NomorAppointment = h.NomorAppointment,
+            KodeCustomer = h.KodeCustomer,
+            KodeKaryawan = h.KodeKaryawan,
+            KodePoli = h.KodePoli,
+            Keterangan = h.Keterangan,
+            UPDDT = h.UPDDT,
+            USRID = h.USRID,
+            Detail = g.Select(d => new PenandaanGambarListDetailDto
             {
-                TotalCount = 0,
+                IDDetail = d.IDDetail,
+                KodeGambar = d.KodeGambar,
+                IDGambar = d.IDGambar,
+                KETLK = d.KETLK,
+                NamaCustomer = d.NamaCustomer,
+                NamaKaryawan = d.NamaKaryawan
+            }).ToList()
+        };
+    })
+    .ToList();
+
+            var result = new Pagination<PenandaanGambarListItemDto>
+            {
+                TotalCount = items.Count,
                 Page = 0,
-                PageSize = 0,
-                Items = list
+                PageSize = items.Count,
+                Items = items
             };
 
-            return Ok(list);
+            return Ok(result);
+
         }
 
         [HttpPost("GetByNomorAppointment")]

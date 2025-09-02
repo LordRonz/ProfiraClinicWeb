@@ -40,7 +40,7 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrEmpty(userName))
                 return Unauthorized();
 
-            // Get user (match your usual pattern: by UserName)
+            // Get user (match your usual pattern: by Ref_USRID)
             var user = await _context.MUser
                             .AsNoTracking()
                             .FirstOrDefaultAsync(u => u.USRID == userName);

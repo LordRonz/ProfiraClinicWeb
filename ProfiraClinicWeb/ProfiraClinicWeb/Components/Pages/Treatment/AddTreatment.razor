@@ -1,0 +1,185 @@
+﻿@page "/treatment/add"
+
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Helpers
+@using System.ComponentModel.DataAnnotations
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject HttpClient httpClient
+@inject GroupPerawatanApiService ApiService
+@inject NavigationManager NavigationManager
+
+
+<MudCard Class="p-4 h-100">
+    <MudForm @ref="form" Class="table-form">
+        <MudGrid GutterSize="3">
+            <!-- Row 1: User ID & Nama User -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Nama Paket"
+                              @bind-Value="treatment.NamaGroupPerawatan"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Kode Group"
+                              @bind-Value="treatment.KodeGroupPerawatan"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" Class="mb-4" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+            <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
+                Kembali
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       Type="Submit"
+                       Disabled="!form.IsValid"
+                       OnClick="SubmitAsync">
+                Simpan
+            </MudButton>
+        </MudStack>
+    </MudForm>
+</MudCard>
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    // The patient model used for data binding.
+    private Customer patient = new Customer();
+    private GroupPerawatan treatment = new GroupPerawatan();
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    // Local UI-bound properties.
+    private DateTime? date = DateTime.Today;
+
+    MudForm form;
+
+    // File upload handling.
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    private void UploadFiles(IBrowserFile file)
+    {
+        files.Add(file);
+        // TODO: Implement file upload logic as needed.
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/package");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.ChangeTitleAndRoute("Group Paket", "Tambah Group Paket");
+        patient.KodeCustomer = "INITIAL";
+    }
+
+    // Called when the "Simpan" button is clicked.
+    private async Task SubmitAsync()
+    {
+        // Call the API service update method.
+        treatment.USRID = "";
+        treatment.Aktif = "1";
+        var result = await ApiService.CreateGroupPerawatanAsync(treatment);
+        if (result.StatusCode < 300)
+        {
+            NavigationManager.NavigateTo("/package");
+        }
+        else
+        {
+            // Here you can display a snackbar or alert message with result.Message.
+            System.Diagnostics.Debug.WriteLine(result.Message);
+        }
+    }
+}
+
+<style>
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
+
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+
+    .active-tab {
+        background-color: rgba(162, 238, 240, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-panel {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-header {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top: none;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .section {
+        width: 100%;
+        overflow: hidden; /* clip rounded corners */
+        border-radius: 8px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        background-color: #a2eef0; /* your blue */
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+    }
+
+        .section-header .mud-icon-root {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+    .section-body {
+        padding: 1rem;
+    }
+</style>
