@@ -61,20 +61,29 @@ html, body {
     background-color: rgb(234,228,228); /* your bg-dark bg-opacity-25 */
 }
 
-.minh-100 {
-    min-height: 100%;
-}
-
-
-
-.sidebar-container .mud-button-label {
-    color: #0D24EC !important;
+.back-btn {
+    background: rgba(156, 99, 5, 1);
+    color: white;
     text-transform: none;
 }
 
+.back-btn:hover {
+    background: rgba(126, 69, 2, 1);
+}
 
-.sidebar-divider {
-    border: 1px solid rgba(71, 71, 71, 1);
+.bg-wave-fixed {
+    background-repeat: no-repeat;
+    background-size: 100% 45%;
+    background-attachment: fixed;
+    height: 100vh;
+}
+
+.bg-wave-fixed.doctor {
+    background-image: url("images/wave-blue.png");
+}
+
+.bg-wave-fixed.patient {
+    background-image: url("images/wave.png");
 }
 
 .master-modal {
@@ -100,9 +109,35 @@ html, body {
     font-weight: 600;
 }
 
+.minh-100 {
+    min-height: 100%;
+}
+
 .mud-drawer--closed.mud-drawer-mini {
     width: 88px !important; /* 56 + 2 * 16 */
     margin-right: 20px;
+}
+
+.mud-nav-link {
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.mud-nav-link-icon-default {
+    color: #0D24EC !important;
+}
+
+.mud-nav-link-text {
+    letter-spacing: 0.5px !important;
+}
+
+.mud-main-content {
+    padding-top: 104px;
+}
+
+.mud-toolbar-appbar {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .save-btn {
@@ -111,18 +146,22 @@ html, body {
     text-transform: none;
 }
 
-    .save-btn:hover {
-        background: rgba(27, 153, 41, 1);
-    }
+.save-btn:hover {
+    background: rgba(27, 153, 41, 1);
+}
 
-.back-btn {
-    background: rgba(156, 99, 5, 1);
-    color: white;
+.sidebar-container .mud-button-label {
+    color: #0D24EC !important;
     text-transform: none;
 }
 
-.back-btn:hover {
-    background: rgba(126, 69, 2, 1);
+.sidebar-container .mud-button-label {
+    color: #0D24EC !important;
+    text-transform: none;
+}
+
+.sidebar-divider {
+    border: 1px solid rgba(71, 71, 71, 1);
 }
 
 /* login */
@@ -167,21 +206,59 @@ html, body {
     aspect-ratio: 1 / 1;
 }
 
+/* error */
+
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+
 /* table */
 .mud-table-cell:nth-child(odd){
-    background-color: #b5cbe2
+    background-color: #b5cbe2;
 }
 
 .mud-table-row{
-    /* margin-bottom: 4px; */
+    margin-bottom: 12px;
 }
-
+table.mud-table-root{
+    border-collapse: separate;
+    border-spacing: 12px;
+}
 @media (min-width: 960px) {
-    .mud-table-cell:nth-child(odd){
-        background-color: #f3f4f4
+    table.mud-table-root{
+        border-collapse: collapse;
+        border-spacing: 4px;
+    }
+    th.mud-table-cell:nth-child(odd){
+        background-color: #A2EEF0;
+    }
+
+    tbody .mud-table-cell:nth-child(odd){
+        background-color: #f3f4f4;
     }
 }
 
+/* tablegen */
+.tablegen{
+    width: 
+}
 /* mudBlazor Override*/
 
 

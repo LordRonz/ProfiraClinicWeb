@@ -13,17 +13,17 @@
 @using ProfiraClinicRME.Components.Section
 
 @inject SessionService SvcSession
+@inject IUserService SvcUser
 @inject NavigationManager Nav
 @inject IAppointmentService SvcAppointment
 
 <TopbarUser 
 Route="Dasboard"
-Title="Dashboard"/>
+Title="@_title"/>
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <Table WithAdd="false" WithFilter="false" WithPaging="false" Config="_appointmentTblConf" />
 </MudCard>
-<MudButton OnClick="ShowSnack">Show</MudButton>
 
 @code {
 
@@ -31,7 +31,7 @@ Title="Dashboard"/>
 
 
     private List<TRMAppointment> _listAppointment;
-
+    private string _title = "Appointment list on ";
 
     public Dashboard()
     {
@@ -45,7 +45,12 @@ Title="Dashboard"/>
     protected override async Task OnInitializedAsync()
     {
         LogTrace.Info("init", path: _classPath);
-        var resApo = await SvcAppointment.GetListOnWaitAsync("LOKASI1", new DateTime(2025, 7, 3), "DFM");
+
+
+        CurrentUser curUser = SvcUser.Current!;
+        _title += curUser.Klinik.KETLK;
+
+        var resApo = await SvcAppointment.GetListOnWaitAsync(curUser.KodeLokasi??"", DateTime.Today, curUser.Karyawan.KodeKaryawan);
         // Check if status code indicates success
 
         if (resApo.Status == ServiceResultEnum.FOUND)
@@ -131,14 +136,6 @@ Title="Dashboard"/>
 
        
         Nav.NavigateTo("/Perawatan/" + apo.IDAppointment );
-        return;
-    }
-
-    private async Task ShowSnack()
-    {
-        addSnackbar("This is a test snackbar message.", Severity.Success);
-        await Task.Delay(2000);
-        addSnackbar("This is a test snackbar message with error severity.", Severity.Error);
         return;
     }
 }
