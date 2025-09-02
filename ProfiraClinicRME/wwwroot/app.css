@@ -256,9 +256,17 @@ table.mud-table-root{
 }
 
 /* tablegen */
-.tablegen{
-    width: 
+.tablegen {
+    td:nth-child(1) {
+        font-size: 1rem;
+        color: #855454;
+    }
+
+    td {
+        padding: 2px 4px;
+    }
 }
+
 /* mudBlazor Override*/
 
 

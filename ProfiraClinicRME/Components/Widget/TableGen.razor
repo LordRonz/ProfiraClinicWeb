@@ -1,0 +1,25 @@
+﻿@inherits BaseWidget
+
+<table class="tablegen">
+    @foreach(var row in Data){
+        <tr>
+            <td>
+                <MudText Typo="Typo.body2">
+                    @row[0]
+                </MudText>
+            </td>
+            <td>
+                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                    @row[1]
+                </MudText>
+            </td>
+        </tr>
+    }
+
+</table>
+@code {
+    [Parameter]
+    public string[][] Data { get; set; } = [[]];
+
+
+}
