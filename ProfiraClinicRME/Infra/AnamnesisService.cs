@@ -14,7 +14,7 @@ namespace ProfiraClinicRME.Infra
     {
         private readonly ApiService _svcApi;
 
-        private string _classPath = "Infra::DiagnosaService";
+        private string _classPath = "Infra::AnamnesisService";
 
         private TRMAppointment? _current;
 

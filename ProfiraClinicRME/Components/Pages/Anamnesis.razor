@@ -55,7 +55,9 @@ OnSave="@DoSave"
         <MudTabPanel Text="Riwayat">
             <MudGrid Class="gap-y-2 riwayat" Style="max-width: 70%;">
                 <MudItem xs="12" Class="p-1">
-                    <MudTextField ShrinkLabel T="string" Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)" Variant="Variant.Outlined" Lines="10" />
+                    <MudTextField 
+                        @bind-Value="@_riwayatInForm.PenyakitDahulu"
+                        ShrinkLabel T="string" Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)" Variant="Variant.Outlined" Lines="10" />
                 </MudItem>
                 <MudItem xs="4" Class="p-1">
                     <p>Riwayat Penyakit Sekarang</p>
