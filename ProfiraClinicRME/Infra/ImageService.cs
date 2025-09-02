@@ -22,13 +22,18 @@ namespace ProfiraClinicRME.Infra
 
         private string _classPath = "Infra::ImageService";
 
+        private string _baseUrl = "";
+
         private BaseRepo<PenandaanGambarFull> _repo;
         // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
-        public ImageService(ApiService svcApi, IJSRuntime js )
+        public ImageService(ApiService svcApi, IJSRuntime js, IConfiguration configuration)
         {
             _js = js;
             _svcApi = svcApi;
             _repo = new BaseRepo<PenandaanGambarFull>();
+            _baseUrl = configuration["ApiSettings:BaseAddress"] ?? "";
+
+
         }
 
 
@@ -43,13 +48,14 @@ namespace ProfiraClinicRME.Infra
             LogTrace.Info("start", new { blobName, fileName}, _classPath);
             ServiceResult<FileNameDto> svcResult = new();
             svcResult.Status = ServiceResultEnum.FAIL;
+            var uploadUrl = _baseUrl + "api/Images/Upload";
 
             OpStatus opStatus = new OpStatus();
             try
             {
 
             //invoke js function to upload blob
-                opStatus = await _js.InvokeAsync<OpStatus>("ImageService.uploadBlob", "file", blobName);
+                opStatus = await _js.InvokeAsync<OpStatus>( "ImageService.uploadBlob", uploadUrl, "file", blobName, "file.jpg");
                 //opStatus = await _js.InvokeAsync<OpStatus>("hello", "john");
 
             }
@@ -137,7 +143,7 @@ namespace ProfiraClinicRME.Infra
 
         public string GetBaseUrlForUserImage()
         {
-            return "http://116.68.252.26:2032/api/Images/";
+            return _baseUrl + "api/Images/";
         }
 
     }

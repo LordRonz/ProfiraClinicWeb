@@ -4,9 +4,9 @@ using ProfiraClinicRME.Helpers;
 using ProfiraClinicRME.Infra;
 using ProfiraClinicRME.MessageHandlers;
 using ProfiraClinicRME.Services;
+using ProfiraClinicRME.Test.Infra;
 using ProfiraClinicRME.Utils;
 using Serilog;
-using ProfiraClinicRME.Test.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 

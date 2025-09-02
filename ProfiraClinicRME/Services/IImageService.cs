@@ -12,6 +12,10 @@ namespace ProfiraClinicRME.Services
 
         public  Task<ServiceResult<List<TemplateImageDto>>> GetListTemplateAsync();
 
+        /// <summary>
+        /// get base url with slash ending
+        /// </summary>
+        /// <returns></returns>
         public string GetBaseUrlForUserImage();
 
     }

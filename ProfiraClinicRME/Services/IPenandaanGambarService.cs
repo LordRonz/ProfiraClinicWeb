@@ -22,13 +22,13 @@ namespace ProfiraClinicRME.Services
         public Task<ServiceResult<Pagination<PenandaanGambarFull>>> GetListAsync(string kodeCustomer);
 
 
-        public Task<ServiceResult<NomorTransaksiDto>> AddHeader(PenandaanGambarHeader newHeader);
+        public Task<ServiceResult<NomorTransaksiDto>> AddHeader(TRMPenandaanGambarHeader newHeader);
 
-        public Task<ServiceResult<IdDetailDto>> AddDetail(PenandaanGambarDetail newDetail);
+        public Task<ServiceResult<IdDetailDto>> AddDetail(TRMPenandaanGambarDetail newDetail);
 
-        public Task<ServiceResult<NomorTransaksiDto>> EditHeader(PenandaanGambarHeader updHeader);
+        public Task<ServiceResult<NomorTransaksiDto>> EditHeader(TRMPenandaanGambarHeader updHeader);
 
-        public Task<ServiceResult<IdDetailDto>> EditDetail(PenandaanGambarDetail updDetail);
+        public Task<ServiceResult<IdDetailDto>> EditDetail(TRMPenandaanGambarDetail updDetail);
 
         public Task<ServiceResult<PenandaanGambarFull>> GetByNomorAppointment(string nomorAppointment);
 

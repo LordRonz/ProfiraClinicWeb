@@ -50,22 +50,24 @@
     </MudItem>
     <MudItem xs="12" md="4">
         <MudPaper Elevation="4" Class="pa-3 rounded-3 minh-100">
-            <MudTextField T="string" Placeholder="Isi keterangan gambar di sini..." Lines="10"></MudTextField>
+            <MudTextField @bind-bind-Value="@_entityInForm.Keterangan"
+
+                T="string" Placeholder="Isi keterangan gambar di sini..." Lines="10"></MudTextField>
         </MudPaper>
     </MudItem>
 </MudGrid>
 <MudGrid Class="p-3 minh-100">
     <MudItem xs="12">
-        <Note EntityType="@PenandaanGambarFull" ListData="@_listRekaman">
+        <Note EntityType="@PenandaanGambarFull" ListData="@_listRekam">
             <NoteContent>
                 <MudGrid Class="p-2">
-                    @foreach(var item in context.Details)
+                    @foreach(var item in context.Detail)
                     {
 
                             <MudItem xs="6" md="4">
 
                             <label>@item.KodeGambar</label>
-                            <img class="pg-img" src="@(_baseUrl + item.IdGambar)" />
+                            <img class="pg-img" src="@(_baseUrl + item.IDGambar)" />
 
 
                         </MudItem>
@@ -89,8 +91,8 @@
 
 
     private bool _hidePosition;
-    private List<PenandaanGambarFull> _listRekaman = new List<PenandaanGambarFull>();
-    private List<TemplateImageDto> _listTemplate = new List<TemplateImageDto>();
+    private List<PenandaanGambarFull> _listRekam = [];
+    private List<TemplateImageDto> _listTemplate = [];
     private bool _loading;
     private string _baseUrl;
     private string clr = "black";
@@ -99,18 +101,26 @@
     private int Width { get; set; } = 0;
     private DrawingWidget _drawingWidget;
     private List<MarkedImage> _listMarkedImage = [];
-    private MarkedImage? _openedImage;
-    private PenandaanGambarFull? _entityInForm = null;
+    private MarkedImage _openedImage = new();
+    private PenandaanGambarFull _entityInForm = new();
+    private enum SaveMode
+    {
+        ADD,
+        EDIT,
+        NONE
+    };
+    private SaveMode _saveMode = SaveMode.ADD;
 
     private class MarkedImage
     {
         public string IdElement { get; set; } = "";
 
-        public string IdGambar { get; set; } = "";
-
-        public string KodeGambar { get; set; } = "";
+        public TRMPenandaanGambarDetail ItemDetail { get; set; } = new();
 
         public string Url { get; set; } = "";
+        public SaveMode SaveMode { get; set; } = SaveMode.NONE;
+        public bool IsTemplate { get; set; } = true;
+
     }
 
     private class Position
@@ -138,13 +148,23 @@
         }
         _apo = resApo.Data;
 
-
+        _baseUrl = SvcImage.GetBaseUrlForUserImage();
     }
 
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+
+        //ambil data appointment
+        var resAppointment = SvcAppointment.GetCurrent();
+        if (resAppointment.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
+            return;
+        };
+        _apo = resAppointment.Data;
 
         //get template
         var resImageTemplate = await SvcImage.GetListTemplateAsync();
@@ -153,55 +173,93 @@
             addSnackbar("Gagal memuat template gambar.", Severity.Error);
             return;
         }
-        _listTemplate = resImageTemplate.Data;
+        _listTemplate = resImageTemplate.Data!;
+
+
+        //ambil rekam medis penandaan gambar
+        var resRekam = await SvcPenandaanGambar.GetListAsync(_apo.KodeCustomer);
+        if (resRekam.Status == ServiceResultEnum.FOUND)
+        {
+            _listRekam = resRekam.Data!.Items;
+
+            // _displayTRMDiagnosa = _listTRMDiagnosa.FirstOrDefault();
+        }
+        else
+        {
+            addSnackbar("Gagal memuat Rekam Medis Penandaan Gambar.", Severity.Error);
+        }
+
+
 
         //get existing data by nomor appointment
+        var resCheck = await SvcPenandaanGambar.GetByNomorAppointment(_apo.NomorAppointment);
+        if (resCheck.Status == ServiceResultEnum.FOUND)
+        {
+            _entityInForm = resCheck.Data!;
+            addSnackbar("Memuat ulang data Penandaan.", Severity.Info);
 
+        }
+        _entityInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
+        _entityInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
+        _entityInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
+        _entityInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
 
         //todo: populate image from the following source, highest proprty first: rekam medis, template
         //assumption latest rekam medis is also the current appointment
         var _idCounter = 0;
+        List<TRMPenandaanGambarDetail> listDetail = [];
+        var dctDetail = new Dictionary<string, MarkedImage>();
         foreach(var item in _listTemplate)
         {
             _idCounter++;
+            var newDetail = new TRMPenandaanGambarDetail
+            {
+                IDDetail = 0,
+                IDGambar = item.FileName,
+                KodeGambar = item.FileName,
+            };
             var newMarkedImage = new MarkedImage()
             {
                 IdElement = $"img-{_idCounter:D2}",
-                IdGambar = item.FileName,
-                KodeGambar = item.FileName,
-                Url = _baseUrl + item.Url
+                ItemDetail = newDetail,
+                Url = item.Url,
+                IsTemplate = true
             };
-            _listMarkedImage.Add(newMarkedImage);
+            dctDetail[item.FileName] = newMarkedImage;
         }
 
-        //load rekam data dummy
-        List<PenandaanGambarDetail> listDetail = [
-            new PenandaanGambarDetail(){
-                IdDetail = 1,
-                IdGambar = "test1.jpg",
-                KodeGambar = "left_face.jpg"
-            },
-            new PenandaanGambarDetail(){
-                IdDetail = 2,
-                IdGambar = "test2.jpg",
-                KodeGambar = "front_face.jpg"
-            },
-            new PenandaanGambarDetail(){
-                IdDetail = 3,
-                IdGambar = "test3.jpg",
-                KodeGambar = "right_face.jpg"
-            }
-        ];
+        //load rekam detail 
 
-        var pgf = new PenandaanGambarFull()
+        List<TRMPenandaanGambarDetail> lastRekamDetail = _listRekam.LastOrDefault()?.Detail ?? [];
+        foreach(var item in lastRekamDetail)
         {
-            NomorTransaksi = "PG/2025/08/0001",
-            Keterangan = "ini keterangan.",
-            Details = listDetail
-        };
 
-        _listRekaman = [pgf];
-        _baseUrl = SvcImage.GetBaseUrlForUserImage();
+            dctDetail[item.KodeGambar].ItemDetail = item;
+            dctDetail[item.KodeGambar].IsTemplate = false;
+            dctDetail[item.KodeGambar].Url = _baseUrl + item.IDGambar;
+        }
+
+
+        //load current transaction
+        var lastRekam = _listRekam.LastOrDefault();
+        //assume nomar trans filled if current trans recorded
+        string lastNoTrans = lastRekam?.NomorTransaksi ?? "";
+        string curNoTrans = _entityInForm.NomorTransaksi;
+        if(curNoTrans != "" && curNoTrans != lastNoTrans)
+        {
+            foreach(var item in _entityInForm.Detail)
+            {
+                dctDetail[item.KodeGambar].ItemDetail = item;
+                dctDetail[item.KodeGambar].IsTemplate = false;
+                dctDetail[item.KodeGambar].Url = _baseUrl + item.IDGambar;
+            }
+        }
+
+        //output to respected view data variables
+        listDetail = dctDetail.ToList().Select(kv => kv.Value.ItemDetail).ToList();
+        _entityInForm.Detail = listDetail;
+        _listMarkedImage = dctDetail.ToList().Select(kv => kv.Value).ToList();
+
     }
 
 
@@ -249,34 +307,130 @@
             addSnackbar("Gagal mengunggah gambar.", Severity.Error);
             return;
         }
-        
 
-        await _drawingWidget.CopyToImage(_openedImage.IdGambar);
 
+        await _drawingWidget.CopyToImage(_openedImage.IdElement);
+
+        var kodeGambar = _openedImage.ItemDetail.KodeGambar;
+
+        var itemDetail = _entityInForm.Detail.Where(item => item.KodeGambar == kodeGambar).FirstOrDefault();
         //update current marked image url
-        _openedImage.IdGambar = resUpload.Data.FileName;
+        _openedImage.ItemDetail.IDGambar = resUpload.Data.FileName;
         _openedImage.Url = _baseUrl + resUpload.Data.FileName;
-        
-        
+        _openedImage.IsTemplate = false;
+
+
+
+
+
         addSnackbar("Gambar berhasil disimpan dengan id " + blobName, Severity.Success);
     }
 
-
+    private List<TRMPenandaanGambarDetail> PopulateDetail(List<TemplateImageDto> listTemplate, List<TRMPenandaanGambarDetail> listLastDetail, List<TRMPenandaanGambarDetail> listExistingDetail)
+    {
+        var listDetail = new List<TRMPenandaanGambarDetail>();
+        //todo
+        return listDetail;
+    }
 
     private async Task SaveForm()
     {
+        var isNewHeader = _entityInForm.NomorTransaksi == "" ? true : false;
+        var msg = "";
+
+        bool isError = false;
+
         //save header
-        
+        var resHeader = new ServiceResult<NomorTransaksiDto>();
+        if (isNewHeader)
+        {
+            resHeader = await SvcPenandaanGambar.AddHeader(_entityInForm);
+        } 
+        else
+        {
+            resHeader = await SvcPenandaanGambar.EditHeader(_entityInForm);
+        }
 
-        //save detail for each markedImage
+        if(resHeader.Status != ServiceResultEnum.SUCCESS)
+        {
 
+            addSnackbar("Gagal menyimpan data penandaan gambar.", Severity.Error);
+            LogTrace.Error("Fail: store header", resHeader, _classPath);
+            return;
+        }
+        _entityInForm.NomorTransaksi = resHeader.Data!.NomorTransaksi;
 
+        //save template to normal image
+        //save detail 
+        foreach(var item in _listMarkedImage)
+        {
+            if (item.IsTemplate)
+            {
+
+                string blobName = await _drawingWidget.GenBlob();
+                if (blobName == "")
+                {
+                    // addSnackbar("Gagal menyimpan gambar.", Severity.Error);
+                    LogTrace.Error("Fail: generate blob for " + item.ItemDetail.KodeGambar, item,  _classPath);
+
+                    isError = true;
+                    continue;
+                }
+
+                StateHasChanged();
+
+                var resUpload = await SvcImage.UploadBlob(blobName, "test.jpg");
+                if (resUpload.Status != ServiceResultEnum.SUCCESS)
+                {
+                    // addSnackbar("Gagal mengunggah gambar.", Severity.Error);
+                    LogTrace.Error("Fail: upload image " + item.ItemDetail.KodeGambar, resUpload, _classPath);
+                    isError = true;
+                    continue;
+                }
+                item.ItemDetail.IDGambar = resUpload.Data.FileName;
+                item.Url = _baseUrl + resUpload.Data.FileName;
+                item.IsTemplate = false;
+
+            }
+
+            if(item.ItemDetail.IDDetail == 0)
+            {
+                //new detail
+                item.ItemDetail.NomorTransaksi = resHeader.Data!.NomorTransaksi;
+                var resDetail = await SvcPenandaanGambar.AddDetail(item.ItemDetail);
+                if(resDetail.Status != ServiceResultEnum.SUCCESS)
+                {
+                    // addSnackbar("Gagal menyimpan data detail penandaan gambar.", Severity.Error);
+
+                    LogTrace.Error("Fail: store detail " + item.ItemDetail.KodeGambar, item, _classPath);
+                    isError = true;
+                    continue;
+                }
+            }
+            else
+            {
+                //edit detail
+                var resDetail = await SvcPenandaanGambar.EditDetail(item.ItemDetail);
+                if(resDetail.Status != ServiceResultEnum.SUCCESS)
+                {
+                    // addSnackbar("Gagal mengubah data detail penandaan gambar.", Severity.Error);
+                    isError = true;
+                    LogTrace.Error("Fail: store detail " + item.ItemDetail.KodeGambar, item, _classPath);
+                    continue;
+                }
+            }
+        }
+        if(isError)
+        {
+            msg = "Proses penyimpanan data penandaan gambar selesai dengan beberapa kesalahan.";
+            addSnackbar(msg, Severity.Warning);
+        } 
+        else
+        {
+            msg = "Proses penyimpanan data penandaan gambar berhasil.";
+            addSnackbar(msg, Severity.Success);
+        }
+        LogTrace.Info("fin: " + msg, path: _classPath);
     }
-
-
-
-
-    
-
 
 }

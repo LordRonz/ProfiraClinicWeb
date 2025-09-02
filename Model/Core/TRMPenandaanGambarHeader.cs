@@ -9,7 +9,7 @@ namespace ProfiraClinic.Models.Core
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]
         [Key]
-        public string NomorTransaksi { get; set; } // DIAG/Tahun/Bulan/Nourut
+        public string NomorTransaksi { get; set; } = ""; // DIAG/Tahun/Bulan/Nourut
 
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
@@ -21,18 +21,18 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string KodeLokasi { get; set; } // Kode Lokasi Klinik
+        public string KodeLokasi { get; set; } = ""; // Kode Lokasi Klinik
 
         [Column(TypeName = "char(4)")]
         [MaxLength(4)]
-        public string TahunTransaksi { get; set; } // Tahun Transaksi Diagnosa
+        public string TahunTransaksi { get; set; } = ""; // Tahun Transaksi Diagnosa
 
         [Column(TypeName = "char(2)")]
         [MaxLength(2)]
-        public string BulanTransaksi { get; set; } // Bulan Transaksi Diagnosa
+        public string BulanTransaksi { get; set; } = ""; // Bulan Transaksi Diagnosa
 
         [Column(TypeName = "date")]
-        public DateTime TanggalTransaksi { get; set; } // Tanggal Transaksi Diagnosa
+        public DateTime TanggalTransaksi { get; set; } = DateTime.Today; // Tanggal Transaksi Diagnosa
 
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]

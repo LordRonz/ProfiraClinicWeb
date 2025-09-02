@@ -8,6 +8,6 @@ namespace ProfiraClinic.Models.Api
 {
     public class IdDetailDto
     {
-        public string IdDetail { get; set; } = "";
+        public int IdDetail { get; set; } = 0;
     }
 }

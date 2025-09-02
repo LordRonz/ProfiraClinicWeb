@@ -29,52 +29,52 @@ namespace ProfiraClinicRME.Infra
         }
 
 
-        public async Task<ServiceResult<NomorTransaksiDto>> AddHeader(PenandaanGambarHeader newHeader)
+        public async Task<ServiceResult<NomorTransaksiDto>> AddHeader(TRMPenandaanGambarHeader newHeader)
         {
             LogTrace.Info($"init", newHeader, _classPath);
 
             //generate dto
 
-            Response<NomorTransaksiDto?> apiResponse = await _svcApi.Send<PenandaanGambarHeader, NomorTransaksiDto>("post", "api/PenandaanGambar/AddPenandaanGambarHeader", newHeader);
+            Response<NomorTransaksiDto?> apiResponse = await _svcApi.Send<TRMPenandaanGambarHeader, NomorTransaksiDto>("post", "api/PenandaanGambar/AddPenandaanGambarHeader", newHeader);
 
             ServiceResult<NomorTransaksiDto> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.ACTION);
 
             return svcResult;
         }
 
-        public async Task<ServiceResult<IdDetailDto>> AddDetail(PenandaanGambarDetail newDetail)
+        public async Task<ServiceResult<IdDetailDto>> AddDetail(TRMPenandaanGambarDetail newDetail)
         {
             LogTrace.Info($"init", newDetail, _classPath);
 
             //generate dto
 
-            Response<IdDetailDto?> apiResponse = await _svcApi.Send<PenandaanGambarDetail, IdDetailDto>("post", "api/PenandaanGambar/AddPenandaanGambarDetail", newDetail);
+            Response<IdDetailDto?> apiResponse = await _svcApi.Send<TRMPenandaanGambarDetail, IdDetailDto>("post", "api/PenandaanGambar/AddPenandaanGambarDetail", newDetail);
 
             ServiceResult<IdDetailDto> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.ACTION);
 
             return svcResult;
         }
 
-        public async Task<ServiceResult<NomorTransaksiDto>> EditHeader(PenandaanGambarHeader updHeader)
+        public async Task<ServiceResult<NomorTransaksiDto>> EditHeader(TRMPenandaanGambarHeader updHeader)
         {
             LogTrace.Info($"init", updHeader, _classPath);
 
             //generate dto
 
-            Response<NomorTransaksiDto?> apiResponse = await _svcApi.Send<PenandaanGambarHeader, NomorTransaksiDto>("post", "api/PenandaanGambar/EditPenandaanGambarHeader", updHeader);
+            Response<NomorTransaksiDto?> apiResponse = await _svcApi.Send<TRMPenandaanGambarHeader, NomorTransaksiDto>("post", "api/PenandaanGambar/EditPenandaanGambarHeader", updHeader);
 
             ServiceResult<NomorTransaksiDto> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.ACTION);
 
             return svcResult;
         }
 
-        public async Task<ServiceResult<IdDetailDto>> EditDetail(PenandaanGambarDetail updDetail)
+        public async Task<ServiceResult<IdDetailDto>> EditDetail(TRMPenandaanGambarDetail updDetail)
         {
             LogTrace.Info($"init", updDetail, _classPath);
 
             //generate dto
 
-            Response<IdDetailDto?> apiResponse = await _svcApi.Send<PenandaanGambarDetail, IdDetailDto>("post", "api/PenandaanGambar/EditPenandaanGambarDetail", updDetail);
+            Response<IdDetailDto?> apiResponse = await _svcApi.Send<TRMPenandaanGambarDetail, IdDetailDto>("post", "api/PenandaanGambar/EditPenandaanGambarDetail", updDetail);
 
             ServiceResult<IdDetailDto> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.ACTION);
 
