@@ -100,66 +100,30 @@
     <MudCard Class="mt-8">
         <Note EntityType="@TRMPemeriksaanUmum" ListData="@_listRekamMedis">
             <NoteContent>
-                <ul>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Kunjungan: @context.NomorAppointment
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Keadaan Umum: @context.KeadaanUmum
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Tingkat Kesadaran: @context.TingkatKesadaran
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Kesadaran: @context.Kesadaran
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Sistolik: @context.Sistolik
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Diastolik: @context.Distolik
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Suhu: @context.Suhu C
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Saturasi O2: @context.Saturasi
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Frekuensi Nafas: (@context.FrekuensiNapas)x/Menist
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Frekuensi Nadi: (@context.FrekuensiNadi)x/Menit
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Dokter: @context.NamaKaryawan
-                        </MudText>
-                    </li>
-                </ul>
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    @context.UPDDT
-                </MudText>
+                @{
+
+                    string[][] displayData = [[]];
+                    if(context is not null)
+                    {
+                        displayData = [
+                            ["Kunjungan", context.NomorAppointment],
+                            ["Keadaan Umum", context.KeadaanUmum],
+                            ["Tingkat Kesadaran", context.TingkatKesadaran],
+                            ["Kesadaran", context.Kesadaran ?? ""],
+                            ["Sistolik", context.Sistolik?.ToString() ?? ""],
+                            ["Diastolik", context.Distolik?.ToString() ?? ""],
+                            ["Suhu", $"{context.Suhu} C"],
+                            ["Saturasi O2", context.Saturasi?.ToString() ?? ""],
+                            ["Frekuensi Nafas", $"{context.FrekuensiNapas}x/menit"],
+                            ["Frekuensi Nadi", $"{context.FrekuensiNadi}x/menit"],
+                            ["Dokter", context.NamaKaryawan ?? ""],
+                            [context.UPDDT?.ToString() ?? "", ""]
+                        ];
+                        
+                    }
+                }
+                <TableGen Data="@displayData" />
+                
             </NoteContent>
         </Note>
     </MudCard>
