@@ -12,9 +12,10 @@
 @inject ProtectedLocalStorage LocalStore
 @inject ICustomerService SvcCustomer
 @inject IAppointmentService SvcAppointment
+@inject IUserService SvcUser
 
 <TopbarUser Route="Perawatan"
-            Title="Perawatan Pasien / Doctor on Duty: dr. Fifien"
+            Title="@_title"
             ShowBack="true"
             />
 
@@ -83,7 +84,7 @@
     private string _prettyTglLahir = "-";
     private string tgTrx { get; set; } = "0";
     private string noTrx { get; set; } = "TRX001";
-
+    private string _title = "";
 
     public Perawatan()
     {
@@ -104,6 +105,8 @@
             return; 
         }
         _apo = resApo.Data;
+        _currentUser = SvcUser.Current;
+        _title = $"Perawatan Pasien / Doctor on Duty :  {_currentUser?.Karyawan?.NamaKaryawan ?? "-"}";
 
     }
 
@@ -132,7 +135,7 @@
         }
         _customer = resCust.Data;
         _jnsKelamin = UIHelper.GetJenisKelamin(_customer.JenisKelamin);
-        _age = UIHelper.FormatAge(_customer.TanggalLahir, DateTime.Now);
+        _age = DateUtility.FormatAge(_customer.TanggalLahir, DateTime.Now);
 
     }
 
