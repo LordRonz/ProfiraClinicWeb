@@ -96,15 +96,15 @@ var DrawingService = {
      * @param {string} blobName - Name to store the blob under
      * @returns {Promise<OpStatus>} Operation status object
      */
-    genBlob: async function (idWidget, blobName) {
-        this._idWidget = idWidget;
+    genBlob: async function (idCanvas, blobName) {
+        this._idWidget = idCanvas;
         this._blobName = blobName;
-        console.log(`Store blob from ${idWidget} to ${blobName}`);
-        const canvas = document.querySelector(`#${idWidget} canvas`);
+        console.log(`genBlob start: store blob from ${idCanvas} to ${blobName}`);
+        const canvas = document.getElementById(idCanvas);
         const opStatus = new OpStatus();
         opStatus.status = 1;
         if (!canvas) {
-            opStatus.message = `Canvas not found for widget ${idWidget}`;
+            opStatus.message = `Canvas with id ${idCanvas} not found`;
             console.error(opStatus);
             return opStatus;
         }

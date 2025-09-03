@@ -39,7 +39,7 @@ builder.Services.AddHttpClient("std", httpClient =>
 
 }).AddHttpMessageHandler<AuthRedirectHandler>();
 
-builder.Services.AddScoped<DataService>();//for test only
+//builder.Services.AddScoped<DataService>();//for test only
 
 
 builder.Services.AddScoped<SessionService>();

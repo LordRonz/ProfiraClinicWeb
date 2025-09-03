@@ -27,7 +27,7 @@ namespace ProfiraClinicRME.Utils
 
         public static string Dump(object element, int depth = 4, int indentSize = 2, char indentChar = ' ')
         {
-            Console.WriteLine("Start dumping ...");
+            //Console.WriteLine("Start dumping ...");
             var instance = new ObjectDumper(depth, indentSize, indentChar);
             return instance.DumpElement(element, true);
         }

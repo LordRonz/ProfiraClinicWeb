@@ -1,12 +1,12 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Net.Http.Headers;
+﻿using MudBlazor;
 using ProfiraClinic.Models.Api;
-using System.Text.Json;
-using ProfiraClinicRME.Utils;
 using ProfiraClinic.Models.Core;
-using BootstrapBlazor.Components;
+using ProfiraClinicRME.Utils;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace ProfiraClinicRME.Infra
