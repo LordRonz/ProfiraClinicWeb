@@ -28,26 +28,19 @@ OnSave="@DoSave"
             <MudCard Class="mt-8">
                 <Note EntityType="@TRMAnamnesis" ListData="@_listRekamAnamnesis">
                     <NoteContent>
-                        <ul>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Kunjungan: @context.NomorAppointment
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Keterangan Anamnesis: @context.KeteranganAnamnesis
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Dokter: @context.NamaKaryawan
-                                </MudText>
-                            </li>
-                        </ul>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            @context.UPDDT
-                        </MudText>
+                        @{
+                            string[][] displayData = [[]];
+                            if (context is not null)
+                            {
+                                displayData = [
+                                    ["Kunjungan", context.NomorAppointment ?? ""],
+                                    ["Keterangan Anamnesis", context.KeteranganAnamnesis ?? ""],
+                                    ["Dokter", context.NamaKaryawan ?? ""],
+                                    [context.UPDDT?.ToString() ?? "", ""]
+                                ];
+                            }
+                        }
+                        <TableGen Data="@displayData" />
                     </NoteContent>
                 </Note>
             </MudCard>
@@ -128,46 +121,22 @@ OnSave="@DoSave"
             <MudCard Class="mt-8">
                 <Note EntityType="@RiwayatAdaptor" ListData="@_listRekamRiwayat">
                     <NoteContent>
-                        <ul>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Kunjungan: @context.NomorAppointment
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Penyakit dahulu: @context.PenyakitDahulu
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Penyakit Sekarang: @context.DisplayPenyakitSekarang
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Alergi Obat: @context.KetAlergiObat
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Alergi Makanan: @context.KetAlergiMakanan
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Faktor Resiko: @context.DisplayResiko
-                                </MudText>
-                            </li>
-                            <li>
-                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                                    Dokter: @context.NamaKaryawan
-                                </MudText>
-                            </li>
-                        </ul>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            @context.UPDDT
-                        </MudText>
+                        @{
+                            string[][] displayData = [[]];
+                            if (context is not null)
+                            {
+                                displayData = [
+                                    ["Kunjungan", context.NomorAppointment ?? ""],
+                                    ["Penyakit dahulu", context.PenyakitDahulu ],
+                                    ["Penyakit Sekarang" , context.DisplayPenyakitSekarang],
+                                    ["Alergi Makanan", context.KetAlergiMakanan],
+                                    ["Faktor Resiko", context.DisplayResiko],
+                                    ["Dokter", context.NamaKaryawan ?? ""],
+                                    [context.UPDDT?.ToString() ?? "", ""]
+                                ];
+                            }
+                        }
+                        <TableGen Data="@displayData" />
                     </NoteContent>
                 </Note>
             </MudCard>

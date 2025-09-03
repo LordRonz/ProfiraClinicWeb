@@ -30,10 +30,10 @@
             <MudTextField @bind-Value="@_trmCPPTInForm.Obyektif" ShrinkLabel T="string" Label="Obyektif" Variant="Variant.Outlined" Lines="10" />
         </MudItem>
         <MudItem xs="12" Class="p-1">
-            <MudTextField @bind-Value="@_trmCPPTInForm.Assestment" ShrinkLabel T="string" Label="Assesment" Variant="Variant.Outlined" Lines="10" />
+            <MudTextField @bind-Value="@_trmCPPTInForm.Assestment" ShrinkLabel T="string" Label="Assesmen" Variant="Variant.Outlined" Lines="10" />
         </MudItem>
         <MudItem xs="12" Class="p-1">
-            <MudTextField @bind-Value="@_trmCPPTInForm.Planning" ShrinkLabel T="string" Label="Planning" Variant="Variant.Outlined" Lines="10" />
+            <MudTextField @bind-Value="@_trmCPPTInForm.Planning" ShrinkLabel T="string" Label="Perencanaan" Variant="Variant.Outlined" Lines="10" />
         </MudItem>
         <MudItem xs="12" Class="p-1">
             <MudTextField ShrinkLabel @bind-Value="@_trmCPPTInForm.Instruksi" T="string" Label="Instruksi" Variant="Variant.Outlined" Lines="10" />
@@ -42,46 +42,24 @@
     <MudCard Class="mt-8">
         <Note EntityType="@TRMCPPT" ListData="@_listRekamMedis">
             <NoteContent>
-                <ul>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Kunjungan: @context.NomorAppointment
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Subyektif: @context.Subyektif
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Obyektif: @context.Obyektif
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Assesment: @context.Assestment
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Planning: @context.Planning
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Instruksi: @context.Instruksi
-                        </MudText>
-                    </li>
-                    <li>
-                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                            Dokter: @context.NamaKaryawan
-                        </MudText>
-                    </li>
-                </ul>
-                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
-                    @context.UPDDT
-                </MudText>
+                @{
+
+                    string[][] displayData = [[]];
+                    if(context is not null)
+                    {
+                        displayData = [
+                            ["Kunjungan", context.NomorAppointment ?? ""],
+                            ["Subyektif", context.Subyektif?? ""],
+                            ["Obyektif" , context.Obyektif?? ""],
+                            ["Assesment", context.Assestment ?? ""],
+                            ["Perencanaan", context.Planning ?? ""],
+                            ["Instruksi", context.Instruksi ?? ""],
+                            ["Dokter", context.NamaKaryawan ?? ""],
+                            [context.UPDDT?.ToString() ?? "", ""]
+                        ];
+                    }
+                }
+                <TableGen Data="@displayData" />
             </NoteContent>
         </Note>
     </MudCard>
