@@ -17,33 +17,6 @@
 @inject NavigationManager NavigationManager;
 @inject ProtectedSessionStorage ProtectedSessionStore
 
-@* <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-        <Button />
-    </main>
-    <ProfiraClinicRME.Components.Layout.Footer.Footer />
-</div>
-
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
-
-<MudThemeProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/> *@
 
 <MudThemeProvider @rendermode="InteractiveServer" Theme="MyCustomTheme" />
 <MudPopoverProvider @rendermode="InteractiveServer" />
@@ -51,7 +24,7 @@
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 
 <CascadingValue Value="this">
-    <MudLayout Class="@LayoutCss" Style='@GetBgClass()'>
+    <MudLayout Class="bg-wave-fixed doctor" >
         @* Top navbar *@
 
 
@@ -74,14 +47,7 @@
                     <div class="mr-8">
                         <MudIcon Icon="@Icons.Material.Filled.Search" Style="color: #fff;" />
                     </div>
-                    @* <div class="d-flex align-items-center gap-1 mr-2">
-                        <MudInput Placeholder="Search for.." Style="background: #fff; padding: 5px;" Class="rounded-3 search" @bind-Value="Search" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary" />
-
-                    </div> *@
-
-                    @* <MudBadge Content="3" Overlap="true" Class="mr-16" Color="MudBlazor.Color.Secondary">
-                <MudIcon Icon="@Icons.Material.Filled.Email" Color="MudBlazor.Color.Default" />
-                </MudBadge> *@
+                    
                     <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
                         <MudText Typo="Typo.body2">@_user?.UserName</MudText>
                         <MudAvatar>
@@ -151,7 +117,7 @@
     public string PasienUsia { get; set; } = "";
 
     private string LayoutCss =>
-    $"bg-wave-fixed {(isDoctor ? "wave-blue" : "wave")}";
+    $"bg-wave-fixed wave-blue";
 
     MudTheme MyCustomTheme = new MudTheme()
         {
@@ -314,108 +280,3 @@
     }
 }
 
-<style>
-    html, body {
-        height: 100%;
-        margin: 0;
-        background-color: rgb(234,228,228); /* your bg-dark bg-opacity-25 */
-    }
-
-    .bg-wave-fixed {
-        background-repeat: no-repeat;
-        background-size: 100% 45%;
-        background-attachment: fixed;
-        height: 100vh;
-    }
-
-        .bg-wave-fixed.doctor {
-            background-image: url("images/wave-blue.png");
-        }
-
-        .bg-wave-fixed.patient {
-            background-image: url("images/wave.png");
-        }
-
-    .minh-100 {
-        min-height: 100%;
-    }
-
-    .mud-nav-link-icon-default {
-        color: #0D24EC !important;
-    }
-
-    .sidebar-container .mud-button-label {
-        color: #0D24EC !important;
-        text-transform: none;
-    }
-
-    .mud-nav-link {
-        font-weight: 500;
-        font-size: 15px;
-    }
-
-    .mud-nav-link-text {
-        letter-spacing: 0.5px !important;
-    }
-
-    .mud-toolbar-appbar {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .mud-main-content {
-        padding-top: 104px;
-    }
-
-    .sidebar-divider {
-        border: 1px solid rgba(71, 71, 71, 1);
-    }
-
-    .master-modal {
-        position: absolute;
-        left: 1vw;
-        top: 10vh;
-        z-index: 696969;
-        white-space: nowrap;
-        background: rgba(255, 255, 255, 1);
-        border-radius: 15px;
-        overflow: hidden;
-        width: 20vw;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    }
-
-    .master-modal-header {
-        background: rgba(255, 166, 34, 1);
-        padding: 8px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: white;
-        font-weight: 600;
-    }
-
-    .mud-drawer--closed.mud-drawer-mini {
-        width: 88px !important; /* 56 + 2 * 16 */
-        margin-right: 20px;
-    }
-
-    .save-btn {
-        background: rgba(47, 193, 71, 1);
-        color: white;
-        text-transform: none;
-    }
-
-        .save-btn:hover {
-            background: rgba(27, 153, 41, 1);
-        }
-
-    .back-btn {
-        background: rgba(156, 99, 5, 1);
-        color: white;
-        text-transform: none;
-    }
-
-        .back-btn:hover {
-            background: rgba(126, 69, 2, 1);
-        }
-</style>
