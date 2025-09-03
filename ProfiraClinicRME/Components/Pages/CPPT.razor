@@ -55,7 +55,7 @@
                             ["Perencanaan", context.Planning ?? ""],
                             ["Instruksi", context.Instruksi ?? ""],
                             ["Dokter", context.NamaKaryawan ?? ""],
-                            [context.UPDDT?.ToString() ?? "", ""]
+                            [DateUtility.FormatDate(context.UPDDT, true), ""]
                         ];
                     }
                 }

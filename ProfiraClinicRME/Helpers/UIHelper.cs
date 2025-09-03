@@ -8,29 +8,10 @@ namespace ProfiraClinicRME.Helpers
 
     public static class UIHelper
     {
-        public static string FormatDate(DateTime? dtSource)
-        {
-            return dtSource is null ? "n/a" : ((DateTime)dtSource).ToString("dd//MM//yyyy");
-        }
-
-        public static string FormatTime(TimeSpan? dtSource)
-        {
-            return dtSource is null ? "n/a" : ((TimeSpan)dtSource).ToString("hh\\:mm");
-        }
 
         public static string GetJenisKelamin(string kode)
         {
             return kode == "0" ? "Laki-laki" : "Perempuan";
-        }
-
-        public static string FormatAge(DateTime? earlier, DateTime later)
-        {
-            if (earlier == null) return "N/A";
-            int years;
-            int months;
-            int days;
-            (years, months, days) = Date.GetDateDiff((DateTime)earlier, later);
-            return $"{years} tahun {months} bulan {days} hari";
         }
 
         //appointment

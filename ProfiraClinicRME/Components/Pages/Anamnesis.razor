@@ -36,7 +36,7 @@ OnSave="@DoSave"
                                     ["Kunjungan", context.NomorAppointment ?? ""],
                                     ["Keterangan Anamnesis", context.KeteranganAnamnesis ?? ""],
                                     ["Dokter", context.NamaKaryawan ?? ""],
-                                    [context.UPDDT?.ToString() ?? "", ""]
+                                    [DateUtility.FormatDate(context.UPDDT, true), ""]
                                 ];
                             }
                         }
@@ -132,7 +132,7 @@ OnSave="@DoSave"
                                     ["Alergi Makanan", context.KetAlergiMakanan],
                                     ["Faktor Resiko", context.DisplayResiko],
                                     ["Dokter", context.NamaKaryawan ?? ""],
-                                    [context.UPDDT?.ToString() ?? "", ""]
+                                    [DateUtility.FormatDate(context.UPDDT, true), ""]
                                 ];
                             }
                         }

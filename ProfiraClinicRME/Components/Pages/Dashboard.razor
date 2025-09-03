@@ -17,9 +17,8 @@
 @inject NavigationManager Nav
 @inject IAppointmentService SvcAppointment
 
-<TopbarUser 
-Route="Dasboard"
-Title="@_title"/>
+<TopbarUser Route="Dasboard"
+            Title="@_title" />
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <Table WithAdd="false" WithFilter="false" WithPaging="false" Config="_appointmentTblConf" />
@@ -50,35 +49,43 @@ Title="@_title"/>
         CurrentUser curUser = SvcUser.Current!;
         _title += curUser.Klinik.KETLK;
 
-        var resApo = await SvcAppointment.GetListOnWaitAsync(curUser.KodeLokasi??"", DateTime.Today, curUser.Karyawan.KodeKaryawan);
+        var resApo = await SvcAppointment.GetListOnWaitAsync(curUser.KodeLokasi ?? "", DateTime.Today, curUser.Karyawan.KodeKaryawan);
+
+        var test = DateUtility.FormatDate(DateTime.Today);
         // Check if status code indicates success
 
         if (resApo.Status == ServiceResultEnum.FOUND)
         {
+
             _listAppointment = resApo.Data.Items;
-
-            var tableData = _listAppointment.Select(apo => (object)new
+            List<object> tableData = [];
+            var dataRow = new object();
+            foreach (var item in _listAppointment)
             {
-                view = "/Perawatan/" + apo.IDAppointment,
-                IDAppointment = apo.IDAppointment,
-                MemberID = apo.KodeCustomer,
-                NamaPasien = apo.NamaCustomer,
-                AlamatDomisili = apo.AlamatDomisili,
-                NomorHPCustomer = apo.NomorHPCustomer,
-                TglLahir = UIHelper.FormatDate(apo.TanggalLahir),
-                Usia = UIHelper.FormatAge(apo.TanggalLahir, DateTime.Now),
-                Tindakan = UIHelper.GetStatusTindakan(apo.StatusTindakan),
-                JanjiTemu = UIHelper.FormatTime(apo.JamAppointment)
+                dataRow = (object)new
+                {
+                    view = "/Perawatan/" + item.IDAppointment,
+                    IDAppointment = item.IDAppointment,
+                    MemberID = item.KodeCustomer ?? "",
+                    NamaPasien = item.NamaCustomer ?? "",
+                    AlamatDomisili = item.AlamatDomisili ?? "",
+                    NomorHPCustomer = item.NomorHPCustomer ?? "",
+                    TglLahir = DateUtility.FormatDate(item.TanggalLahir),
+                    Usia = DateUtility.FormatAge(item.TanggalLahir, DateTime.Now),
+                    Tindakan = UIHelper.GetStatusTindakan(item.StatusTindakan),
+                    JanjiTemu = DateUtility.FormatTime(item.JamAppointment)
+                };
+                tableData.Add(dataRow);
+            }
 
-            }).ToList();
 
             LogTrace.Debug("table data", tableData, _classPath);
 
             _appointmentTblConf = new TableConfig(
                 new List<TableColumn> {
-                    new TableColumn { 
+                    new TableColumn {
                         Caption="Pilih", DataField="view", Type=ColumnType.View, CustomIcon="fa fa-hand-pointer", Action=SetCurrentAppointment
-                    }, 
+                    },
                     new TableColumn { Caption = "Janji Temu", DataField = "JanjiTemu" },
                     new TableColumn { Caption="Member ID", DataField="MemberID" },
                     new TableColumn { Caption = "Nama Pasien", DataField = "NamaPasien" },
@@ -101,14 +108,14 @@ Title="@_title"/>
 
 
 
-    private async Task SetCurrentAppointment(Dictionary<string,string> dct)
+    private async Task SetCurrentAppointment(Dictionary<string, string> dct)
     {
 
         LogTrace.Info("init", dct, _classPath);
-        string stIdApo = dct.GetValueOrDefault("IDAppointment")?? "";
+        string stIdApo = dct.GetValueOrDefault("IDAppointment") ?? "";
         var res = long.TryParse(stIdApo, out long idApo);
 
-        if(!res)
+        if (!res)
         {
             addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
             return;
@@ -116,12 +123,12 @@ Title="@_title"/>
 
         var apo = _listAppointment.FirstOrDefault(item => item.IDAppointment == idApo);
 
-        if(apo is null)
+        if (apo is null)
         {
             addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
             return;
         }
-        // SvcSession.Title = 
+        // SvcSession.Title =
         SvcAppointment.SetCurrent(apo);
 
         //update status tindakan
@@ -134,8 +141,8 @@ Title="@_title"/>
             return;
         }
 
-       
-        Nav.NavigateTo("/Perawatan/" + apo.IDAppointment );
+
+        Nav.NavigateTo("/Perawatan/" + apo.IDAppointment);
         return;
     }
 }

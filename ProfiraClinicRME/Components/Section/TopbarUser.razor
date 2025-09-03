@@ -68,7 +68,7 @@
         base.OnParametersSet();
         if (Appointment is not null)
         {
-            _patientAge = UIHelper.FormatAge(Appointment.TanggalLahir, DateTime.Now);
+            _patientAge = DateUtility.FormatAge(Appointment.TanggalLahir, DateTime.Now);
             _patientName = Appointment.NamaCustomer;
         }
     }

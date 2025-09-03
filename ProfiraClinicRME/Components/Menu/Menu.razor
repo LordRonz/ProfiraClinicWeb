@@ -6,9 +6,9 @@
     @* <MenuItem Src="/images/dokter/menu/rekam-medis.png" Title="Rekam Medis"></MenuItem> *@
     <MenuItem Click="GoToPemeriksaan" Src="/images/dokter/menu/stetoskop.png" Title="Pemeriksaan" Href="/pemeriksaan" Class="p-0"></MenuItem>
     <MenuItem Click="GoToPenandaanGambar" Src="/images/dokter/menu/pencil.png" Title="Penandaan Gambar" Href="/penandaan-gambar"></MenuItem>
-    <MenuItem Click="GoToCPPT" Src="/images/dokter/menu/notes.png" Title="CPPT" Class="p-0" Href="/cppt"></MenuItem>
-    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/palang-merah.png" Title="Kontrol" Href="/kontrol"></MenuItem>
-    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/tindakan-perawatan" Class="p-0"></MenuItem>
+    <MenuItem  Click="GoToCPPT" Src="/images/dokter/menu/notes.png" Title="CPPT" Class="p-0" Href="/cppt"></MenuItem>
+    <MenuItem Disabled Click="GoToKontrol" Src="/images/dokter/menu/palang-merah.png" Title="Kontrol" Href="/perawatan" />
+    <MenuItem Disabled Click="GoToTindakanPerawatan" Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/perawatan" Class="p-0" />
 </div>
 
 @code {
@@ -28,6 +28,22 @@
         // Layout.ChangeTitleAndRoute("Diagnosa", "Perawatan Pasien / Diagnosa");
 
         Nav.NavigateTo("/cppt");
+
+    }
+
+    private async void GoToKontrol()
+    {
+        // Layout.ChangeTitleAndRoute("Diagnosa", "Perawatan Pasien / Diagnosa");
+
+        // Nav.NavigateTo("/kontrol");
+
+    }
+
+    private async void GoToTindakanPerawatan()
+    {
+        // Layout.ChangeTitleAndRoute("Diagnosa", "Perawatan Pasien / Diagnosa");
+
+        // Nav.NavigateTo("/tindakan-perawatan");
 
     }
 
@@ -55,11 +71,5 @@
 
     }
 
-    private async void GoToTindakanPerawatan()
-    {
-        // Layout.ChangeTitleAndRoute("Penandaan Gambar", "Perawatan Pasien / Penandaan Gambar");
 
-        Nav.NavigateTo("/penandaan-gambar");
-
-    }
 }
