@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Services;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -55,6 +56,8 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound();
 
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+
             var karyawan = await _context.MKaryawan
                             .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
@@ -63,7 +66,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
         new SqlParameter("@TanggalTransaksi", appDto.TanggalTransaksi ?? DateTime.Now),
         new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
         new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
@@ -118,6 +121,8 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound();
 
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+
             var karyawan = await _context.MKaryawan
                 .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
@@ -136,7 +141,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
         new SqlParameter("@TanggalTransaksi", appDto.TanggalTransaksi ?? DateTime.Now),
         new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
         new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),

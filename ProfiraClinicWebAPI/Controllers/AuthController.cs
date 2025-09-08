@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
 using ProfiraClinicWebAPI.Model;
-using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,13 +24,7 @@ namespace ProfiraClinicWebAPI.Controllers
             var authenticatedUser = _authService.Authenticate(model.Username, model.Password);
             if (authenticatedUser == null || authenticatedUser.Equals(null))
                 return Unauthorized();
-            if (!string.IsNullOrEmpty(authenticatedUser.KodeLokasi) && !string.IsNullOrEmpty(model.KodeLokasi))
-            {
-                if (model.KodeLokasi != authenticatedUser.KodeLokasi)
-                    return BadRequest("Invalid Kode Lokasi");
-            }
-
-                var token = _authService.GenerateToken(authenticatedUser);
+            var token = _authService.GenerateToken(authenticatedUser, model.KodeLokasi);
             return Ok(new { Token = token });
         }
 
@@ -58,7 +52,7 @@ namespace ProfiraClinicWebAPI.Controllers
             var loginModel = new LoginModel();
             loginModel.Username = model.Username;
 
-            var token = _authService.GenerateToken(loginModel);
+            var token = _authService.GenerateToken(loginModel, model.KodeLokasi);
             return Ok(new { Token = token });
         }
 

@@ -60,15 +60,15 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string? USRID { get; set; } // User Input
 
-        public int IDDetail { get; set; } // IDDetail
+        public int? IDDetail { get; set; } // IDDetail
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
-        public string KodeGambar { get; set; } // Relasi dengan Table Customer
+        public string? KodeGambar { get; set; } // Relasi dengan Table Customer
 
         [Column(TypeName = "char(255)")]
         [MaxLength(255)]
-        public string IDGambar { get; set; } // Kode Dokter / Terapis
+        public string? IDGambar { get; set; } // Kode Dokter / Terapis
 
         public string? KETLK { get; set; }
         public string? NamaCustomer { get; set; }

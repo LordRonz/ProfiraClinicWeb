@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Services;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -71,12 +72,14 @@ namespace ProfiraClinicWebAPI.Controllers
             var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.USRID == userName);
             if (user == null) return NotFound();
 
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+
             var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
             if (appDto.KodeKaryawan == null && karyawan == null) return NotFound();
 
             var sqlParameters = new[]
                     {
-                new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+                new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
                 new SqlParameter("@TanggalTransaksi", appDto.TanggalTransaksi ?? DateTime.Now),
                 new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
                 new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
@@ -131,6 +134,8 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound();
 
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+
             var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
             if (dto.KodeKaryawan == null && karyawan == null)
@@ -150,7 +155,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // 2. Insert new record (Edit = Delete + Insert)
             var editParams = new[]
             {
-        new SqlParameter("@KodeLokasi", dto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@KodeLokasi", dto.KodeLokasi ?? kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
         new SqlParameter("@TanggalTransaksi", dto.TanggalTransaksi ?? DateTime.Now),
         new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
         new SqlParameter("@KodeCustomer", dto.KodeCustomer ?? (object)DBNull.Value),
