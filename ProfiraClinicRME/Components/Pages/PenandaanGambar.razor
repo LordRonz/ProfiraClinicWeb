@@ -50,7 +50,7 @@
     </MudItem>
     <MudItem xs="12" md="4">
         <MudPaper Elevation="4" Class="pa-3 rounded-3 minh-100">
-            <MudTextField @bind-bind-Value="@_entityInForm.Keterangan"
+            <MudTextField @bind-Value="@_entityInForm.Keterangan"
 
                 T="string" Placeholder="Isi keterangan gambar di sini..." Lines="10"></MudTextField>
         </MudPaper>
@@ -279,7 +279,7 @@
 
         // var result = await _drawingWidget.CallJsFunction();
         // await JS.InvokeVoidAsync("DrawingWidget.setTargetImage", "test", "left_face.jpg");
-        await _drawingWidget.DrawImage(markedImage.IdElement);
+        await _drawingWidget.DrawImageToCanvas(markedImage.IdElement);
         // addSnackbar($"helllo {result?.Message}", Severity.Info);
     }
 
@@ -292,7 +292,7 @@
             return;
         }
 
-        string blobName = await _drawingWidget.GenBlob();
+        string blobName = await _drawingWidget.GenDrawingBlob();
         if (blobName == "")
         {
             addSnackbar("Gagal menyimpan gambar.", Severity.Error);
@@ -367,7 +367,7 @@
             if (item.IsTemplate)
             {
 
-                string blobName = await _drawingWidget.GenBlob();
+                string blobName = await _drawingWidget.GenImageBlob(item.IdElement);
                 if (blobName == "")
                 {
                     // addSnackbar("Gagal menyimpan gambar.", Severity.Error);
@@ -396,7 +396,7 @@
             if(item.ItemDetail.IDDetail == 0)
             {
                 //new detail
-                item.ItemDetail.NomorTransaksi = resHeader.Data!.NomorTransaksi;
+                item.ItemDetail.NomorTransaksi = _entityInForm.NomorTransaksi;
                 var resDetail = await SvcPenandaanGambar.AddDetail(item.ItemDetail);
                 if(resDetail.Status != ServiceResultEnum.SUCCESS)
                 {

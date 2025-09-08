@@ -17,11 +17,15 @@
     </MudCardHeader>
     <MudCardContent>
         <div @ref="@_container">
-            <Canvas @ref="@_canvas"
-                    @onmousemove="MouseMoveCanvasAsync"
-                    @onmouseup="MouseUpCanvas"
-                    @onmousedown="MouseDownCanvas"
+            <Canvas @ref="@_canvasDraw"
+                    id="@_idDrawingCanvas"
                     height="400" width="400" class="dw-canvas">
+            </Canvas>
+            <Canvas @ref="@_canvasHidden"
+
+                    id="@_idHiddenCanvas"
+                    hidden
+                    height="400" width="400">
             </Canvas>
         </div>
     </MudCardContent>
@@ -43,21 +47,27 @@
     private bool _isLoaded = false;
     private bool _mouseDown = false;
     private bool _renderRequired = true;
-    private Canvas _canvas = new();
-    private Context2D? _ctxCanvas;
+    private Canvas _canvasDraw = new();
+    private Canvas _canvasHidden = new();
+    private Context2D? _ctxCanvasDraw;
+    private Context2D? _ctxCanvasHidden;
     private Context2D? ctx;
-    private double _canvasX;
-    private double _canvasY;
+    private double _canvasDrawX;
+    private double _canvasDrawY;
     private double _mouseX;
     private double _mouseY;
     private double _prevMouseX;
     private double _prevMouseY;
     private ElementReference _container;
-    private int _canvasHeight { get; set; } = 0;
-    private int _canvasWidth { get; set; } = 0;
+    private int _canvasDrawHeight { get; set; } = 0;
+    private int _canvasDrawWidth { get; set; } = 0;
     private string _color = "black";
+    private string _guid = "";
+    private string _idDrawingCanvas = "";
+    private string _idHiddenCanvas = "";
     private string _idWidget = "";
     private string _widgetCss = "";
+    private IJSObjectReference? _drawingWidgetJsInstance;
 
     private class Position
     {
@@ -84,7 +94,7 @@
         await JS.InvokeVoidAsync("eval", $"mycanvas = document.getElementById('{_idWidget}').querySelector('canvas')");
         await JS.InvokeVoidAsync("eval", $"myimage.src = mycanvas.toDataURL()"); */
 
-        if (opStatus.Status != 0)
+    if (opStatus.Status != 0)
         {
             LogTrace.Error(opStatus.Message, opStatus.Data, _classPath);
             return;
@@ -94,23 +104,48 @@
         return;
     }
 
-    public async Task DrawImage(string IdImage)
+    public async Task<bool> DrawImageToCanvas(string IdImage)
     {
         LogTrace.Info("start", IdImage, _classPath);
 
-        await JS.InvokeVoidAsync("eval", $"myimage = document.getElementById('{IdImage}')");
 
-        var width = 400;
+        var res = await DrawImage(_ctxCanvasDraw, IdImage);
+        if(res) _isLoaded = true;
+        else _isLoaded = false;
+
+        LogTrace.Info("fin", IdImage, _classPath);
+        return res;
+    }
+
+    private async Task<bool> DrawImage(Context2D? ctx, string IdImage)
+    {
+        LogTrace.Info("start", IdImage, _classPath);
+
+        if (ctx is null )
+        {
+            LogTrace.Info("warn: ctx is null", ctx.ToString(), path: _classPath);
+            return false;
+        }
+
+        if ( _drawingWidgetJsInstance is null)
+        {
+            LogTrace.Info("warn: drawing is null", path: _classPath);
+            return false;
+        }
+
+        /* await JS.InvokeVoidAsync("eval", $"myimage = document.getElementById('{IdImage}')"); */
+
+        /* var width = 400;
         var height = 400;
-        await _ctxCanvas.ClearRectAsync(0, 0, width, height);
-        await _ctxCanvas.SetTransformAsync(1, 0, 0, 1, 0, 0);
-        await _ctxCanvas.FillStyleAsync("white");
-        await _ctxCanvas.FillRectAsync(0, 0, width, height);
-        await _ctxCanvas.RestoreAsync();
-        await _ctxCanvas.SaveAsync();
-        await _ctxCanvas.DrawImageAsync("myimage", 0, 0, width, height);
-
-        _isLoaded = true;
+        await ctx.ClearRectAsync(0, 0, width, height);
+        await ctx.SetTransformAsync(1, 0, 0, 1, 0, 0);
+        await ctx.FillStyleAsync("white");
+        await ctx.FillRectAsync(0, 0, width, height);
+        await ctx.RestoreAsync();
+        await ctx.SaveAsync(); 
+        await ctx.DrawImageAsync("myimage", 0, 0, width, height); */
+        await _drawingWidgetJsInstance.InvokeVoidAsync("drawImageFromId", IdImage);
+        return true;
     }
 
     private async Task<OpStatus> ProcessJsInvocation(string methodName, params object[] parameters)
@@ -140,10 +175,42 @@
     }
 
     /// <summary>
-    /// get blob property name
+    /// gen image from img tag
+    /// </summary>
+    /// <param name="IdElement">id of img tag</param>
+    /// <returns></returns>
+    public async Task<string> GenImageBlob(string IdElement)
+    {
+
+        LogTrace.Info("start", IdElement, _classPath);
+
+        var res = await DrawImage(_ctxCanvasHidden, IdElement);
+        if (!res)
+        {
+            LogTrace.Info("warn: fail to get image", path: _classPath);
+            return "";
+        }
+        string blobName = "dw-blob-" + Util.GenerateRandomAlphanumeric(10);
+
+        OpStatus opStatus = await ProcessJsInvocation("DrawingService.genBlob", _idHiddenCanvas, blobName);
+
+
+
+        if (opStatus.Status != 0)
+        {
+            LogTrace.Error(opStatus.Message, opStatus.Data, _classPath);
+            return "";
+        }
+
+        LogTrace.Info("end", blobName, _classPath);
+        return blobName;
+    }
+
+    /// <summary>
+    /// generate blob of user drawing
     /// </summary>
     /// <returns>return string if the canvas already loaded, else return empty string</returns>
-    public async Task<string> GenBlob()
+    public async Task<string> GenDrawingBlob()
     {
         if (!_isLoaded) {
             LogTrace.Info("warn: not loaded", path: _classPath);
@@ -151,30 +218,30 @@
         }
         string blobName = "dw-blob-" + Util.GenerateRandomAlphanumeric(10);
 
-        OpStatus opStatus = await ProcessJsInvocation("DrawingService.genBlob", _idWidget, blobName);
+        OpStatus opStatus = await ProcessJsInvocation("DrawingService.genBlob", _idDrawingCanvas, blobName);
 
         /* OpStatus opStatus = new();
         try
         {
 
             opStatus = await JS.InvokeAsync<OpStatus>("DrawingService.genBlob", _idWidget, blobName);
-        }
+            }
         catch (Microsoft.JSInterop.JSException ex)
         {
             // Catch a specific exception for JavaScript interop errors
             opStatus.Status = 1; // Set a failure status
             opStatus.Message = $"JavaScript error: {ex.Message}";
             opStatus.Data = ex;
-        } 
+            } 
         catch (Exception ex)
         {
             // Catch any other general exceptions
             opStatus.Status = 1; // Set a failure status
             opStatus.Message = $"C# error: {ex.Message}";
             opStatus.Data = ex;
-        } */
+            } */
 
-        if (opStatus.Status != 0)
+    if (opStatus.Status != 0)
         {
             LogTrace.Error(opStatus.Message, opStatus.Data, _classPath);
             return "";
@@ -198,7 +265,12 @@
     {
         // Generate a new unique ID using Guid and assign it to the property.
         base.OnInitialized();
-        _idWidget = "dw-" + Guid.NewGuid().ToString();
+        _guid = Guid.NewGuid().ToString();
+        _idWidget = "dw-" + _guid;
+        _idHiddenCanvas = "dw-hdn-" + _guid;
+        _idDrawingCanvas = "dw-drw-" + _guid; 
+
+
         var width = Side + 32;
         _widgetCss = $@"
             #{_idWidget} {{
@@ -214,21 +286,39 @@
         if (firstRender)
         {
             // await GetDimensions();
-            _ctxCanvas = await _canvas.GetContext2DAsync();
+            _ctxCanvasDraw = await _canvasDraw.GetContext2DAsync();
+            await _ctxCanvasDraw.LineWidthAsync(4);
+            _ctxCanvasHidden = await _canvasHidden.GetContext2DAsync();
+
             // await SetupCanvas();
         }
+
+        await InstantiateDrawingJs();
         var p = await JS.InvokeAsync<Position>("eval", $"var dw = document.querySelector('[_bl_{_container.Id}=\"\"]'); e = dw.getBoundingClientRect(); e = {{ 'Left': e.x, 'Top': e.y }}; e");
-        (_canvasX, _canvasY) = (p.Left, p.Top);
+        (_canvasDrawX, _canvasDrawY) = (p.Left, p.Top);
         LogTrace.Debug("trace", p, _classPath);
 
     }
 
+    private async Task InstantiateDrawingJs()
+    {
+        try
+        {
+            // Use InvokeAsync to call the global JS function
+            _drawingWidgetJsInstance = await JS.InvokeAsync<IJSObjectReference>("DrawingWidget.Create", _guid);
+            LogTrace.Info("JavaScript class instance created.", _guid, _classPath);
+        }
+        catch (JSException ex)
+        {
+            LogTrace.Error("Fail to create javaScript class instance.", ex.Message, _classPath);
+        }
+    }
 
     private void MouseDownCanvas(MouseEventArgs e)
     {
         _renderRequired = false;
-        _prevMouseX = _mouseX = e.ClientX - _canvasX;
-        _prevMouseY = _mouseY = e.ClientY - _canvasY;
+        _prevMouseX = _mouseX = e.ClientX - _canvasDrawX;
+        _prevMouseY = _mouseY = e.ClientY - _canvasDrawY;
         _mouseDown = true;
     }
 
@@ -245,8 +335,8 @@
         {
             return;
         }
-        _mouseX = e.ClientX - _canvasX;
-        _mouseY = e.ClientY - _canvasY;
+        _mouseX = e.ClientX - _canvasDrawX;
+        _mouseY = e.ClientY - _canvasDrawY;
         await DrawCanvasAsync(_mouseX, _mouseY, _prevMouseX, _prevMouseY, _color);
         _prevMouseX = _mouseX;
         _prevMouseY = _mouseY;
@@ -254,7 +344,7 @@
 
     private async Task DrawCanvasAsync(double prev_x, double prev_y, double x, double y, string clr)
     {
-        await using (var ctx2 = _ctxCanvas.CreateBatch())
+        await using (var ctx2 = _ctxCanvasDraw.CreateBatch())
         {
             await ctx2.BeginPathAsync();
             await ctx2.MoveToAsync(prev_x, prev_y);
