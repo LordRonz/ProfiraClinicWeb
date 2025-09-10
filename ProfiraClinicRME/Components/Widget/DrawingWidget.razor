@@ -2,17 +2,44 @@
 
 @using Excubo.Blazor.Canvas
 @using Excubo.Blazor.Canvas.Contexts
+@using MudBlazor.Utilities
 
 @inject IJSRuntime JS
 
-<MudCard Elevation="4" id="@_idWidget">
+<MudCard Elevation="4" id="@_idWidget" Class="dw">
     <MudCardHeader Class="">
         <CardHeaderContent>
             <MudText Typo="Typo.body1"> Editor </MudText>
             <MudText Typo="Typo.body2"> select tools and draw..</MudText>
+            <div class="d-flex justify-space-between gap-2 p-2 align-center" style="height:6em">
+                <ColorPicker Value="@_color" ValueChanged="DoUpdateColor" />
+                <MudToggleIconButton Toggled="@(_drawMode == "free" ? true : false)"
+                                     Icon="@Icons.Material.Filled.Brush"
+                                     Color="@Color.Dark"
+                                     ToggledIcon="@Icons.Material.Filled.Brush"
+                                     ToggledColor="@Color.Success"
+                                     title="Free" ToggledChanged="@(() => SetMode("free"))" />
+                <MudToggleIconButton Toggled="@(_drawMode == "rectangle" ? true : false)"
+                                     Icon="@Icons.Material.Filled.Square"
+                                     Color="@Color.Dark"
+                                     ToggledIcon="@Icons.Material.Filled.Square"
+                                     ToggledColor="@Color.Success"
+                                     title="Rectangle" ToggledChanged="@(() => SetMode("rectangle"))" />
+                <MudToggleIconButton Toggled="@(_drawMode == "ellipse" ? true : false)"
+                                     Icon="@Icons.Material.Filled.Circle"
+                                     Color="@Color.Dark"
+                                     ToggledIcon="@Icons.Material.Filled.Circle"
+                                     ToggledColor="@Color.Success"
+                                     title="Ellipse"
+                                     ToggledChanged="@(() => SetMode("ellipse"))" />
+                <MudIconButton OnClick="DoReset" Icon="@Icons.Material.Filled.Restore" Color="Color.Warning" />
+                <MudIconButton OnClick="OnSave" Icon="@Icons.Material.Filled.Save" Color="Color.Primary" />
+
+            </div>
+
         </CardHeaderContent>
         <CardHeaderActions>
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
@@ -22,7 +49,6 @@
                     height="400" width="400" class="dw-canvas">
             </Canvas>
             <Canvas @ref="@_canvasHidden"
-
                     id="@_idHiddenCanvas"
                     hidden
                     height="400" width="400">
@@ -30,8 +56,7 @@
         </div>
     </MudCardContent>
     <MudCardActions Class="flex-row-reverse">
-        <MudIconButton Icon="@Icons.Material.Filled.Restore" Color="Color.Default" />
-        <MudIconButton OnClick="OnSave" Icon="@Icons.Material.Filled.Save" Color="Color.Default" />
+
     </MudCardActions>
 </MudCard>
 <style>
@@ -59,15 +84,17 @@
     private double _prevMouseX;
     private double _prevMouseY;
     private ElementReference _container;
+    private IJSObjectReference? _drawingWidgetJsInstance;
     private int _canvasDrawHeight { get; set; } = 0;
     private int _canvasDrawWidth { get; set; } = 0;
+    private MudColor _mudColor = new(0, 0, 0, 255);
     private string _color = "black";
+    private string _drawMode = "free";
     private string _guid = "";
     private string _idDrawingCanvas = "";
     private string _idHiddenCanvas = "";
     private string _idWidget = "";
     private string _widgetCss = "";
-    private IJSObjectReference? _drawingWidgetJsInstance;
 
     private class Position
     {
@@ -78,6 +105,17 @@
     public DrawingWidget()
     {
         _classPath = "App::Widget::DrawingWidget";
+    }
+
+    public async Task DoUpdateColor(string color)
+    {
+        _color = color;
+        _mudColor = new MudColor(color);
+        if (_drawingWidgetJsInstance is not null)
+        {
+            await _drawingWidgetJsInstance.InvokeVoidAsync("setColor", color);
+
+        }
     }
 
     public async Task CopyToImage(string IdImage)
@@ -94,7 +132,7 @@
         await JS.InvokeVoidAsync("eval", $"mycanvas = document.getElementById('{_idWidget}').querySelector('canvas')");
         await JS.InvokeVoidAsync("eval", $"myimage.src = mycanvas.toDataURL()"); */
 
-    if (opStatus.Status != 0)
+        if (opStatus.Status != 0)
         {
             LogTrace.Error(opStatus.Message, opStatus.Data, _classPath);
             return;
@@ -110,7 +148,7 @@
 
 
         var res = await DrawImage(_ctxCanvasDraw, IdImage);
-        if(res) _isLoaded = true;
+        if (res) _isLoaded = true;
         else _isLoaded = false;
 
         LogTrace.Info("fin", IdImage, _classPath);
@@ -121,13 +159,13 @@
     {
         LogTrace.Info("start", IdImage, _classPath);
 
-        if (ctx is null )
+        /* if (ctx is null )
         {
             LogTrace.Info("warn: ctx is null", ctx.ToString(), path: _classPath);
             return false;
-        }
+            } */
 
-        if ( _drawingWidgetJsInstance is null)
+        if (_drawingWidgetJsInstance is null)
         {
             LogTrace.Info("warn: drawing is null", path: _classPath);
             return false;
@@ -142,7 +180,7 @@
         await ctx.FillStyleAsync("white");
         await ctx.FillRectAsync(0, 0, width, height);
         await ctx.RestoreAsync();
-        await ctx.SaveAsync(); 
+        await ctx.SaveAsync();
         await ctx.DrawImageAsync("myimage", 0, 0, width, height); */
         await _drawingWidgetJsInstance.InvokeVoidAsync("drawImageFromId", IdImage);
         return true;
@@ -172,6 +210,26 @@
             opStatus.Data = ex;
         }
         return opStatus;
+    }
+
+    private async Task DoReset()
+    {
+        LogTrace.Info("start", path: _classPath);
+        if (!_isLoaded)
+        {
+            LogTrace.Info("warn: not loaded", path: _classPath);
+            return;
+        }
+
+        if(_drawingWidgetJsInstance is null)
+        {
+            LogTrace.Info("warn: drawing is null", path: _classPath);
+            return;
+        }
+        await _drawingWidgetJsInstance.InvokeVoidAsync("resetCanvas");
+
+        LogTrace.Info("end", path: _classPath);
+        return;
     }
 
     /// <summary>
@@ -212,7 +270,8 @@
     /// <returns>return string if the canvas already loaded, else return empty string</returns>
     public async Task<string> GenDrawingBlob()
     {
-        if (!_isLoaded) {
+        if (!_isLoaded)
+        {
             LogTrace.Info("warn: not loaded", path: _classPath);
             return "";
         }
@@ -232,7 +291,7 @@
             opStatus.Status = 1; // Set a failure status
             opStatus.Message = $"JavaScript error: {ex.Message}";
             opStatus.Data = ex;
-            } 
+            }
         catch (Exception ex)
         {
             // Catch any other general exceptions
@@ -241,7 +300,7 @@
             opStatus.Data = ex;
             } */
 
-    if (opStatus.Status != 0)
+        if (opStatus.Status != 0)
         {
             LogTrace.Error(opStatus.Message, opStatus.Data, _classPath);
             return "";
@@ -268,8 +327,7 @@
         _guid = Guid.NewGuid().ToString();
         _idWidget = "dw-" + _guid;
         _idHiddenCanvas = "dw-hdn-" + _guid;
-        _idDrawingCanvas = "dw-drw-" + _guid; 
-
+        _idDrawingCanvas = "dw-drw-" + _guid;
 
         var width = Side + 32;
         _widgetCss = $@"
@@ -289,15 +347,24 @@
             _ctxCanvasDraw = await _canvasDraw.GetContext2DAsync();
             await _ctxCanvasDraw.LineWidthAsync(4);
             _ctxCanvasHidden = await _canvasHidden.GetContext2DAsync();
+            await InstantiateDrawingJs();
 
             // await SetupCanvas();
         }
 
-        await InstantiateDrawingJs();
         var p = await JS.InvokeAsync<Position>("eval", $"var dw = document.querySelector('[_bl_{_container.Id}=\"\"]'); e = dw.getBoundingClientRect(); e = {{ 'Left': e.x, 'Top': e.y }}; e");
         (_canvasDrawX, _canvasDrawY) = (p.Left, p.Top);
         LogTrace.Debug("trace", p, _classPath);
 
+    }
+
+    private async Task SetMode(string mode)
+    {
+        _drawMode = mode;
+        if (_drawingWidgetJsInstance is not null)
+        {
+            await _drawingWidgetJsInstance.InvokeVoidAsync("setMode", mode);
+        }
     }
 
     private async Task InstantiateDrawingJs()
@@ -305,7 +372,7 @@
         try
         {
             // Use InvokeAsync to call the global JS function
-            _drawingWidgetJsInstance = await JS.InvokeAsync<IJSObjectReference>("DrawingWidget.Create", _guid);
+            _drawingWidgetJsInstance = await JS.InvokeAsync<IJSObjectReference>("CreateDrawingWidget", _guid);
             LogTrace.Info("JavaScript class instance created.", _guid, _classPath);
         }
         catch (JSException ex)

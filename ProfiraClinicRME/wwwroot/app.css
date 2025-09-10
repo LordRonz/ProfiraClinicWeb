@@ -228,6 +228,10 @@ html, body {
     top: 0.5rem;
 }
 
+/* drawing widget*/
+button.dw-active {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 
 /* table */
 .mud-table-cell:nth-child(odd){

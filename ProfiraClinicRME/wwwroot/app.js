@@ -3,6 +3,15 @@ var hello = async function (name) {
     return { status: 0, message: 'hello ' };
 }
 
+var showPicker = function(inputId) {
+    const input = document.getElementById(inputId);
+    try {
+        input.showPicker();
+    } catch (e) {
+        console.warn(e);
+    }
+}
+
 var ImageService = {
 
     /**
@@ -14,7 +23,7 @@ var ImageService = {
      * @returns {Promise<OpStatus>} Operation status object
      */
     uploadBlob: async function (url, paramName, blobName, fileName) {
-        console.log(`start upload {paramName} from {blobName}`);
+        console.log(`start upload ${paramName} from ${blobName}`);
         const blob = window[blobName];
         const opStatus = new OpStatus();
         opStatus.status = 1;
@@ -70,27 +79,32 @@ class OpStatus {
 class DrawingWidget {
     _idWidget = "";
 
-    static Create(guid) {
-        return new DrawingWidget(guid);
-    }
+    static allWidgets = {};
 
     constructor(guid) {
         console.log("Object constructor: " + guid);
 
+        DrawingWidget.allWidgets[guid] = this;
         this._idWidget = "dw-" + guid;
 
-
+        /**
+         * @type {HTMLCanvasElement}
+         */
         this.canvas = document.getElementById("dw-drw-" + guid);
-        this.ctx = this.canvas.getContext("2d");
+
+        this.ctx = this.canvas.getContext("2d", {
+            willReadFrequently: true
+        });
         this.isDrawing = false;
         this.currentMode = "free";
         this.startX = 0;
         this.startY = 0;
-        this.currentColor = "#000000";
+        this.currentColor = "#ff0000";
         this.currentWidth = 3;
         this.imageLoaded = false;
         this.backgroundImage = null;
         this.savedImageData = null;
+        this.rect = null;
 
         this.initializeEventListeners();
 
@@ -98,7 +112,6 @@ class DrawingWidget {
 
     initializeEventListeners() {
         
-
         // Canvas events - using pointer events for better touch support
         this.canvas.addEventListener("pointerdown", (e) =>
             this.startDrawing(e)
@@ -126,8 +139,183 @@ class DrawingWidget {
     }
 
     drawImageFromId(IdElement) {
+        this.#updateStatus('start: draw image');
         const srcImage = document.getElementById(IdElement);
         this.#drawCanvas(srcImage);
+    }
+
+    setColor(color) {
+        this.currentColor = color;
+        this.#updateStatus(`Color set to ${color}`);
+    }
+
+    draw(e) {
+        if (!this.isDrawing || !this.imageLoaded) return;
+
+        const coords = this.#getCanvasCoordinates(e);
+
+        if (this.currentMode === "free") {
+            this.ctx.lineTo(coords.x, coords.y);
+            this.ctx.stroke();
+        } else if (this.currentMode === "rectangle") {
+            // Restore the saved image data and draw rectangle
+            this.ctx.putImageData(this.savedImageData, 0, 0);
+            this.ctx.strokeRect(
+                this.startX,
+                this.startY,
+                coords.x - this.startX,
+                coords.y - this.startY
+            );
+        } else if (this.currentMode === "ellipse") {
+            // Restore the saved image data and draw ellipse
+            this.ctx.putImageData(this.savedImageData, 0, 0);
+            this.drawEllipse(
+                this.startX,
+                this.startY,
+                coords.x,
+                coords.y
+            );
+        }
+    }
+
+    drawEllipse(x1, y1, x2, y2) {
+        const centerX = (x1 + x2) / 2;
+        const centerY = (y1 + y2) / 2;
+        const radiusX = Math.abs(x2 - x1) / 2;
+        const radiusY = Math.abs(y2 - y1) / 2;
+
+        this.ctx.beginPath();
+        this.ctx.ellipse(
+            centerX,
+            centerY,
+            radiusX,
+            radiusY,
+            0,
+            0,
+            2 * Math.PI
+        );
+        this.ctx.stroke();
+    }
+
+    /**
+     * load image to canvas
+     * @param {blob} file
+     * @returns
+     */
+    loadImage(file) {
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => this.#drawCanvas(img);
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    resetCanvas() {
+        if (!this.imageLoaded) {
+            this.#updateStatus("No image to reset!");
+            return;
+        }
+
+        // Redraw the original image
+        this.ctx.clearRect(
+            0,
+            0,
+            this.canvas.width,
+            this.canvas.height
+        );
+        if (this.backgroundImage) {
+            const canvasAspect =
+                this.canvas.width / this.canvas.height;
+            const imageAspect =
+                this.backgroundImage.width /
+                this.backgroundImage.height;
+
+            let drawWidth,
+                drawHeight,
+                offsetX = 0,
+                offsetY = 0;
+
+            if (imageAspect > canvasAspect) {
+                drawWidth = this.canvas.width;
+                drawHeight = drawWidth / imageAspect;
+                offsetY = (this.canvas.height - drawHeight) / 2;
+            } else {
+                drawHeight = this.canvas.height;
+                drawWidth = drawHeight * imageAspect;
+                offsetX = (this.canvas.width - drawWidth) / 2;
+            }
+
+            this.ctx.drawImage(
+                this.backgroundImage,
+                offsetX,
+                offsetY,
+                drawWidth,
+                drawHeight
+            );
+        }
+
+        this.#updateStatus("Canvas reset to original image.");
+    }
+
+    setMode(mode) {
+        if (!this.imageLoaded) {
+            this.#updateStatus("Please select an image first!");
+            return;
+        }
+
+        this.currentMode = mode;
+
+        // Update button states
+
+        this.#updateStatus(`Drawing mode: ${mode}`);
+        
+    }
+
+    startDrawing(e) {
+        if (!this.imageLoaded) {
+            this.#updateStatus("Please select an image first!");
+            return;
+        }
+        this.#updateStatus(`start draw: color ${this.currentColor}`);
+
+        this.isDrawing = true;
+
+        //get coordinate
+        this.rect = this.canvas.getBoundingClientRect();
+        const coords = this.#getCanvasCoordinates(e);
+        this.startX = coords.x;
+        this.startY = coords.y;
+
+        this.ctx.strokeStyle = this.currentColor;
+        this.ctx.lineWidth = this.currentWidth;
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
+
+        if (this.currentMode === "free") {
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.startX, this.startY);
+        } else {
+            // Save the current canvas state for rectangle/ellipse drawing
+            this.savedImageData = this.ctx.getImageData(
+                0, 0, this.canvas.width, this.canvas.height);
+        }
+        if (e.pointerType === "pen") {
+            // This event was triggered by a stylus
+            this.#updateStatus("stylus used");
+        } else {
+            this.#updateStatus("not a stylus");
+        }
+    }
+
+    stopDrawing() {
+        if (this.isDrawing) {
+            this.isDrawing = false;
+            this.savedImageData = null;
+        }
     }
 
     /**
@@ -178,208 +366,25 @@ class DrawingWidget {
         );
     }
 
-    /**
-     * load image to canvas
-     * @param {blob} file
-     * @returns
-     */
-    loadImage(file) {
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => this.#drawCanvas(img);
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    setMode(mode) {
-        if (!this.imageLoaded) {
-            this.#updateStatus("Please select an image first!");
-            return;
-        }
-
-        this.currentMode = mode;
-
-        // Update button states
-        document.querySelectorAll(".mode-btn").forEach((btn) => {
-            btn.classList.remove("active");
-        });
-        document
-            .querySelector(`[data-mode="${mode}"]`)
-            .classList.add("active");
-
-        this.#updateStatus(
-            `Drawing mode: ${mode.charAt(0).toUpperCase() + mode.slice(1)
-            }`
-        );
-    }
-
-    getCanvasCoordinates(e) {
-        const rect = this.canvas.getBoundingClientRect();
+    #getCanvasCoordinates(e) {
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
+            x: e.clientX - this.rect.left,
+            y: e.clientY - this.rect.top,
         };
-    }
-
-    startDrawing(e) {
-        if (!this.imageLoaded) {
-            this.#updateStatus("Please select an image first!");
-            return;
-        }
-
-        this.isDrawing = true;
-        const coords = this.getCanvasCoordinates(e);
-        this.startX = coords.x;
-        this.startY = coords.y;
-
-        this.ctx.strokeStyle = this.currentColor;
-        this.ctx.lineWidth = this.currentWidth;
-        this.ctx.lineCap = "round";
-        this.ctx.lineJoin = "round";
-
-        if (this.currentMode === "free") {
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.startX, this.startY);
-        } else {
-            // Save the current canvas state for rectangle/ellipse drawing
-            this.savedImageData = this.ctx.getImageData(
-                0,
-                0,
-                this.canvas.width,
-                this.canvas.height
-            );
-        }
-        if (e.pointerType === "pen") {
-            // This event was triggered by a stylus
-            this.#updateStatus("stylus used");
-            if (e.button === 2) {
-                this.#updateStatus(
-                    "Stylus barrel button (right-click equivalent) was pressed."
-                );
-            } else if (e.button === 3) {
-                this.#updateStatus(
-                    "Stylus eraser or another button was pressed."
-                );
-            } else {
-                this.#updateStatus("Stylus tip was pressed.");
-            }
-        } else {
-            this.#updateStatus("not a stylus");
-        }
-    }
-
-    draw(e) {
-        if (!this.isDrawing || !this.imageLoaded) return;
-
-        const coords = this.getCanvasCoordinates(e);
-
-        if (this.currentMode === "free") {
-            this.ctx.lineTo(coords.x, coords.y);
-            this.ctx.stroke();
-        } else if (this.currentMode === "rectangle") {
-            // Restore the saved image data and draw rectangle
-            this.ctx.putImageData(this.savedImageData, 0, 0);
-            this.ctx.strokeRect(
-                this.startX,
-                this.startY,
-                coords.x - this.startX,
-                coords.y - this.startY
-            );
-        } else if (this.currentMode === "ellipse") {
-            // Restore the saved image data and draw ellipse
-            this.ctx.putImageData(this.savedImageData, 0, 0);
-            this.drawEllipse(
-                this.startX,
-                this.startY,
-                coords.x,
-                coords.y
-            );
-        }
-    }
-
-    stopDrawing() {
-        if (this.isDrawing) {
-            this.isDrawing = false;
-            this.savedImageData = null;
-        }
-    }
-
-    drawEllipse(x1, y1, x2, y2) {
-        const centerX = (x1 + x2) / 2;
-        const centerY = (y1 + y2) / 2;
-        const radiusX = Math.abs(x2 - x1) / 2;
-        const radiusY = Math.abs(y2 - y1) / 2;
-
-        this.ctx.beginPath();
-        this.ctx.ellipse(
-            centerX,
-            centerY,
-            radiusX,
-            radiusY,
-            0,
-            0,
-            2 * Math.PI
-        );
-        this.ctx.stroke();
-    }
-
-    resetCanvas() {
-        if (!this.imageLoaded) {
-            this.#updateStatus("No image to reset!");
-            return;
-        }
-
-        // Redraw the original image
-        this.ctx.clearRect(
-            0,
-            0,
-            this.canvas.width,
-            this.canvas.height
-        );
-        if (this.backgroundImage) {
-            const canvasAspect =
-                this.canvas.width / this.canvas.height;
-            const imageAspect =
-                this.backgroundImage.width /
-                this.backgroundImage.height;
-
-            let drawWidth,
-                drawHeight,
-                offsetX = 0,
-                offsetY = 0;
-
-            if (imageAspect > canvasAspect) {
-                drawWidth = this.canvas.width;
-                drawHeight = drawWidth / imageAspect;
-                offsetY = (this.canvas.height - drawHeight) / 2;
-            } else {
-                drawHeight = this.canvas.height;
-                drawWidth = drawHeight * imageAspect;
-                offsetX = (this.canvas.width - drawWidth) / 2;
-            }
-
-            this.ctx.drawImage(
-                this.backgroundImage,
-                offsetX,
-                offsetY,
-                drawWidth,
-                drawHeight
-            );
-        }
-
-        this.#updateStatus("Canvas reset to original image.");
     }
 
     #updateStatus(message) {
         //document.getElementById("status").textContent = message;
         console.log(message);
     }
+
+
 }
-this.DrawingWidget = DrawingWidget;
+
+this.CreateDrawingWidget = function (guid) {
+    return new DrawingWidget(guid);
+};
+//this.DrawingWidget = DrawingWidget;
 
 var DrawingService = {
     _blobStore: {},

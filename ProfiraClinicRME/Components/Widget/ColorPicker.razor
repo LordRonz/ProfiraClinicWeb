@@ -1,0 +1,140 @@
+﻿
+@using MudBlazor
+
+@inherits BaseWidget
+@inject ISnackbar SB;
+@inject IJSRuntime JS
+
+<div class="color-picker-container">
+    <div class="color-picker-wrapper" @onclick="OpenColorPicker">
+        <input @ref="colorInput"
+               id="colorInput"
+               type="color"
+               value="@Value"
+               @onchange="OnColorChanged"
+               class="color-input" />
+        <MudIcon Icon="@Icons.Material.Filled.ArrowDropDown" Class="dropdown-icon" />
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <MudText Typo="Typo.body2" Class="color-label">@Label</MudText>
+    }
+</div>
+
+@code {
+    private ElementReference colorInput;
+
+    [Parameter] 
+    public string Value { get; set; } = "#000000";
+
+    [Parameter] 
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter] public string? Label { get; set; }
+
+    [Parameter] public bool Disabled { get; set; } = false;
+
+    public ColorPicker()
+    {
+        _classPath = "App::Widget::ColorPicker";
+    }
+
+    protected void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        LogTrace.Info("trace", message, _classPath);
+        // Snackbar.Clear();
+        SB.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        SB.Configuration.VisibleStateDuration = 3000;
+        SB.Add(message, severity);
+    }
+
+    private async Task DoTest(string src)
+    {
+        LogTrace.Info("test " + src);
+        // addSnackbar("test " + src, Severity.Info);
+    }
+
+    private async Task OpenColorPicker()
+    {
+        try
+        {
+            // Call JavaScript to trigger the click event on the input
+            LogTrace.Info("trigger click");
+            await JS.InvokeVoidAsync("showPicker", "colorInput");
+        }
+        catch (Exception ex)
+        {
+            var ErrorMessage = $"Failed to trigger input click: {ex.Message}";
+            LogTrace.Error("error triggering click");
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnColorChanged(ChangeEventArgs e)
+    {
+        var newValue = e.Value?.ToString() ?? "#000000";
+        // Value = newValue;
+        await ValueChanged.InvokeAsync(newValue);
+    }
+}
+
+<style>
+
+    .color-picker-container {
+        display: inline-block;
+        position: relative;
+
+    }
+
+    .color-picker-wrapper {
+        align-items: center;
+        background: var(--mud-palette-surface);
+        border: 1px solid var(--mud-palette-lines-default);
+        border-radius: 4px;
+        cursor: pointer;
+        cursor: pointer;
+        display: flex;
+        min-width: 120px;
+        padding: 8px 12px;
+        transition: border-color 0.3s ease;
+    }
+
+    .color-picker-wrapper:hover {
+        border-color: var(--mud-palette-primary);
+    }
+
+    .color-picker-wrapper:focus-within {
+        border-color: var(--mud-palette-primary);
+        box-shadow: 0 0 0 2px var(--mud-palette-primary-lighten);
+    }
+
+    .color-preview {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--mud-palette-lines-default);
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    .color-input {
+        /* opacity: 0; */
+        position: absolute;
+        width:30%;
+    }
+
+    .dropdown-icon {
+        margin-left: auto;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .color-label {
+        margin-top: 4px;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    .color-picker-wrapper[disabled] {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+</style>
