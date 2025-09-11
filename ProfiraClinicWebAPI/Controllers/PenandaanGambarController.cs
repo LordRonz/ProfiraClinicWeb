@@ -127,33 +127,53 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         [HttpPost("EditPenandaanGambarHeader")]
-        public async Task<IActionResult> EditPenandaanGambarHeader([FromBody] EditPenandaanGambarHeaderDto header)
+        public async Task<IActionResult> EditPenandaanGambarHeader([FromBody] EditPenandaanGambarHeaderDto dto)
         {
-
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userName))
                 return Unauthorized();
 
             var user = await _context.MUser
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.USRID == userName);
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(u => u.USRID == userName);
 
             if (user == null)
                 return NotFound("User not found");
 
-            if (header == null || string.IsNullOrEmpty(header.NomorTransaksi))
+            if (dto == null || string.IsNullOrWhiteSpace(dto.NomorTransaksi))
                 return BadRequest("NomorTransaksi is required");
 
-            var existing = await _context.TRMPenandaanGambarHeader.FindAsync(header.NomorTransaksi);
-            if (existing == null) return NotFound("Header not found");
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
 
-            _context.Entry(existing).CurrentValues.SetValues(header);
-            existing.UPDDT = DateTime.Now;
-            existing.USRID = user.USRID;
+            var karyawan = await _context.MKaryawan
+                                .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Header updated successfully", data = existing });
+            if (dto.KodeKaryawan == null && karyawan == null)
+                return NotFound("Karyawan not found");
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeLokasi",       kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@TanggalTransaksi", DateTime.Now),
+        new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
+        new SqlParameter("@KodeCustomer",     dto.KodeCustomer ?? (object)DBNull.Value),
+        new SqlParameter("@KodeKaryawan",     dto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+        new SqlParameter("@KodePoli",         _kodePoli ?? (object)DBNull.Value),
+        new SqlParameter("@Keterangan",       dto.Keterangan ?? (object)DBNull.Value),
+        new SqlParameter("@USRID",            user.USRID ?? (object)DBNull.Value),
+        new SqlParameter("@NomorTransaksi",   dto.NomorTransaksi)
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_PenandaanGambar_Header_Edit " +
+                "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, " +
+                "@KodeKaryawan, @KodePoli, @Keterangan, @USRID, @NomorTransaksi",
+                sqlParameters
+            );
+
+            return Ok(new { message = "Header updated successfully", nomorTransaksi = dto.NomorTransaksi });
         }
+
 
         // ===============================
         // Penandaan Gambar Detail
@@ -202,19 +222,31 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         [HttpPost("EditPenandaanGambarDetail")]
-        public async Task<IActionResult> EditPenandaanGambarDetail([FromBody] TRMPenandaanGambarDetail detail)
+        public async Task<IActionResult> EditPenandaanGambarDetail([FromBody] TRMPenandaanGambarDetail dto)
         {
-            if (detail == null || string.IsNullOrEmpty(detail.NomorTransaksi))
+            if (dto == null || string.IsNullOrEmpty(dto.NomorTransaksi))
                 return BadRequest("NomorTransaksi is required");
 
-            var existing = await _context.TRMPenandaanGambarDetail.FindAsync(detail.NomorTransaksi);
-            if (existing == null) return NotFound("Detail not found");
+            if (dto.IDGambar == null || dto.KodeGambar == null)
+                return BadRequest("KodeGambar and IDGambar are required");
 
-            _context.Entry(existing).CurrentValues.SetValues(detail);
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi),
+        new SqlParameter("@KodeGambar", dto.KodeGambar ?? (object)DBNull.Value),
+        new SqlParameter("@IDGambar", dto.IDGambar ?? (object)DBNull.Value),
+        new SqlParameter("@IDDetail", dto.IDDetail)
+    };
 
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Detail updated successfully", data = existing });
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_PenandaanGambar_Detail_Edit " +
+                "@NomorTransaksi, @KodeGambar, @IDGambar, @IDDetail",
+                sqlParameters
+            );
+
+            return Ok(new { message = "Detail updated successfully", data = dto });
         }
+
 
         [HttpPost("GetListTrm")]
         public async Task<IActionResult> GetListTrm([FromBody] PenandaanGambarListDto penandaanGambarDto)
