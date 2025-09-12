@@ -72,12 +72,12 @@
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/package");
+        NavigationManager.NavigateTo("/treatment");
     }
 
     protected override async Task OnInitializedAsync()
     {
-        Layout.ChangeTitleAndRoute("Group Paket", "Tambah Group Paket");
+        Layout.ChangeTitleAndRoute("Group Perawatan", "Tambah Group Perawatan");
         patient.KodeCustomer = "INITIAL";
     }
 
@@ -90,7 +90,7 @@
         var result = await ApiService.CreateGroupPerawatanAsync(treatment);
         if (result.StatusCode < 300)
         {
-            NavigationManager.NavigateTo("/package");
+            NavigationManager.NavigateTo("/treatment");
         }
         else
         {

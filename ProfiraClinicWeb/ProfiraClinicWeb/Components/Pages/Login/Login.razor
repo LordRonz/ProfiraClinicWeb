@@ -63,7 +63,6 @@
 @inject ClinicApiService ClinicApiService
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
-    List<MKaryawan> customers = new List<MKaryawan>();
 
     List<MKlinik> kliniks = new List<MKlinik>();
 
@@ -131,7 +130,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        customers = await dbContext.MKaryawan.ToListAsync();
         var apiResponse = await ClinicApiService.GetClinicsAsync();
         System.Diagnostics.Debug.WriteLine("Done");
         if (apiResponse.StatusCode == 0 && apiResponse.Data != null)

@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using ProfiraClinic.Models;
-using ProfiraClinicWebAPI.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using ProfiraClinic.Models.Core;
+using ProfiraClinicWebAPI.Data;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    public class TindakanController(AppDbContext ctx)
-        : BaseCrudController<PPerawatanH>(ctx)
+    public class TindakanController : BaseCrudController<PPerawatanH>
     {
+        public TindakanController(AppDbContext ctx) : base(ctx) { }
+
         protected override DbSet<PPerawatanH> DbSet
             => _context.PPerawatanH;
 
@@ -18,20 +19,63 @@ namespace ProfiraClinicWebAPI.Controllers
             => q.Where(d
                 => EF.Functions.Like(d.KodeJenis, likeParam)
                 || EF.Functions.Like(d.KodeGroupPerawatan, likeParam)
-            || EF.Functions.Like(d.KodePerawatan, likeParam)
-            || EF.Functions.Like(d.NamaPerawatan, likeParam));
+                || EF.Functions.Like(d.KodePerawatan, likeParam)
+                || EF.Functions.Like(d.NamaPerawatan, likeParam));
 
         protected override IOrderedQueryable<PPerawatanH> ApplyOrder(
             IQueryable<PPerawatanH> q)
             => q.OrderBy(d => d.KodePerawatan);
 
         protected override IQueryable<PPerawatanH> ApplyLastFilter(
-        IQueryable<PPerawatanH> q,
-        DateTime lastDate)
+            IQueryable<PPerawatanH> q,
+            DateTime lastDate)
         {
-            return q.Where(p =>
-                p.UpdDt > lastDate
-            );
+            return q.Where(p => p.UpdDt > lastDate);
+        }
+
+        // POST: api/Tindakan/add
+        [HttpPost("add")]
+        public async Task<ActionResult<PPerawatanH>> AddTindakan([FromBody] PPerawatanH newTindakan)
+        {
+            if (newTindakan == null)
+            {
+                return BadRequest("Tindakan data is null.");
+            }
+
+            var sqlParameters = new[]
+            {
+                new SqlParameter("@KodeJenis", newTindakan.KodeJenis ?? (object)DBNull.Value),
+                new SqlParameter("@KategoriPerawatan", newTindakan.KategoriPerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@KodeGroupPerawatan", newTindakan.KodeGroupPerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@KodePerawatan", newTindakan.KodePerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@NamaPerawatan", newTindakan.NamaPerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@HARGA", newTindakan.HARGA),
+                new SqlParameter("@DiscMember", newTindakan.DiscMember),
+                new SqlParameter("@DiscNonMember", newTindakan.DiscNonMember),
+                new SqlParameter("@POINT", newTindakan.POINT),
+                new SqlParameter("@AKTIF", newTindakan.Aktif ?? (object)DBNull.Value),
+                new SqlParameter("@USRID", newTindakan.USRID ?? (object)DBNull.Value)
+            };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPerawatanH_Add " +
+                    "@KodeJenis, @KategoriPerawatan, @KodeGroupPerawatan, @KodePerawatan, @NamaPerawatan, " +
+                    "@HARGA, @DiscMember, @DiscNonMember, @POINT, @AKTIF, @USRID",
+                    sqlParameters);
+
+                // Return the newly created tindakan object
+                return CreatedAtAction(nameof(GetItem), new { id = newTindakan.KodePerawatan }, newTindakan);
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
+            }
         }
     }
 }

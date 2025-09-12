@@ -1,5 +1,4 @@
-﻿using ProfiraClinic.Models;
-using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
