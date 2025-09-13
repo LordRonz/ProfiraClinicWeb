@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
-    [Table("PPerawtanD")]
+    [Table("PPerawatanD")]
     public class PerawatanDetail
     {
         [Column(TypeName = "bigint")]
@@ -16,6 +16,10 @@ namespace ProfiraClinic.Models.Core
         [Key]
         [Column(TypeName = "int")]
         public int NoUrut { get; set; }
+
+        [Column(TypeName = "char(10)")]
+        [MaxLength(10)]
+        public string KodePerawatan { get; set; }
 
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]

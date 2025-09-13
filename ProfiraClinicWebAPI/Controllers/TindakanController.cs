@@ -49,12 +49,12 @@ namespace ProfiraClinicWebAPI.Controllers
                 new SqlParameter("@KodeGroupPerawatan", newTindakan.KodeGroupPerawatan ?? (object)DBNull.Value),
                 new SqlParameter("@KodePerawatan", newTindakan.KodePerawatan ?? (object)DBNull.Value),
                 new SqlParameter("@NamaPerawatan", newTindakan.NamaPerawatan ?? (object)DBNull.Value),
-                new SqlParameter("@HARGA", newTindakan.HARGA),
+                new SqlParameter("@HARGA", newTindakan.Harga),
                 new SqlParameter("@DiscMember", newTindakan.DiscMember),
                 new SqlParameter("@DiscNonMember", newTindakan.DiscNonMember),
-                new SqlParameter("@POINT", newTindakan.POINT),
+                new SqlParameter("@POINT", newTindakan.Point),
                 new SqlParameter("@AKTIF", newTindakan.Aktif ?? (object)DBNull.Value),
-                new SqlParameter("@USRID", newTindakan.USRID ?? (object)DBNull.Value)
+                new SqlParameter("@USRID", newTindakan.UsrId ?? (object)DBNull.Value)
             };
 
             try
