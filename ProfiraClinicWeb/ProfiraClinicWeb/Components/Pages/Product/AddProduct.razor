@@ -1,0 +1,145 @@
+﻿@page "/product/add"
+
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Helpers
+@using System.ComponentModel.DataAnnotations
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject HttpClient httpClient
+@inject GroupBarangApiService ApiService
+@inject NavigationManager NavigationManager
+
+<MudCard Class="p-4 h-100">
+    <MudForm @ref="form" Class="table-form">
+        <MudGrid GutterSize="3">
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Nama Group Barang"
+                              @bind-Value="groupBarang.NamaGroupBarang"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" Class="mb-3" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Kode Group"
+                              @bind-Value="groupBarang.KodeGroupBarang"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" Class="mb-4" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+            <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
+                Kembali
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       Type="Submit"
+                       Disabled="!form.IsValid"
+                       OnClick="SubmitAsync">
+                Simpan
+            </MudButton>
+        </MudStack>
+    </MudForm>
+</MudCard>
+
+@code {
+    MudForm form;
+
+    private GroupBarang groupBarang = new();
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout.ChangeTitleAndRoute("Group Barang", "Tambah Group Barang");
+        // defaults
+        groupBarang.Aktif = "1";
+        groupBarang.USRID = ""; // set from your auth context if needed
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/product");
+    }
+
+    private async Task SubmitAsync()
+    {
+        var result = await ApiService.CreateGroupBarangAsync(groupBarang);
+        if (result.StatusCode < 300)
+        {
+            NavigationManager.NavigateTo("/product");
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(result.Message);
+        }
+    }
+}
+
+<style>
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
+
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+
+    .section {
+        width: 100%;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        background-color: #a2eef0;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+    }
+
+        .section-header .mud-icon-root {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+    .section-body {
+        padding: 1rem;
+    }
+</style>
