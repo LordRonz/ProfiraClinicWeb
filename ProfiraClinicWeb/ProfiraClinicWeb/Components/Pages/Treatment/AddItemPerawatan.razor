@@ -4,49 +4,56 @@
 @using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Services
 @using MudBlazor
-@inject PaketDetailApiService PaketApiService
-@inject PaketHeaderApiService PaketHeaderApiService
+
 @inject NavigationManager NavigationManager
 @inject GroupPerawatanApiService ApiService
 @inject PerawatanHeaderApiService PerawatanApiService
+@inject PerawatanDetailApiService PerawatanDetailApiService
 
 <MudCard Class="p-4 h-100">
-    <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
+    <MudText Typo="Typo.h6" Class="mb-4">Tambah Perawatan</MudText>
 
     <!-- Header Form -->
     <MudForm @ref="headerForm" Class="section-body table-form">
         <MudGrid>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                <MudTextField T="string" Label="Kode Perawatan" @bind-Value="header.KodePerawatan" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
+
             <MudItem xs="12" sm="6">
                 <MudAutocomplete T="GroupPerawatan"
-                                 Label="Pilih Group Paket"
+                                 Label="Pilih Group Perawatan"
                                  @bind-Value="selectedGroup"
                                  SearchFunc="SearchGroup"
                                  Clearable="true"
-                                 ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPerawatan} ({gp.KodeGroupPerawatan})")"
+                                 ToStringFunc="@(gp=> gp==null?null : $"{gp.KodeGroupPerawatan} ({gp.KodeGroupPerawatan})")"
                                  Dense="true"
                                  Variant="Variant.Outlined"
                                  Margin="Margin.Dense" />
             </MudItem>
+
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                <MudTextField T="string" Label="Kategori Perawatan" @bind-Value="header.KategoriPerawatan" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Harga" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" />
+
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Nama Perawatan" @bind-Value="header.NamaPerawatan" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
-            <MudItem xs="12" sm="4">
+
+            <MudItem xs="12" sm="3">
+                <MudNumericField T="decimal" Label="Harga" @bind-Value="header.Harga" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="3">
                 <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
-            <MudItem xs="12" sm="4">
+            <MudItem xs="12" sm="3">
                 <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <MudItem xs="12" sm="3">
+                <MudNumericField T="int" Label="Point" @bind-Value="header.Point" Variant="Variant.Outlined" Margin="Margin.Dense" />
             </MudItem>
         </MudGrid>
     </MudForm>
@@ -57,20 +64,18 @@
     <MudForm @ref="detailForm" Class="table-form section-body">
         <MudGrid>
             <MudItem xs="12" sm="3">
-                <!-- Replaced text input with autocomplete for Perawatan -->
-                <MudAutocomplete T="PPerawatanH"
-                                 Label="Pilih Perawatan"
-                                 @bind-Value="selectedPerawatan"
-                                 SearchFunc="SearchPerawatan"
-                                 Clearable="true"
-                                 ToStringFunc="@(p => p == null ? null : $"{p.KodePerawatan} ({p.NamaPerawatan})")"
-                                 Dense="true"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense" />
+                <MudTextField T="string" Label="Kode Barang" @bind-Value="detail.KodeBarang" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="3">
-                <MudNumericField T="int" Label="Jumlah Perawatan" @bind-Value="detail.JumlahPerawatan" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                <MudTextField T="string" Label="Unit Pakai" @bind-Value="detail.UnitPakai" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
+            <MudItem xs="12" sm="3">
+                <MudNumericField T="decimal" Label="Jumlah Pakai" @bind-Value="detail.JumlahPakai" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="3">
+                <MudTextField T="string" Label="Indikator Pakai" @bind-Value="detail.IndikatorPakai" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+
             <MudItem xs="12" sm="6" Class="d-flex align-end">
                 @if (isEditingDetail)
                 {
@@ -89,14 +94,18 @@
     <MudTable Items="details" Hover="true" Class="mt-4">
         <HeaderContent>
             <MudTh>No Urut</MudTh>
-            <MudTh>Kode Perawatan</MudTh>
-            <MudTh>Jumlah</MudTh>
+            <MudTh>Kode Barang</MudTh>
+            <MudTh>Unit Pakai</MudTh>
+            <MudTh>Jumlah Pakai</MudTh>
+            <MudTh>Indikator</MudTh>
             <MudTh>Aksi</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="No Urut">@context.NoUrut</MudTd>
-            <MudTd DataLabel="Kode Perawatan">@context.KodePerawatan</MudTd>
-            <MudTd DataLabel="Jumlah">@context.JumlahPerawatan</MudTd>
+            <MudTd DataLabel="Kode Barang">@context.KodeBarang</MudTd>
+            <MudTd DataLabel="Unit Pakai">@context.UnitPakai</MudTd>
+            <MudTd DataLabel="Jumlah Pakai">@context.JumlahPakai</MudTd>
+            <MudTd DataLabel="Indikator">@context.IndikatorPakai</MudTd>
             <MudTd DataLabel="Aksi">
                 <MudIconButton Icon="Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
                 <MudIconButton Icon="Icons.Material.Filled.Delete" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
@@ -106,7 +115,7 @@
 
     <!-- Save Header and Details -->
     <div class="d-flex justify-end mt-4">
-        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Class="save-btn" OnClick="SubmitAll">Simpan Paket</MudButton>
+        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Class="save-btn" OnClick="SubmitAll">Simpan Perawatan</MudButton>
         <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" Class="back-btn" OnClick="Back">Kembali</MudButton>
     </div>
 </MudCard>
@@ -115,50 +124,41 @@
     private MudForm headerForm;
     private MudForm detailForm;
 
-    private PaketHeader header = new PaketHeader();
-    private PaketDetail detail = new PaketDetail();
-    private List<PaketDetail> details = new List<PaketDetail>();
+    private PPerawatanH header = new();
+    private PerawatanDetail detail = new();
+    private List<PerawatanDetail> details = new();
 
-    private List<GroupPerawatan> groupPerawatans = new List<GroupPerawatan>();
-    private List<PPerawatanH> perawatans = new List<PPerawatanH>();
+    private List<GroupPerawatan> groupPerawatans = new();
+    private List<PPerawatanH> perawatans = new(); // kept if you want to search existing for reference
 
     private GroupPerawatan selectedGroup;
-    private PPerawatanH selectedPerawatan; // NEW: holds current perawatan selection
-
-    private bool isActive;
+    private bool isActive = true;
     private bool isEditingDetail = false;
     private int editingIndex = -1;
 
-    private void Back()
-    {
-        NavigationManager.NavigateTo("/package-item");
-    }
+    private void Back() => NavigationManager.NavigateTo("/treatment-item");
 
     protected override void OnInitialized()
     {
         header.Aktif = "1";
-        isActive = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Load Group Paket
             var apiResponse = await ApiService.GetGroupPerawatansAsync();
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
-                groupPerawatans = apiResponse.Data.Items ?? new List<GroupPerawatan>();
+                groupPerawatans = apiResponse.Data.Items ?? new();
 
-            // Load Perawatan (Tindakan)
+            // optional reference list (not used by picker here)
             var perawatanApiResponse = await PerawatanApiService.GetTindakansAsync();
             if (perawatanApiResponse.StatusCode == 0 && perawatanApiResponse.Data != null)
-                perawatans = perawatanApiResponse.Data.Items ?? new List<PPerawatanH>();
+                perawatans = perawatanApiResponse.Data.Items ?? new();
 
             StateHasChanged();
         }
     }
-
-    // --- Autocomplete: Group Paket ---
 
     private Task<IEnumerable<GroupPerawatan>> SearchGroup(string value, CancellationToken cancelToken)
     {
@@ -166,7 +166,6 @@
             return Task.FromResult(groupPerawatans.AsEnumerable());
 
         var result = groupPerawatans.Where(g =>
-            (g.KodeGroupPerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (g.KodeGroupPerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
 
         return Task.FromResult(result);
@@ -175,236 +174,139 @@
     private void OnGroupChanged(GroupPerawatan gp)
     {
         selectedGroup = gp;
-        if (gp != null)
-        {
-            header.KodeGroupPaket = gp.KodeGroupPerawatan;
-            // If you want NamaPaket to default from group name:
-            // Only set when user hasn't typed a custom name
-            if (string.IsNullOrWhiteSpace(header.NamaPaket))
-                header.NamaPaket = gp.KodeGroupPerawatan;
-        }
+        header.KodeGroupPerawatan = gp?.KodeGroupPerawatan;
+        if (string.IsNullOrWhiteSpace(header.NamaPerawatan) && gp != null)
+            header.NamaPerawatan = gp.KodeGroupPerawatan;
     }
-
-    // --- Autocomplete: Perawatan ---
-
-    private Task<IEnumerable<PPerawatanH>> SearchPerawatan(string value, CancellationToken cancelToken)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return Task.FromResult(perawatans.AsEnumerable());
-
-        var result = perawatans.Where(p =>
-            (p.KodePerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
-            (p.NamaPerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
-
-        return Task.FromResult(result);
-    }
-
-    private void OnPerawatanChanged(PPerawatanH p)
-    {
-        selectedPerawatan = p;
-        detail.KodePerawatan = p?.KodePerawatan; // keep the saved code in sync with selection
-    }
-
-    // --- Detail CRUD ---
 
     private async Task AddDetail()
     {
         await detailForm.Validate();
         if (!detailForm.IsValid) return;
 
-        // ensure a perawatan is selected
-        if (string.IsNullOrWhiteSpace(detail.KodePerawatan))
-        {
-            // optionally show a snackbar/toast here
+        if (string.IsNullOrWhiteSpace(detail.KodeBarang)
+            || string.IsNullOrWhiteSpace(detail.UnitPakai))
             return;
-        }
 
-        detail.NoUrut = details.Count + 1;
+        var noUrut = details.Count + 1;
 
-        details.Add(new PaketDetail
+        details.Add(new PerawatanDetail
         {
-            NoUrut = detail.NoUrut,
-            KodePerawatan = detail.KodePerawatan,
-            JumlahPerawatan = detail.JumlahPerawatan
+            NoUrut = noUrut,
+            KodePerawatan = header.KodePerawatan, // tie to header code
+            KodeBarang = detail.KodeBarang,
+            UnitPakai = detail.UnitPakai,
+            JumlahPakai = detail.JumlahPakai,
+            IndikatorPakai = detail.IndikatorPakai
         });
 
         ResetDetailForm();
     }
 
-    private void EditDetail(PaketDetail item)
+    private void EditDetail(PerawatanDetail item)
     {
         isEditingDetail = true;
         editingIndex = details.IndexOf(item);
 
-        detail = new PaketDetail
+        detail = new PerawatanDetail
         {
             NoUrut = item.NoUrut,
             KodePerawatan = item.KodePerawatan,
-            JumlahPerawatan = item.JumlahPerawatan
+            KodeBarang = item.KodeBarang,
+            UnitPakai = item.UnitPakai,
+            JumlahPakai = item.JumlahPakai,
+            IndikatorPakai = item.IndikatorPakai
         };
-
-        // sync the autocomplete selection to reflect current row
-        selectedPerawatan = perawatans.FirstOrDefault(p => p.KodePerawatan == item.KodePerawatan);
     }
 
     private void UpdateDetail()
     {
         if (isEditingDetail && editingIndex >= 0)
         {
-            details[editingIndex].KodePerawatan = detail.KodePerawatan;
-            details[editingIndex].JumlahPerawatan = detail.JumlahPerawatan;
+            details[editingIndex].KodeBarang = detail.KodeBarang;
+            details[editingIndex].UnitPakai = detail.UnitPakai;
+            details[editingIndex].JumlahPakai = detail.JumlahPakai;
+            details[editingIndex].IndikatorPakai = detail.IndikatorPakai;
             ResetDetailForm();
         }
     }
 
-    private void CancelEdit()
-    {
-        ResetDetailForm();
-    }
+    private void CancelEdit() => ResetDetailForm();
 
-    private void RemoveDetail(PaketDetail item)
+    private void RemoveDetail(PerawatanDetail item)
     {
         details.Remove(item);
-        // Re-number NoUrut
-        for (int i = 0; i < details.Count; i++)
-            details[i].NoUrut = i + 1;
+        for (int i = 0; i < details.Count; i++) details[i].NoUrut = i + 1;
     }
 
     private void ResetDetailForm()
     {
         isEditingDetail = false;
         editingIndex = -1;
-        detail = new PaketDetail();
-        selectedPerawatan = null; // clear perawatan picker
+        detail = new PerawatanDetail();
     }
 
     private async Task SubmitAll()
     {
         await headerForm.Validate();
-        if (headerForm.IsValid)
+        if (!headerForm.IsValid) return;
+
+        header.Aktif = isActive ? "1" : "0";
+
+        var h = new PPerawatanH
         {
-            header.Aktif = isActive ? "1" : "0";
+            KodePerawatan = header.KodePerawatan,
+            KodeJenis = header.KodeJenis,
+            KodeGroupPerawatan = header.KodeGroupPerawatan,
+            KategoriPerawatan = header.KategoriPerawatan,
+            NamaPerawatan = header.NamaPerawatan,
+            Harga = header.Harga,
+            DiscMember = header.DiscMember,
+            DiscNonMember = header.DiscNonMember,
+            Point = header.Point,
+            Aktif = header.Aktif,
+            UsrId = ""
+        };
 
-            var paket = new PaketHeader
-            {
-                KodePaket = header.KodePaket,
-                KodeJenis = header.KodeJenis,
-                KodeGroupPaket = header.KodeGroupPaket,
-                NamaPaket = header.NamaPaket,
-                HARGA = header.HARGA,
-                DiscMember = header.DiscMember,
-                DiscNonMember = header.DiscNonMember,
-                MasaLaku = header.MasaLaku,
-                Aktif = header.Aktif,
-                USRID = ""
-            };
+        var resultHeader = await PerawatanApiService.CreateTindakanAsync(h);
+        if (resultHeader.StatusCode < 300)
+        {
+            long idHeader = resultHeader.Data?.IDPerawatanHeader > 0
+                ? resultHeader.Data.IDPerawatanHeader
+                : (await PerawatanApiService.GetTindakanByCodeAsync(h.KodePerawatan)).Data?.IDPerawatanHeader ?? 0;
 
-            // Save header
-            var resultHeader = await PaketHeaderApiService.CreatePaketHeaderAsync(paket);
-            if (resultHeader.StatusCode < 300)
+            if (idHeader > 0 && details.Count > 0)
             {
-                // Save details
                 foreach (var d in details)
                 {
-                    d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
-                    await PaketApiService.CreatePaketDetailAsync(d);
+                    await PerawatanDetailApiService.CreatePerawatanDetailAsync(d);
                 }
+            }
 
-                NavigationManager.NavigateTo("/package-item");
-            }
-            else
-            {
-                // TODO: handle error (snackbar/log)
-            }
+            NavigationManager.NavigateTo("/treatment-item");
+        }
+        else
+        {
+            // handle error as you do elsewhere
         }
     }
 }
 
 <style>
-    .save-btn {
-        background: rgba(47, 193, 71, 1);
-        color: white;
-        text-transform: none;
-    }
-
-        .save-btn:hover {
-            background: rgba(27, 153, 41, 1);
-        }
-
-    .back-btn {
-        background: rgba(156, 99, 5, 1);
-        color: white;
-        margin-left: 20px;
-        text-transform: none;
-    }
-
-        .back-btn:hover {
-            background: rgba(126, 69, 2, 1);
-        }
-
-    .table-form .mud-input-root {
-        height: 30px !important;
-        padding: 0px 10px !important;
-        font-size: 12px !important;
-    }
-
-    .table-form .mud-input-label {
-        font-size: 14px !important;
-        line-height: 14px !important;
-    }
-
-    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
-        transform: translate(12px, 10px) scale(1);
-    }
-
-    .table-form .mud-input-label-inputcontrol {
-        top: -3px;
-    }
-
-    .table-form .mud-select-input.mud-input-slot {
-        transform: translate(5px, 7px);
-        top: -8px;
-    }
-
-    .active-tab {
-        background-color: rgba(162, 238, 240, 1);
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .tab-panel {
-        border: 1px solid rgba(202, 199, 199, 1);
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .tab-header {
-        border: 1px solid rgba(202, 199, 199, 1);
-        border-top: none;
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .section {
-        width: 100%;
-        overflow: hidden; /* clip rounded corners */
-        border-radius: 8px;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        background-color: #a2eef0; /* your blue */
-        padding: 0.75rem 1rem;
-        font-weight: 500;
-    }
-
-        .section-header .mud-icon-root {
-            margin-right: 0.5rem;
-            font-size: 1.25rem;
-        }
-
-    .section-body {
-        padding: 1rem;
-    }
+    .save-btn { background: rgba(47, 193, 71, 1); color: white; text-transform: none; }
+    .save-btn:hover { background: rgba(27, 153, 41, 1); }
+    .back-btn { background: rgba(156, 99, 5, 1); color: white; margin-left: 20px; text-transform: none; }
+    .back-btn:hover { background: rgba(126, 69, 2, 1); }
+    .table-form .mud-input-root { height: 30px !important; padding: 0 10px !important; font-size: 12px !important; }
+    .table-form .mud-input-label { font-size: 14px !important; line-height: 14px !important; }
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense { transform: translate(12px, 10px) scale(1); }
+    .table-form .mud-input-label-inputcontrol { top: -3px; }
+    .table-form .mud-select-input.mud-input-slot { transform: translate(5px, 7px); top: -8px; }
+    .active-tab { background-color: rgba(162, 238, 240, 1); border-top-right-radius: 20px; border-top-left-radius: 20px; }
+    .tab-panel { border: 1px solid rgba(202, 199, 199, 1); border-top-right-radius: 20px; border-top-left-radius: 20px; }
+    .tab-header { border: 1px solid rgba(202, 199, 199, 1); border-top: none; border-top-right-radius: 20px; border-top-left-radius: 20px; }
+    .section { width: 100%; overflow: hidden; border-radius: 8px; }
+    .section-header { display: flex; align-items: center; background-color: #a2eef0; padding: .75rem 1rem; font-weight: 500; }
+    .section-header .mud-icon-root { margin-right: .5rem; font-size: 1.25rem; }
+    .section-body { padding: 1rem; }
 </style>
