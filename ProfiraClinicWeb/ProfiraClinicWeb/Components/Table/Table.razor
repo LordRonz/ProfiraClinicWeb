@@ -22,7 +22,13 @@
                             }
                         }
                     </MudSelect>
-                    <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
+                    @if (!UseServerData || ServerDataFunc == null)
+                    {
+                        <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
+                    } else
+                    {
+                        <MudTextField DebounceInterval="2000" T="string" ValueChanged="OnSearchChanged" ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
+                    }
                 </div>
                 @* <div class="d-flex justify-content-between mb-4"> *@
                 @*     <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton> *@
@@ -263,6 +269,22 @@
             TotalItems = resp.Data?.TotalCount ?? 0,
             Items = resp.Data?.Items ?? new List<Dictionary<string, string>>()
         };
+    }
+
+    private void OnSearchChanged(string value)
+    {
+        searchString1 = value ?? string.Empty;
+        ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        try
+        {
+
+            await InvokeAsync(() => table?.ReloadServerData());
+        }
+        catch (TaskCanceledException) { /* ignored */ }
     }
 }
 

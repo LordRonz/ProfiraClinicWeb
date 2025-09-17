@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
@@ -54,6 +55,35 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var token = _authService.GenerateToken(loginModel, model.KodeLokasi);
             return Ok(new { Token = token });
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.NewPassword))
+                return BadRequest("Invalid request");
+
+            // Get username from JWT claims
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser.FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            // Verify old password
+            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.Password))
+                return BadRequest("Current password is incorrect");
+
+            // Hash new password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.UPDDT = DateTime.Now;
+
+            _context.MUser.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Password updated successfully" });
         }
 
         private string GenerateJwtToken()
