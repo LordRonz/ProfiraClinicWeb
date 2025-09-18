@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using System.Security.Claims;
@@ -83,5 +82,63 @@ namespace ProfiraClinicWebAPI.Controllers
                 });
             }
         }
+        public class EditGroupPaketDto
+        {
+            public string? KodeGroupPaket { get; set; }
+            public string? NamaGroupPaket { get; set; }
+            public string? Aktif { get; set; } // '1' or '0'
+        }
+
+        [HttpPost("Edit")]
+        public async Task<IActionResult> EditGroupPaket([FromBody] EditGroupPaketDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (string.IsNullOrWhiteSpace(dto.KodeGroupPaket))
+                return BadRequest("KodeGroupPaket is required");
+            if (string.IsNullOrWhiteSpace(dto.NamaGroupPaket))
+                return BadRequest("NamaGroupPaket is required");
+            if (string.IsNullOrWhiteSpace(dto.Aktif))
+                return BadRequest("Aktif is required");
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeGroupPaket", dto.KodeGroupPaket),
+        new SqlParameter("@NamaGroupPaket", dto.NamaGroupPaket),
+        new SqlParameter("@Aktif", dto.Aktif),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_MGroupPaket_Edit @KodeGroupPaket, @NamaGroupPaket, @Aktif, @USRID",
+                    sqlParameters
+                );
+
+                return Ok(new
+                {
+                    message = "Group paket updated successfully",
+                    data = new { dto.KodeGroupPaket, dto.NamaGroupPaket, dto.Aktif }
+                });
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Failed to update group paket",
+                    data = new { error = ex.Message }
+                });
+            }
+        }
+
     }
 }
