@@ -140,5 +140,13 @@ namespace ProfiraClinicWebAPI.Controllers
             public string? Aktif { get; set; }  // '1' or '0'
         }
 
+        protected override IQueryable<GroupBarang> ApplyDeleteFilter(
+    IQueryable<GroupBarang> q,
+    string filter)
+        {
+            // delete by code; you can broaden this as needed
+            return q.Where(x => x.KodeGroupBarang == filter);
+        }
+
     }
 }

@@ -140,5 +140,13 @@ namespace ProfiraClinicWebAPI.Controllers
             }
         }
 
+        protected override IQueryable<GroupPaket> ApplyDeleteFilter(
+    IQueryable<GroupPaket> q,
+    string filter)
+        {
+            // delete by code; you can broaden this as needed
+            return q.Where(x => x.KodeGroupPaket == filter);
+        }
+
     }
 }

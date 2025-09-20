@@ -158,5 +158,110 @@ namespace ProfiraClinicWebAPI.Controllers
             var item = await DbSet.FirstOrDefaultAsync(predicate);
             return item == null ? NotFound() : item;
         }
+
+        /// <summary>
+        /// Optional override for controllers that need non-PK deletes (e.g., keyless entities).
+        /// Example: return q.Where(e => EF.Property<string>(e, "KodeBarang") == filter);
+        /// Default throws for keyless types unless overridden.
+        /// </summary>
+        protected virtual IQueryable<TEntity> ApplyDeleteFilter(
+            IQueryable<TEntity> query,
+            string filter)
+        {
+            // Default: not implemented. Override in derived controllers that need this.
+            throw new NotSupportedException(
+                $"{typeof(TEntity).Name} does not support delete by filter. Override ApplyDeleteFilter in the controller.");
+        }
+
+        /// <summary>
+        /// POST /api/{Entity}/Del
+        /// - If entity has a single primary key and GetParam is provided, deletes by PK.
+        /// - Otherwise calls ApplyDeleteFilter(query, GetParam) and deletes matching rows (max 50).
+        /// </summary>
+        [HttpPost("Del")]
+        public virtual async Task<IActionResult> Delete([FromBody] BaseBodyListOr body)
+        {
+            var filter = body?.GetParam?.Trim();
+            if (string.IsNullOrEmpty(filter))
+                return BadRequest(new { message = "`GetParam` is required for delete." });
+
+            var entityType = _context.Model.FindEntityType(typeof(TEntity));
+            var isKeyless = entityType?.FindPrimaryKey() == null;
+
+            // Try PK path if not keyless and single-column PK exists
+            if (!isKeyless)
+            {
+                var pk = entityType?.FindPrimaryKey();
+                if (pk != null && pk.Properties.Count == 1)
+                {
+                    var keyProp = pk.Properties[0];
+                    var keyClrType = keyProp.ClrType;
+
+                    object keyValue;
+                    try
+                    {
+                        // Convert string filter to the PK type
+                        keyValue = Convert.ChangeType(filter, Nullable.GetUnderlyingType(keyClrType) ?? keyClrType, CultureInfo.InvariantCulture);
+                    }
+                    catch
+                    {
+                        return BadRequest(new { message = $"Could not convert '{filter}' to key type {keyClrType.Name}." });
+                    }
+
+                    var found = await DbSet.FindAsync(keyValue);
+                    if (found == null)
+                        return NotFound(new { message = $"Entity '{typeof(TEntity).Name}' with key '{filter}' not found." });
+
+                    DbSet.Remove(found);
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        return Ok(new { message = $"Deleted '{typeof(TEntity).Name}' with key '{filter}'." });
+                    }
+                    catch (DbUpdateException ex)
+                    {
+                        return BadRequest(new
+                        {
+                            message = "Delete failed due to database constraints.",
+                            error = ex.GetBaseException().Message
+                        });
+                    }
+                }
+            }
+
+            // Fallback: filter-based delete (for keyless or non-PK deletes) via ApplyDeleteFilter
+            IQueryable<TEntity> query;
+            try
+            {
+                query = ApplyDeleteFilter(DbSet, filter);
+            }
+            catch (NotSupportedException nse)
+            {
+                return BadRequest(new { message = nse.Message });
+            }
+
+            var toDelete = await query.AsTracking().Take(51).ToListAsync();
+            if (toDelete.Count == 0)
+                return NotFound(new { message = "No matching entities to delete." });
+            if (toDelete.Count > 50)
+                return BadRequest(new { message = "Refusing to delete more than 50 rows in one request." });
+
+            DbSet.RemoveRange(toDelete);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new { message = $"Deleted {toDelete.Count} '{typeof(TEntity).Name}' row(s)." });
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Delete failed due to database constraints.",
+                    error = ex.GetBaseException().Message
+                });
+            }
+        }
+
     }
 }

@@ -79,5 +79,72 @@ namespace ProfiraClinicWebAPI.Controllers
                 });
             }
         }
+
+        public class EditGroupPerawatanDto
+        {
+            public string? KodeGroupPerawatan { get; set; }
+            public string? NamaGroupPerawatan { get; set; }
+            public string? Aktif { get; set; } // '1' or '0'
+        }
+
+        [HttpPost("Edit")]
+        public async Task<IActionResult> EditGroupPerawatan([FromBody] EditGroupPerawatanDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (string.IsNullOrWhiteSpace(dto.KodeGroupPerawatan))
+                return BadRequest("KodeGroupPerawatan is required");
+            if (string.IsNullOrWhiteSpace(dto.NamaGroupPerawatan))
+                return BadRequest("NamaGroupPerawatan is required");
+            if (string.IsNullOrWhiteSpace(dto.Aktif))
+                return BadRequest("Aktif is required");
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeGroupPerawatan", dto.KodeGroupPerawatan),
+        new SqlParameter("@NamaGroupPerawatan", dto.NamaGroupPerawatan),
+        new SqlParameter("@Aktif", dto.Aktif),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_MGroupPerawatan_Edit @KodeGroupPerawatan, @NamaGroupPerawatan, @Aktif, @USRID",
+                    sqlParameters
+                );
+
+                return Ok(new
+                {
+                    message = "Group perawatan updated successfully",
+                    data = new { dto.KodeGroupPerawatan, dto.NamaGroupPerawatan, dto.Aktif }
+                });
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Failed to update group perawatan",
+                    data = new { error = ex.Message }
+                });
+            }
+        }
+
+        protected override IQueryable<GroupPerawatan> ApplyDeleteFilter(
+    IQueryable<GroupPerawatan> q,
+    string filter)
+        {
+            return q.Where(x => x.KodeGroupPerawatan == filter);
+        }
+
+
     }
 }
