@@ -1,9 +1,12 @@
 ﻿@page "/treatment"
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Components.Dialog
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
 @inject GroupPerawatanApiService ApiService
+@inject ISnackbar Snackbar
+@inject IDialogService Dialog
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" AddButtonText="Tambah" />
@@ -69,6 +72,7 @@
                         new TableColumn { Caption = "Kode Group Perawatan", DataField = "kodeGroupPerawatan" },
                         new TableColumn { Caption = "Nama Group Perawatan", DataField = "namaGroupPerawatan" },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete, ActionField = "kodeGroupPerawatan", Action = OnDelete },
                                 },
                     dataSource,
                     "/treatment/add"
@@ -80,6 +84,43 @@
                 System.Diagnostics.Debug.WriteLine($"Error loading paket: {ex.Message}");
             }
             StateHasChanged();
+        }
+    }
+
+    private void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add(message, severity);
+    }
+
+    private async Task<bool> OnDelete(string kodeGroupPerawatan)
+    {
+        System.Diagnostics.Debug.WriteLine("OnDelete Group Perawatan");
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = $"Yakin ingin menghapus '{kodeGroupPerawatan}'?"
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = Dialog.Show<ConfirmDialog>("Hapus Group Paket", parameters, options);
+        var result = await dialog.Result;
+
+        if (result?.Canceled == true) return false;
+
+        var resp = await ApiService.DeleteGroupPerawatanByIdAsync(kodeGroupPerawatan);
+        if (resp.StatusCode < 300)
+        {
+            Perawatans.RemoveAll(p => p.KodeGroupPerawatan == kodeGroupPerawatan);
+            StateHasChanged();
+            Snackbar.Add("Berhasil dihapus.", Severity.Success);
+            return true;
+        }
+        else
+        {
+            Snackbar.Add(resp.Message ?? "Gagal menghapus.", Severity.Error);
+            return false;
         }
     }
 }

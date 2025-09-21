@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -83,6 +78,14 @@ namespace ProfiraClinicWeb.Services
             }
 
             return new ApiResponse<object>((int)responseMessage.StatusCode, "GroupPaket updated successfully");
+        }
+
+        public async Task<ApiResponse<GroupPaket>> DeleteGroupPaketByIdAsync(string id)
+        {
+            var response = await _httpClient
+                .DeleteFromJsonAsync<ApiResponse<GroupPaket>>($"api/GroupPaket/Del/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
+            return response;
         }
     }
 }

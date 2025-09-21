@@ -178,10 +178,10 @@ namespace ProfiraClinicWebAPI.Controllers
         /// - If entity has a single primary key and GetParam is provided, deletes by PK.
         /// - Otherwise calls ApplyDeleteFilter(query, GetParam) and deletes matching rows (max 50).
         /// </summary>
-        [HttpPost("Del")]
-        public virtual async Task<IActionResult> Delete([FromBody] BaseBodyListOr body)
+        [HttpDelete("Del/{id}")]
+        public virtual async Task<IActionResult> Delete(string id)
         {
-            var filter = body?.GetParam?.Trim();
+            var filter = id;
             if (string.IsNullOrEmpty(filter))
                 return BadRequest(new { message = "`GetParam` is required for delete." });
 
@@ -189,7 +189,7 @@ namespace ProfiraClinicWebAPI.Controllers
             var isKeyless = entityType?.FindPrimaryKey() == null;
 
             // Try PK path if not keyless and single-column PK exists
-            if (!isKeyless)
+            if (!isKeyless && ApplyDeleteFilter == null)
             {
                 var pk = entityType?.FindPrimaryKey();
                 if (pk != null && pk.Properties.Count == 1)
@@ -242,7 +242,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var toDelete = await query.AsTracking().Take(51).ToListAsync();
             if (toDelete.Count == 0)
-                return NotFound(new { message = "No matching entities to delete." });
+                return NotFound(new { message = $"Entity '{typeof(TEntity).Name}' with key '{filter}' not found." });
             if (toDelete.Count > 50)
                 return BadRequest(new { message = "Refusing to delete more than 50 rows in one request." });
 

@@ -3,7 +3,8 @@
 @using System.Linq;
 @using static MudBlazor.CategoryTypes
 
-@if (WithAdd == true) {
+@if (WithAdd == true)
+{
     <div class="d-flex justify-content-end mb-2">
         <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">@AddButtonText</MudButton>
     </div>
@@ -11,13 +12,14 @@
 <div class="mb-5">
     <MudCard Class="rounded-3">
         <MudStack Spacing="1" Class="w-100 table-header pb-4">
-            <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
+            <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudCollapse Expanded="_expanded" Class="px-4">
                 <div class="d-flex justify-content-start align-items-start gap-4">
                     <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll @bind-Value="value" @bind-SelectedValues="options" OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
-                        @foreach (TableColumn col in Config.GetColumn())
+                        @foreach (TableColumn col in _columns)
                         {
-                            @if(col.Type == ColumnType.Data) {
+                            @if (col.Type == ColumnType.Data)
+                            {
                                 <MudSelectItem Style="height: 30px" T="string" Value="@col.DataField">@col.Caption</MudSelectItem>
                             }
                         }
@@ -25,23 +27,21 @@
                     @if (!UseServerData || ServerDataFunc == null)
                     {
                         <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
-                    } else
+                    }
+                    else
                     {
                         <MudTextField DebounceInterval="2000" T="string" ValueChanged="OnSearchChanged" ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
                     }
                 </div>
-                @* <div class="d-flex justify-content-between mb-4"> *@
-                @*     <MudButton Size="MudBlazor.Size.Small" StartIcon="fa fa-search" IconSize="@MudBlazor.Size.Small" Class="search-btn mt-2" OnClick="() => tableFilterRef.ForceUpdate()">Cari</MudButton> *@
-                @*     @* <MudButton StartIcon="fa fa-plus" IconSize="@MudBlazor.Size.Small" Href="@Config.GetAddRoute()" Class="add-btn mt-2">Tambah</MudButton> *@
-                @* </div> *@
             </MudCollapse>
         </MudStack>
     </MudCard>
 </div>
-@if (!UseServerData || ServerDataFunc == null) {
-    <MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="@Config.GetData()" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="new Func<Dictionary<string, string>,bool>(FilterFunc1)" @ref="table">
+@if (!UseServerData || ServerDataFunc == null)
+{
+    <MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="_data" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="_filterPredicate" @ref="table">
         <ColGroup>
-            @foreach (TableColumn col in Config.GetColumn())
+            @foreach (TableColumn col in _columns)
             {
                 // Pass the Dto properties to the component
                 @switch (col.Type)
@@ -61,14 +61,14 @@
             }
         </ColGroup>
         <HeaderContent>
-            @foreach (TableColumn col in Config.GetColumn())
+            @foreach (TableColumn col in _columns)
             {
                 // Pass the Dto properties to the component
                 <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
             }
         </HeaderContent>
         <RowTemplate>
-            @foreach (TableColumn col in Config.GetColumn())
+            @foreach (TableColumn col in _columns)
             {
                 @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
                 var cellClass = col.Align switch
@@ -90,8 +90,18 @@
                             <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
                             break;
                         case ColumnType.Delete:
-                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
-                            break;
+                            {
+                                var keyField = col.ActionField ?? col.DataField;
+                                var keyVal = context.GetValueOrDefault(keyField);
+                                <MudFab DisableElevation Size="MudBlazor.Size.Small"
+                                        IconSize="MudBlazor.Size.Small"
+                                        Color="@(col.Color ?? MudBlazor.Color.Transparent)"
+                                        Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;"
+                                        DropShadow="false"
+                                        StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)"
+                                        OnClick="@(() => OnDeleteClicked(keyField, keyVal, col.Action))" />
+                                break;
+                            }
                         default:
                             @context.GetValueOrDefault(col.DataField)
                             break;
@@ -103,10 +113,12 @@
             <MudTablePager PageSizeOptions="new int[] { 5, 10, 15, 25, 50, 100, int.MaxValue }" InfoFormat="@infoFormat" HorizontalAlignment="MudBlazor.HorizontalAlignment.Center" />
         </PagerContent>
     </MudTable>
-} else {
+}
+else
+{
     <MudTable HeaderClass="@GetHeaderClass()" ServerData="LoadServerData" Striped Bordered Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" @ref="table">
         <ColGroup>
-            @foreach (TableColumn col in Config.GetColumn())
+            @foreach (TableColumn col in _columns)
             {
                 // Pass the Dto properties to the component
                 @switch (col.Type)
@@ -126,14 +138,14 @@
             }
         </ColGroup>
         <HeaderContent>
-            @foreach (TableColumn col in Config.GetColumn())
+            @foreach (TableColumn col in _columns)
             {
                 // Pass the Dto properties to the component
                 <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
             }
         </HeaderContent>
         <RowTemplate>
-            @foreach (TableColumn col in Config.GetColumn())
+            @foreach (TableColumn col in _columns)
             {
                 @* Use CSS classes for cell alignment since MudTd doesn’t support Align param *@
                 var cellClass = col.Align switch
@@ -155,8 +167,18 @@
                             <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: rgba(111, 74, 2, 1); background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.RemoveRedEye)" Href="@context.GetValueOrDefault(col.DataField)" />
                             break;
                         case ColumnType.Delete:
-                            <MudFab DisableElevation Size="MudBlazor.Size.Small" IconSize="MudBlazor.Size.Small" Color="@(col.Color ?? MudBlazor.Color.Transparent)" Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;" DropShadow="false" StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)" OnClick="col.Action" />
-                            break;
+                            {
+                                var keyField = col.ActionField ?? col.DataField;
+                                var keyVal = context.GetValueOrDefault(keyField);
+                                <MudFab DisableElevation Size="MudBlazor.Size.Small"
+                                        IconSize="MudBlazor.Size.Small"
+                                        Color="@(col.Color ?? MudBlazor.Color.Transparent)"
+                                        Style="color: #f00; background-color: transparent; height: 20px !important; min-height: 20px;"
+                                        DropShadow="false"
+                                        StartIcon="@(col.CustomIcon ?? Icons.Material.Filled.DeleteForever)"
+                                        OnClick="@(() => OnDeleteClicked(keyField, keyVal, col.Action))" />
+                                break;
+                            }
                         default:
                             @context.GetValueOrDefault(col.DataField)
                             break;
@@ -179,6 +201,8 @@
     private MudTable<Dictionary<string, string>> table;
     private MudTextField<string> tableFilterRef;
 
+    private List<Dictionary<string, string>> _data = [];
+
     bool _expanded = true;
 
     private void OnExpandCollapseClick()
@@ -189,6 +213,11 @@
     private IEnumerable<string> options { get; set; } = [];
 
     private string value { get; set; } = "Nothing selected";
+
+    private Func<Dictionary<string, string>, bool>? _filterPredicate;
+
+    private TableConfig? _prevConfigRef;
+
     [Parameter] public bool UseServerData { get; set; } = false;
 
     [Parameter]
@@ -205,10 +234,31 @@
 
     private bool FilterFunc1(Dictionary<string, string> element) => FilterFunc(element, searchString1.ToLower().Trim());
 
+    private List<TableColumn> _columns = new();
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_prevConfigRef, Config))
+        {
+            _prevConfigRef = Config;
+
+            _columns = Config.GetColumn().ToList();
+
+            // Pin Items to a stable reference; if GetData() returns a new list each time,
+            // lift it in the PARENT so the reference is stable, or snapshot it once here:
+            _data = Config.GetData();
+        }
+    }
+
     string GetHeaderClass()
     {
         var defaultClass = "table-head-bordered bg-pastel-sky" + (ClassOverride ?? "");
         return defaultClass;
+    }
+
+    protected override void OnInitialized()
+    {
+        _filterPredicate = FilterFunc1;
     }
 
     private string GetMultiSelectionText(List<string> selectedValues)
@@ -224,7 +274,6 @@
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        System.Diagnostics.Debug.Print(element.Values.ToList()[2]);
 
         var filters = Config.GetFilters();
         foreach (var filter in filters)
@@ -259,11 +308,8 @@
 
     private async Task<TableData<Dictionary<string, string>>> LoadServerData(TableState state, CancellationToken token)
     {
-        _loading = true; 
-        StateHasChanged();
         var resp = await ServerDataFunc!(state.Page + 1, state.PageSize, searchString1);
-        _loading = false;
-        StateHasChanged();
+
         return new TableData<Dictionary<string, string>>
         {
             TotalItems = resp.Data?.TotalCount ?? 0,
@@ -283,9 +329,34 @@
         {
 
             await InvokeAsync(() => table?.ReloadServerData());
+            StateHasChanged();
         }
         catch (TaskCanceledException) { /* ignored */ }
     }
+
+    private void RemoveRowByKey(string keyField, string? keyVal)
+    {
+        if (string.IsNullOrEmpty(keyVal)) return;
+
+        // remove in-memory, create a new list to change reference for MudTable
+        _data = _data.Where(r =>
+            !string.Equals(r.GetValueOrDefault(keyField), keyVal, StringComparison.Ordinal)
+        ).ToList();
+    }
+
+    private async Task OnDeleteClicked(string keyField, string? keyVal, Func<string?, Task<bool>>? serverAction)
+    {
+        var before = _data;
+        if (serverAction != null)
+        {
+            var ok = await serverAction(keyVal);
+
+            RemoveRowByKey(keyField, keyVal);
+            StateHasChanged();
+            if (!ok) { _data = before; StateHasChanged(); }
+        }
+    }
+
 }
 
 
@@ -310,11 +381,11 @@
         border-top-right-radius: 12px;
     }
 
-    .filter-btn > .mud-button-label {
-        text-align: left;
-        justify-content: start;
-        padding-left: 10px;
-    }
+        .filter-btn > .mud-button-label {
+            text-align: left;
+            justify-content: start;
+            padding-left: 10px;
+        }
 
     .search-btn {
         background: rgba(59, 113, 251, 1);
@@ -322,9 +393,9 @@
         text-transform: none;
     }
 
-    .search-btn:hover {
-        background: rgba(39, 83, 201, 1);
-    }
+        .search-btn:hover {
+            background: rgba(39, 83, 201, 1);
+        }
 
     .add-btn {
         background: rgba(47, 193, 71, 1);
@@ -333,12 +404,11 @@
         text-transform: none;
     }
 
-    .add-btn:hover {
-        background: rgba(27, 153, 41, 1);
-    }
+        .add-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
 
     .mud-table {
-
     }
 
     .table-header .mud-input-root {

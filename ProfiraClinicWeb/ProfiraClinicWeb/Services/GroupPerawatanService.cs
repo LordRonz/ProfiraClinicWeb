@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -77,6 +72,14 @@ namespace ProfiraClinicWeb.Services
                 return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating GroupPerawatan: {errorMsg}");
             }
             return new ApiResponse<object>((int)responseMessage.StatusCode, "GroupPerawatan updated successfully");
+        }
+
+        public async Task<ApiResponse<GroupPerawatan>> DeleteGroupPerawatanByIdAsync(string id)
+        {
+            var response = await _httpClient
+                .DeleteFromJsonAsync<ApiResponse<GroupPerawatan>>($"api/GroupPerawatan/Del/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
+            return response;
         }
     }
 }
