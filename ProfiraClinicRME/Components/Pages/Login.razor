@@ -1,6 +1,6 @@
 ﻿@page "/"
 
-@layout ProfiraClinicRME.Components.Layout.UnauthedLayout
+@layout Layout.LoginLayout
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text.RegularExpressions
@@ -9,74 +9,72 @@
 @using Microsoft.EntityFrameworkCore
 @using ProfiraClinic.Models
 @using ProfiraClinic.Models.Api
+@using ProfiraClinicRME.Application
 @using ProfiraClinicRME.Infra
-@using ProfiraClinicRME.Services
 @using ProfiraClinicRME.Model
+@using ProfiraClinicRME.Services
 
 @inject ApiService SvcApi
-@inject IUserService SvcUser
-@inject ISnackbar Snackbar
-@inject ProtectedSessionStorage ProtectedSessionStore
-@inject NavigationManager NavManager
 @inject AuthService AuthApiService
 @inject IClinicService SvcClinic
+@inject ISessionManager SesMan
+@inject ISnackbar Snackbar
+@inject IUserService SvcUser
+@inject NavigationManager NavManager
+@inject ProtectedSessionStorage ProtectedSessionStore
 
 <PageTitle>Login</PageTitle>
 
+<MudGrid id="login" Class="align-center" Justify="Justify.Center">
+    <MudItem xs="6" Class="d-flex justify-center align-center">
+        <MudImage Style="width:400px" Src="/images/login_lady.png" ObjectFit="ObjectFit.Cover"></MudImage>
 
+    </MudItem>
 
-            <MudGrid id="login" Class="align-center" Justify="Justify.Center">
-                <MudItem xs="6" Class="d-flex justify-center align-center">
-                    <MudImage Style="width:400px" Src="/images/login_lady.png"  ObjectFit="ObjectFit.Cover"></MudImage>
+    <MudItem xs="6">
 
-                </MudItem>
+        <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
+                <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+                <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
 
-                <MudItem xs="6">
-
-                    <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
-                        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
-                            <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-                            <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
-
-                            <MudSelect T="string"
-                                       @bind-Value="selectedKlinikCode"
-                                       OuterClass="bg-transparent rounded-pill"
-                                       InputClass="bg-transparent"
-                                       Style="border-radius: 20px; background-color: #F1F5F9;"
-                                       DisableUnderLine="true"
-                                       Variant="Variant.Filled"
-                                       Label="Pilih clinic"
-                                       AnchorOrigin="Origin.BottomCenter">
-                                @if (kliniks == null || !kliniks.Any())
-                                {
-                                    <MudSelectItem Value="@("")">Loading clinics...</MudSelectItem>
-                                }
-                                else
-                                {
-                                    @foreach (var k in kliniks)
-                                    {
-                                        <MudSelectItem Value="@k.KDLOK">@k.KETLK</MudSelectItem>
-                                    }
-                                }
-                            </MudSelect>
-                            <MudCheckBox @bind-Value="@rememberMe" Dense="true">
-                                Remember me
-                            </MudCheckBox>
-                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
-                        </MudForm>
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
+                <MudSelect T="string"
+                           @bind-Value="_selectedKetLok"
+                           OuterClass="bg-transparent rounded-pill"
+                           InputClass="bg-transparent"
+                           Style="border-radius: 20px; background-color: #F1F5F9;"
+                           DisableUnderLine="true"
+                           Variant="Variant.Filled"
+                           Label="Pilih klinik ..."
+                           AnchorOrigin="Origin.BottomCenter">
+                    @if (_listKlinik == null || !_listKlinik.Any())
+                    {
+                        <MudSelectItem Value="@("")">Loading clinics...</MudSelectItem>
+                    }
+                    else
+                    {
+                        @foreach (var klinik in _listKlinik)
+                        {
+                            <MudSelectItem Value="@klinik.KDLOK">@klinik.KETLK</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+                <MudCheckBox @bind-Value="@rememberMe" Dense="true">
+                    Remember me
+                </MudCheckBox>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
 
 @code {
     private List<DateTime> markedDates = new List<DateTime>();
 
-    List<MKlinik> kliniks = new List<MKlinik>();
+    private List<MKlinik> _listKlinik = new List<MKlinik>();
 
-    MKlinik? selectedKlinik;
-
-    private string selectedKlinikCode;
+    private string _selectedKetLok = "";
 
     bool success;
     bool rememberMe = false;
@@ -143,7 +141,19 @@
         System.Diagnostics.Debug.WriteLine("Done");
         if (svcClinic.Status == ServiceResultEnum.FOUND)
         {
-            kliniks = svcClinic.Data.Items;
+            _listKlinik = svcClinic.Data.Items;
+        }
+        _selectedKetLok = _listKlinik.FirstOrDefault()?.KETLK;
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // await pwField.FocusAsync();
+            // StateHasChanged();
+            SesMan.LoadState();
         }
     }
 
@@ -158,23 +168,26 @@
     {
         try
         {
-            var clinic = kliniks.FirstOrDefault(k => k.KDLOK == selectedKlinikCode);
+            var clinic = _listKlinik.FirstOrDefault(k => k.KETLK == _selectedKetLok);
             var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass, KodeLokasi = clinic?.KDLOK });
 
-            await ProtectedSessionStore.SetAsync("token", token);
+            // await ProtectedSessionStore.SetAsync("token", token);
+            await SesMan.SetToken(token);
 
 
             // addSnackbar("Logged In", Severity.Success);
 
-            var resUser = await SvcUser.UpdateCurrentUserAsync();
+            var resUser = await SvcUser.GetCurrentUserAsync();
             if (resUser.Status != ServiceResultEnum.SUCCESS)
             {
                 addSnackbar("Terjadi kesalahan sistem. (LP.OS.01)");
                 return;
             }
 
-            var user = resUser.Data;
 
+            //get current  user data and store to session
+            var user = resUser.Data;
+            await SesMan.SetCurrentUser(user!);
             NavManager.NavigateTo("/dashboard");
         }
         catch (Exception ex)

@@ -17,7 +17,7 @@
     {
         await ProtectedSessionStore.DeleteAsync("token");
         MudDialog.Close(MudBlazor.DialogResult.Ok(true));
-        NavManager.NavigateTo("/admin/login");
+        NavManager.NavigateTo("/");
     }
     void Cancel() => MudDialog.Cancel();
 }

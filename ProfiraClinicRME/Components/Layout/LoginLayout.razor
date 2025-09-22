@@ -21,4 +21,19 @@
 </div>
 
 @code {
+    private string _classPath = "App::Page::LoginLayout";
+
+    protected override void OnInitialized()
+    {
+        LogTrace.Info("start", path: _classPath);
+
+    }
+
+    protected override void OnParametersSet()
+    {
+        //_entPropChanged = false;
+        LogTrace.Info("trace", path: _classPath);
+
+
+    }
 }
