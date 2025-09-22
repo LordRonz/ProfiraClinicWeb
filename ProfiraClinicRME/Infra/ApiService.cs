@@ -1,6 +1,8 @@
 ﻿using MudBlazor;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
+using ProfiraClinicRME.Application;
+using ProfiraClinicRME.Services;
 using ProfiraClinicRME.Utils;
 using System;
 using System.Net.Http;
@@ -31,13 +33,16 @@ namespace ProfiraClinicRME.Infra
 
         private readonly IHttpClientFactory _httpClientFactory;
 
+        private IAuthPublisher _authPublisher;
+
         private string _classPath = "Infra::ApiService";
 
         private string StdFailMessage = "Terjadi kesalahan sistem.";
-        public ApiService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public ApiService(IHttpClientFactory httpClientFactory, IAuthPublisher authPublisher, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
-
+            _authPublisher = authPublisher;
+            _authPublisher.AuthEvent += OnAuthChanged;
             ApiBaseUri = configuration["ApiSettings:BaseAddress"] ?? "";
 
             //configuring this.httpClient
@@ -50,7 +55,18 @@ namespace ProfiraClinicRME.Infra
             LogTrace.Debug("fin: " + Bearer, path: _classPath);
         }
 
-        
+        public void OnAuthChanged(object? sender, AuthEventArgs authEventArgs)
+        {
+            if(authEventArgs.type == "login" )
+            {
+                SetBearer(authEventArgs.token);
+            }
+            else
+            {
+                SetBearer("");
+            }
+        }
+
         //
         public async Task<Response<RespType?>> SendEmpty<RespType>(string method, string reqUrlPath)
         {
@@ -234,7 +250,7 @@ namespace ProfiraClinicRME.Infra
                 response?.Dispose();
             }
             //return for exception
-            LogTrace.Error("FIN: ERR" + errCode, apiResponse, _classPath);
+            LogTrace.Error("FIN: ERR " + errCode, apiResponse, _classPath);
             return apiResponse;
         }
 

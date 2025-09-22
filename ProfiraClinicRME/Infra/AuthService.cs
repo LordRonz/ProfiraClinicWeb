@@ -56,7 +56,7 @@ namespace ProfiraClinicRME.Infra
             {
                 throw new HttpRequestException("Authentication succeeded but token was not returned.");
             }
-            _svcApi.SetBearer(authResult.Data.Token);
+            //_svcApi.SetBearer(authResult.Data.Token);
             return authResult.Data.Token;
         }
 

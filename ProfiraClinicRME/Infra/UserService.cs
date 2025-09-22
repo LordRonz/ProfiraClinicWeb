@@ -28,29 +28,30 @@ namespace ProfiraClinicRME.Infra
 
         }
 
-        public async Task<ServiceResult<bool>> UpdateCurrentUserAsync()
+        public async Task<ServiceResult<CurrentUser>> GetCurrentUserAsync()
         {
             Response<CurrentUser?> apiResponse = await _svcApi.SendEmpty<CurrentUser>("get", "api/User/me");
 
             ServiceResult<CurrentUser> svcResult = _repo.ProcessResult<CurrentUser>(apiResponse, RepoProcessEnum.GET);
 
-            var thisResult = new ServiceResult<bool>()
+            var thisResult = new ServiceResult<CurrentUser>()
             {
                 Message = svcResult.Message,
 
             };
 
             if (svcResult.Status == ServiceResultEnum.FOUND) {
-                _current = svcResult.Data;
+                thisResult.Data = svcResult.Data;
 
                 thisResult.Status = ServiceResultEnum.SUCCESS;
                 
             } else {
 
                 thisResult.Status = ServiceResultEnum.FAIL;
+                thisResult.Data = null;
             }
 
-            LogTrace.Info("fin", _current, _classPath);
+            LogTrace.Info("fin", thisResult, _classPath);
             return thisResult;
         }
 

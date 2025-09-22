@@ -1,4 +1,5 @@
 using MudBlazor.Services;
+using ProfiraClinicRME.Application;
 using ProfiraClinicRME.Components;
 using ProfiraClinicRME.Helpers;
 using ProfiraClinicRME.Infra;
@@ -41,9 +42,17 @@ builder.Services.AddHttpClient("std", httpClient =>
 
 //builder.Services.AddScoped<DataService>();//for test only
 
-
-builder.Services.AddScoped<SessionService>();
-builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<ISessionManager, SesManSSR>();
+builder.Services.AddScoped<ApiService>(provider =>
+{ 
+    var sesMan = (IAuthPublisher)provider.GetRequiredService<ISessionManager>();
+    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    ApiService srvApi = new ApiService(httpClientFactory, sesMan, configuration);
+    return srvApi;
+}
+    
+);
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IClinicService, ClinicService>();
 builder.Services.AddScoped<IUserService, UserService>();

@@ -16,7 +16,7 @@ namespace ProfiraClinicRME.Services
 
         public CurrentUser? Current { get; }
 
-        public Task<ServiceResult<bool>> UpdateCurrentUserAsync();
+        public Task<ServiceResult<CurrentUser>> GetCurrentUserAsync();
 
 
     }
