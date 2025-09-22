@@ -65,7 +65,7 @@ namespace ProfiraClinicWeb.Services
             GroupPerawatan paket)
         {
             var responseMessage = await _httpClient
-                .PutAsJsonAsync($"api/GroupPerawatan/edit/{kodeGroup}", paket);
+                .PostAsJsonAsync($"api/GroupPerawatan/edit", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();

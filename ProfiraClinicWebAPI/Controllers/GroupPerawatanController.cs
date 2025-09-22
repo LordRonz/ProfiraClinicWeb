@@ -145,6 +145,19 @@ namespace ProfiraClinicWebAPI.Controllers
             return q.Where(x => x.KodeGroupPerawatan == filter);
         }
 
+        [HttpGet("GetByCode/{code}")]
+        public async Task<IActionResult> GetByCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return BadRequest(new { statusCode = 400, message = "KodeGroupPerawatan is required." });
 
+            var item = await _context.GroupPerawatan
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.KodeGroupPerawatan == code);
+
+            if (item == null)
+                return NotFound(new { statusCode = 404, message = $"Group paket '{code}' not found." });
+            return Ok(item);
+        }
     }
 }

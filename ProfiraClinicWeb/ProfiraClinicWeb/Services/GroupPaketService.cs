@@ -42,13 +42,20 @@ namespace ProfiraClinicWeb.Services
             return result!;
         }
 
-        public async Task<ApiResponse<GroupPaket>> GetGroupPaketByCodeAsync(string id)
+        /// <summary>
+        /// Get GroupPaket by its KodeGroupPaket (new route: GetByCode/{code})
+        /// </summary>
+        public async Task<ApiResponse<GroupPaket>> GetGroupPaketByCodeAsync(string code)
         {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentException("Code must be provided", nameof(code));
+
             var response = await _httpClient
-                .GetFromJsonAsync<ApiResponse<GroupPaket>>($"api/GroupPaket/GetByCode/{id}")
+                .GetFromJsonAsync<ApiResponse<GroupPaket>>($"api/GroupPaket/GetByCode/{code}")
                 ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
+
 
         public async Task<ApiResponse<GroupPaket>> CreateGroupPaketAsync(GroupPaket paket)
         {
@@ -69,7 +76,7 @@ namespace ProfiraClinicWeb.Services
             GroupPaket paket)
         {
             var responseMessage = await _httpClient
-                .PutAsJsonAsync($"api/GroupPaket/edit/{kodeGroup}", paket);
+                .PostAsJsonAsync($"api/GroupPaket/edit", paket);
 
             if (!responseMessage.IsSuccessStatusCode)
             {

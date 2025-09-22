@@ -70,7 +70,7 @@ namespace ProfiraClinicWeb.Services
             GroupBarang paket)
         {
             var responseMessage = await _httpClient
-                .PutAsJsonAsync($"api/GroupBarang/edit/{kodeGroup}", paket);
+                .PostAsJsonAsync($"api/GroupBarang/edit", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();

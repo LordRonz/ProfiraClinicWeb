@@ -58,8 +58,8 @@
                 var dataSource = Pakets.Select(el =>
                     (object)new
                     {
-                        view = $"paket/{el.KodeGroupPaket}",
-                        edit = $"paket/{el.KodeGroupPaket}/edit",
+                        view = $"package/{el.KodeGroupPaket}",
+                        edit = $"package/{el.KodeGroupPaket}/edit",
                         kodeGroupPaket = el.KodeGroupPaket,
                         namaGroupPaket = el.NamaGroupPaket,
                         aktif = el.Aktif == "1" ? "Ya" : "Tidak",
