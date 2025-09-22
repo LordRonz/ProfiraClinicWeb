@@ -1,0 +1,23 @@
+﻿<MudDialog>
+    <DialogContent>
+        Are you sure you want to log out?
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="Submit">Yes</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@inject NavigationManager NavManager
+@inject ProtectedSessionStorage ProtectedSessionStore
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public async Task Submit()
+    {
+        await ProtectedSessionStore.DeleteAsync("token");
+        MudDialog.Close(MudBlazor.DialogResult.Ok(true));
+        NavManager.NavigateTo("/admin/login");
+    }
+    void Cancel() => MudDialog.Cancel();
+}

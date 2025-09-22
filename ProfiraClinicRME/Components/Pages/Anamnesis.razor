@@ -1,0 +1,376 @@
+﻿@page "/anamnesis"
+@inherits BasePage
+
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Api
+@using ProfiraClinicRME.Utils;
+@using ProfiraClinicRME.Components.Section
+@using ProfiraClinicRME.Components.Widget
+
+@inject HttpClient httpClient
+@inject IAppointmentService SvcAppointment
+@inject IAnamnesisService SvcAnamnesis
+@inject IRiwayatService SvcRiwayat
+@inject NavigationManager Nav
+
+<TopbarUser Route="Anamnesis"
+Title="Perawatan Pasien / Anamnesis"
+Appointment="_apo"
+ShowBack="true" 
+ShowSave="true"
+OnSave="@DoSave"
+/>
+
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
+    <MudTabs @bind-ActivePanelIndex=@_activePanelIndex Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6 tabcontainer" style="">
+        <MudTabPanel Text="Anamnesis">
+            <MudTextField @bind-Value="@_anamnesisInForm.KeteranganAnamnesis" ShrinkLabel T="string" Placeholder="Silakan ketik anamnesis pasien disini" Variant="Variant.Outlined" Lines="15" MaxLines="15" AutoGrow />
+            <MudCard Class="mt-8">
+                <Note EntityType="@TRMAnamnesis" ListData="@_listRekamAnamnesis">
+                    <NoteContent>
+                        <ul>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Kunjungan: @context.NomorAppointment
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Keterangan Anamnesis: @context.KeteranganAnamnesis
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Dokter: @context.NamaKaryawan
+                                </MudText>
+                            </li>
+                        </ul>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            @context.UPDDT
+                        </MudText>
+                    </NoteContent>
+                </Note>
+            </MudCard>
+        </MudTabPanel>
+        <MudTabPanel Text="Riwayat">
+            <MudGrid Class="gap-y-2 riwayat" Style="max-width: 70%;">
+                <MudItem xs="12" Class="p-1">
+                    <MudTextField ShrinkLabel T="string" Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Riwayat Penyakit Sekarang</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox @bind-Value="@_riwayatInForm.IsDM" T="bool" Label="DM" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox @bind-Value="@_riwayatInForm.IsHipertensi" T="bool" Label="Hipertensi" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox @bind-Value="@_riwayatInForm.IsTBC" T="bool" Label="TBC" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox @bind-Value="@_riwayatInForm.IsAsthma" T="bool" Label="Asthma" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox @bind-Value="@_riwayatInForm.IsHepatitis" T="bool" Label="Hepatitis" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox @bind-Value="@_riwayatInForm.IsKelainanDarah"  T="bool" Label="Kelainan Darah" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox Value="@_riwayatInForm.IsPanyakitLain"  T="bool" Label="Lain-lain, sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Riwayat Alergi Obat</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox Value="@(!_riwayatInForm.IsAlergiObat)" T="bool" Label="Tidak" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox 
+                            Value="@(_riwayatInForm.IsAlergiObat)" 
+                        T="bool" Label="Ya, Sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField 
+                        @bind-Value="@_riwayatInForm.KetAlergiObat"
+                        ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Riwayat Alergi Makanan</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox 
+                            Value="@(!_riwayatInForm.IsAlergiMakanan)"
+                            T="bool" Label="Tidak" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox 
+                            Value="@(_riwayatInForm.IsAlergiMakanan)"
+                            T="bool" Label="Ya, Sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField 
+                        @bind-Value="@_riwayatInForm.KetAlergiMakanan"
+                        ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+                <MudItem xs="4" Class="p-1">
+                    <p>Faktor Resiko</p>
+                </MudItem>
+                <MudItem xs="8" Class="p-1 gap-2">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <MudCheckBox 
+                            Value="@_riwayatInForm.IsMerokok"
+                            T="bool" Label="Merokok" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox Value="@_riwayatInForm.IsObesitas"
+                            T="bool" Label="Obesitas" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox 
+                            Value="@_riwayatInForm.IsDisplidemia"
+                            T="bool" Label="Displidemia" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                        <MudCheckBox Value="@_riwayatInForm.IsResikoLain"
+                            T="bool" Label="Lain-lain, sebutkan" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
+                    </div>
+                    <MudTextField 
+                        @bind-Value="@_riwayatInForm.KetResiko"
+                        ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
+                </MudItem>
+            </MudGrid>
+            <MudCard Class="mt-8">
+                <Note EntityType="@RiwayatAdaptor" ListData="@_listRekamRiwayat">
+                    <NoteContent>
+                        <ul>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Kunjungan: @context.NomorAppointment
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Penyakit dahulu: @context.PenyakitDahulu
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Penyakit Sekarang: @context.DisplayPenyakitSekarang
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Alergi Obat: @context.KetAlergiObat
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Alergi Makanan: @context.KetAlergiMakanan
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Faktor Resiko: @context.DisplayResiko
+                                </MudText>
+                            </li>
+                            <li>
+                                <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                                    Dokter: @context.NamaKaryawan
+                                </MudText>
+                            </li>
+                        </ul>
+                        <MudText Typo="Typo.body2" Color="MudBlazor.Color.Default">
+                            @context.UPDDT
+                        </MudText>
+                    </NoteContent>
+                </Note>
+            </MudCard>
+        </MudTabPanel>
+    </MudTabs>
+
+
+</MudCard>
+
+
+@code {
+    private bool _hidePosition;
+    private bool _loading;
+    private List<TRMAnamnesis> _listRekamAnamnesis = [];
+    private List<RiwayatAdaptor> _listRekamRiwayat = [];
+    private int _activePanelIndex = 0;
+    private string _saveModeAnamnesis = "add";
+    private string _saveModeRiwayat= "add";
+    private TRMAppointment? _apo = null;
+    private TRMAnamnesis _anamnesisInForm = new();
+    private RiwayatAdaptor _riwayatInForm = new(new TRMRiwayat());
+
+
+    public Anamnesis()
+    {
+        _classPath = "App::Page::Anamnesis";
+        LogTrace.Info("class init", path: _classPath);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var resApo = SvcAppointment.GetCurrent();
+        if (resApo.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
+            return;
+        }
+        _apo = resApo.Data;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //ambil rekam medis anamnesis
+        var resRekamAnamnesis = await SvcAnamnesis.GetListAsync(_apo.KodeCustomer);
+        if (resRekamAnamnesis.Status == ServiceResultEnum.FOUND)
+        {
+            _listRekamAnamnesis  = resRekamAnamnesis.Data.Items;
+        }
+        else
+        {
+            addSnackbar("Gagal memuat Rekam Medis Anamnesis.", Severity.Error);
+        }
+
+        //cek apakah sudah ada anamnesis untuk appointment ini
+        var resCheckAnamnesis = await SvcAnamnesis.GetByNomorAppointment(_apo.NomorAppointment);
+        if (resCheckAnamnesis.Status == ServiceResultEnum.FOUND)
+        {
+            _saveModeAnamnesis = "edit";
+            _anamnesisInForm = resCheckAnamnesis.Data!;
+            addSnackbar("Memuat ulang data Anamnesis.", Severity.Info);
+
+        }
+        _anamnesisInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
+        _anamnesisInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
+        _anamnesisInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
+        _anamnesisInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+
+
+
+        //ambil  riwayat
+        var resRekamRiwayat = await SvcRiwayat.GetListAsync(_apo.KodeCustomer);
+        if (resRekamRiwayat.Status == ServiceResultEnum.FOUND)
+        {
+            _listRekamRiwayat = resRekamRiwayat.Data.Items;
+
+        }
+        else
+        {
+            addSnackbar("Gagal memuat Rekam Medis Riwayat.", Severity.Error);
+        }
+
+        //cek apakah sudah ada riwayat  untuk appointment ini
+        var resCheckRiwayat = await SvcRiwayat.GetByNomorAppointment(_apo.NomorAppointment);
+        if (resCheckRiwayat.Status == ServiceResultEnum.FOUND)
+        {
+            _saveModeRiwayat = "edit";
+            _riwayatInForm = resCheckRiwayat.Data!;
+            addSnackbar("Memuat ulang data Riwayat.", Severity.Info);
+
+        }
+
+        if(resCheckRiwayat.Status != ServiceResultEnum.FOUND & resRekamRiwayat.Status == ServiceResultEnum.FOUND )
+        {
+            _riwayatInForm = _listRekamRiwayat.Last();
+        }
+        _riwayatInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
+        _riwayatInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
+        _riwayatInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
+        _riwayatInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task DoSave()
+    {
+        LogTrace.Info("start", path: _classPath);
+        _anamnesisInForm.KodeLokasi = _apo?.KodeLokasi ?? "-";
+        _anamnesisInForm.TanggalTransaksi = DateTime.Now;
+        //keadaan umum binded
+        //tk kesadaran binded
+        //sistolik distlik suhu sturasi, frek napas, frek nadi, berat badan, tgg bdn, idx tubh , lngkr kepala
+
+        ServiceResult<NomorTransaksiDto> resSave;
+        string msgSuccess = "";
+        string msgFail = "";
+
+        //save anamnesis
+        if(_activePanelIndex == 0)
+        {
+            if (_saveModeAnamnesis == "add")
+            {
+                _anamnesisInForm.TanggalTransaksi = DateTime.Today;
+                resSave = await SvcAnamnesis.Add(_anamnesisInForm);
+                msgSuccess = "Penyimpanan Anamnesis berhasil dilakukan";
+                _saveModeAnamnesis = "edit";
+            }
+            else
+            {
+                resSave = await SvcAnamnesis.Edit(_anamnesisInForm);
+                msgSuccess = "Perubahan Anamnesis berhasil dilakukan";
+            }
+            msgFail = resSave.Message;
+        }
+        else
+        {
+            if (_saveModeRiwayat == "add")
+            {
+                _riwayatInForm.TanggalTransaksi = DateTime.Today;
+                resSave = await SvcRiwayat.Add(_riwayatInForm);
+                msgSuccess = "Penyimpanan Riwayat berhasil dilakukan";
+            }
+            else
+            {
+                resSave = await SvcRiwayat.Edit(_riwayatInForm);
+                msgSuccess = "Perubahan Riwayat berhasil dilakukan";
+            }
+            msgFail = resSave.Message;
+        }
+        await InvokeAsync(StateHasChanged);
+
+        LogTrace.Info("Result Save", resSave, _classPath);
+        if (resSave.Status == ServiceResultEnum.SUCCESS)
+        {
+            addSnackbar(msgSuccess, Severity.Info);
+            // await Task.Delay(1000);
+            // Nav.NavigateTo("/perawatan/" + _apo?.IDAppointment);
+            if(_activePanelIndex == 0)
+            {
+                _saveModeAnamnesis = "edit";
+            } else
+            {
+                _saveModeRiwayat = "edit";
+                
+            }
+        }
+        else
+        {
+            addSnackbar(msgFail, Severity.Error);
+
+        }
+
+    }
+
+}
+
+<style>
+    .pemeriksaan-input .mud-input-root {
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .pemeriksaan-input .tabcontainer {
+       height: 100% !important;
+    }
+
+    .pemeriksaan-input .riwayat .mud-input-root {
+        height: 40px !important;
+    }
+
+    .riwayat .mud-typography {
+        font-size: 12px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label-outlined {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .pemeriksaan-input .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>

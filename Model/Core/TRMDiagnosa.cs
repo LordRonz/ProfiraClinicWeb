@@ -49,6 +49,11 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string? KodeDiagnosa { get; set; } // Relasi dengan Table MDiagnosa
 
+        [Column(TypeName = "char(255)")]
+        [MaxLength(255)]
+        public string NamaDiagnosa { get; set; } = ""; 
+
+
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
         public string? KodePoli { get; set; } // Relasi dengan Table MDiagnosa

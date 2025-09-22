@@ -1,0 +1,208 @@
+﻿@page "/"
+
+@layout ProfiraClinicRME.Components.Layout.UnauthedLayout
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text.RegularExpressions
+@using BC = BCrypt.Net.BCrypt
+@using Color = MudBlazor.Color
+@using Microsoft.EntityFrameworkCore
+@using ProfiraClinic.Models
+@using ProfiraClinic.Models.Api
+@using ProfiraClinicRME.Infra
+@using ProfiraClinicRME.Services
+@using ProfiraClinicRME.Model
+
+@inject ApiService SvcApi
+@inject IUserService SvcUser
+@inject ISnackbar Snackbar
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavManager
+@inject AuthService AuthApiService
+@inject IClinicService SvcClinic
+
+<PageTitle>Login</PageTitle>
+
+
+
+            <MudGrid id="login" Class="align-center" Justify="Justify.Center">
+                <MudItem xs="6" Class="d-flex justify-center align-center">
+                    <MudImage Style="width:400px" Src="/images/login_lady.png"  ObjectFit="ObjectFit.Cover"></MudImage>
+
+                </MudItem>
+
+                <MudItem xs="6">
+
+                    <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
+                        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
+                            <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+                            <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+
+                            <MudSelect T="string"
+                                       @bind-Value="selectedKlinikCode"
+                                       OuterClass="bg-transparent rounded-pill"
+                                       InputClass="bg-transparent"
+                                       Style="border-radius: 20px; background-color: #F1F5F9;"
+                                       DisableUnderLine="true"
+                                       Variant="Variant.Filled"
+                                       Label="Pilih clinic"
+                                       AnchorOrigin="Origin.BottomCenter">
+                                @if (kliniks == null || !kliniks.Any())
+                                {
+                                    <MudSelectItem Value="@("")">Loading clinics...</MudSelectItem>
+                                }
+                                else
+                                {
+                                    @foreach (var k in kliniks)
+                                    {
+                                        <MudSelectItem Value="@k.KDLOK">@k.KETLK</MudSelectItem>
+                                    }
+                                }
+                            </MudSelect>
+                            <MudCheckBox @bind-Value="@rememberMe" Dense="true">
+                                Remember me
+                            </MudCheckBox>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
+                        </MudForm>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+
+
+@code {
+    private List<DateTime> markedDates = new List<DateTime>();
+
+    List<MKlinik> kliniks = new List<MKlinik>();
+
+    MKlinik? selectedKlinik;
+
+    private string selectedKlinikCode;
+
+    bool success;
+    bool rememberMe = false;
+    string[] errors = { };
+    MudTextField<string> pwField;
+    MudTextField<string> userNameField;
+    string userName = "";
+    string userPass = "";
+    string ktp = "";
+    bool isDoctor = true;
+    MudForm form;
+
+    // string GetLady()
+    // {
+    //     return isDoctor ? "/images/login_lady.png" : "/images/ashley.png";
+    // }
+
+    // string GetContainerClass()
+    // {
+    //     return isDoctor ? "background-color: #BAE0F3;" : "background-color: #C1C1C1;";
+    // }
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ButtonVisibilityClick()
+    {
+        if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // customers = await dbContext.MKaryawan.ToListAsync();
+        var svcClinic = await SvcClinic.GetListClinicsAsync(0, 10);
+        System.Diagnostics.Debug.WriteLine("Done");
+        if (svcClinic.Status == ServiceResultEnum.FOUND)
+        {
+            kliniks = svcClinic.Data.Items;
+        }
+    }
+
+    private void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add(message, severity);
+    }
+
+    public async Task OnSubmit()
+    {
+        try
+        {
+            var clinic = kliniks.FirstOrDefault(k => k.KDLOK == selectedKlinikCode);
+            var token = await AuthApiService.LoginAsync(new LoginModel { Username = userName, Password = userPass, KodeLokasi = clinic?.KDLOK });
+
+            await ProtectedSessionStore.SetAsync("token", token);
+
+
+            // addSnackbar("Logged In", Severity.Success);
+
+            var resUser = await SvcUser.UpdateCurrentUserAsync();
+            if (resUser.Status != ServiceResultEnum.SUCCESS)
+            {
+                addSnackbar("Terjadi kesalahan sistem. (LP.OS.01)");
+                return;
+            }
+
+            var user = resUser.Data;
+
+            NavManager.NavigateTo("/dashboard");
+        }
+        catch (Exception ex)
+        {
+            addSnackbar($"Failed to login: {ex.Message}", Severity.Error);
+
+        }
+    }
+
+}
+
+<style>
+    .mud-input-root {
+        height: 40px !important;
+        padding: 0px 10px !important;
+        font-size: 14px !important;
+    }
+
+    .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .mud-input-label-filled.mud-input-label-margin-dense {
+        transform: translate(12px, 22px) scale(1);
+    }
+
+    .mud-input-label-inputcontrol {
+        top: -10px;
+    }
+</style>

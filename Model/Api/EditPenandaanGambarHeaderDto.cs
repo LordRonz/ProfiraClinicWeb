@@ -1,28 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ProfiraClinic.Models.Api
 {
     public class EditPenandaanGambarHeaderDto
+
+        ()
     {
-        public string NomorTransaksi { get; set; } // DIAG/Tahun/Bulan/Nourut
-
-        public DateTime TanggalTransaksi { get; set; } // Tanggal Transaksi Diagnosa
-
-        [Column(TypeName = "char(25)")]
-        [MaxLength(25)]
-        public string? NomorAppointment { get; set; } // Nomor Appointment
-
-        [Column(TypeName = "char(10)")]
-        [MaxLength(10)]
-        public string? KodeCustomer { get; set; } // Relasi dengan Table Customer
-
-        [Column(TypeName = "char(10)")]
-        [MaxLength(10)]
-        public string? KodeKaryawan { get; set; }
-
-        [Column(TypeName = "varchar(1024)")]
-        [MaxLength(1024)]
-        public string? Keterangan { get; set; } // Keterangan
+        public string KodeLokasi { get; set; } = "";
+        public DateTime TanggalTransaksi { get; set; } = DateTime.Today;
+        public string NomorAppointment { get; set; } = "";
+        public string KodeCustomer { get; set; } = "";
+        public string KodeKaryawan { get; set; } = "";
+        public string Keterangan { get; set; } = "";
+        public string NomorTransaksi { get; set; } = "";
     }
 }

@@ -1,0 +1,50 @@
+﻿@using ProfiraClinicRME.Utils
+
+
+@code {
+
+
+    protected string _classPath = "Widget::BaseWidget";
+
+
+
+    protected override void OnInitialized()
+    {
+        LogTrace.Info("trace", path: _classPath);
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LogTrace.Info("trace", path: _classPath);
+        // Events.Add("2. OnInitializedAsync", path: _classPath);
+    }
+
+    protected override void OnParametersSet()
+    {
+        //_entPropChanged = false;
+        LogTrace.Info("trace", path: _classPath);
+        
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        LogTrace.Info("trace", path: _classPath);
+
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        LogTrace.Info($"trace: first render {firstRender}", path: _classPath);
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+            LogTrace.Info($"trace: first render {firstRender}", path: _classPath);
+    }
+    
+
+}
