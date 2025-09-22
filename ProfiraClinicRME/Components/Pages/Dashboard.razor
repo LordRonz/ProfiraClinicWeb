@@ -1,18 +1,19 @@
 ﻿@page "/dashboard"
 @inherits BasePage
 
-@using Microsoft.EntityFrameworkCore
-@using ProfiraClinicRME.Utils
-@using ProfiraClinicRME.Components.Table
-@using ProfiraClinicRME.Model
-@using ProfiraClinicRME.Infra
-@using ProfiraClinic.Models.Api
 @using System.Net.Http.Json
-@using ProfiraClinicRME.Helpers
+@using Microsoft.EntityFrameworkCore
+@using ProfiraClinic.Models.Api
+@using ProfiraClinicRME.Application
 @using ProfiraClinicRME.Components.Layout
 @using ProfiraClinicRME.Components.Section
+@using ProfiraClinicRME.Components.Table
+@using ProfiraClinicRME.Helpers
+@using ProfiraClinicRME.Infra
+@using ProfiraClinicRME.Model
+@using ProfiraClinicRME.Utils
 
-@inject SessionService SvcSession
+@inject ISessionManager SesMan
 @inject IUserService SvcUser
 @inject NavigationManager Nav
 @inject IAppointmentService SvcAppointment
@@ -25,6 +26,8 @@
 </MudCard>
 
 @code {
+    [CascadingParameter(Name = "CurrentUser")]
+    public CurrentUser CurrentUser { get; set; }
 
     public TableConfig _appointmentTblConf { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
@@ -45,11 +48,15 @@
     {
         LogTrace.Info("init", path: _classPath);
 
+        if (CurrentUser is null || CurrentUser?.Klinik is null)
+        {
+            var msg = "Current user data not valid.";
+            LogTrace.Error(msg);
+            throw new Exception(msg);
+        }
+        LogTrace.Info("current user", CurrentUser, _classPath);
 
-        CurrentUser curUser = SvcUser.Current!;
-        _title += curUser.Klinik.KETLK;
-
-        var resApo = await SvcAppointment.GetListOnWaitAsync(curUser.KodeLokasi ?? "", DateTime.Today, curUser.Karyawan.KodeKaryawan);
+        var resApo = await SvcAppointment.GetListOnWaitAsync(CurrentUser.KodeLokasi ?? "", DateTime.Today, CurrentUser.Karyawan?.KodeKaryawan);
 
         var test = DateUtility.FormatDate(DateTime.Today);
         // Check if status code indicates success
@@ -128,7 +135,8 @@
             addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
             return;
         }
-        // SvcSession.Title =
+
+        await SesMan.SetCurrentAppointment(apo);
         SvcAppointment.SetCurrent(apo);
 
         //update status tindakan
