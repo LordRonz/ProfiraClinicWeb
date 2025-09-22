@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -47,13 +42,20 @@ namespace ProfiraClinicWeb.Services
             return result!;
         }
 
-        public async Task<ApiResponse<GroupPaket>> GetGroupPaketByCodeAsync(string id)
+        /// <summary>
+        /// Get GroupPaket by its KodeGroupPaket (new route: GetByCode/{code})
+        /// </summary>
+        public async Task<ApiResponse<GroupPaket>> GetGroupPaketByCodeAsync(string code)
         {
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentException("Code must be provided", nameof(code));
+
             var response = await _httpClient
-                .GetFromJsonAsync<ApiResponse<GroupPaket>>($"api/GroupPaket/GetByCode/{id}")
+                .GetFromJsonAsync<ApiResponse<GroupPaket>>($"api/GroupPaket/GetByCode/{code}")
                 ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
+
 
         public async Task<ApiResponse<GroupPaket>> CreateGroupPaketAsync(GroupPaket paket)
         {
@@ -74,7 +76,7 @@ namespace ProfiraClinicWeb.Services
             GroupPaket paket)
         {
             var responseMessage = await _httpClient
-                .PutAsJsonAsync($"api/GroupPaket/edit/{kodeGroup}", paket);
+                .PostAsJsonAsync($"api/GroupPaket/edit", paket);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -83,6 +85,14 @@ namespace ProfiraClinicWeb.Services
             }
 
             return new ApiResponse<object>((int)responseMessage.StatusCode, "GroupPaket updated successfully");
+        }
+
+        public async Task<ApiResponse<GroupPaket>> DeleteGroupPaketByIdAsync(string id)
+        {
+            var response = await _httpClient
+                .DeleteFromJsonAsync<ApiResponse<GroupPaket>>($"api/GroupPaket/Del/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
+            return response;
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProfiraClinic.Models
+namespace ProfiraClinic.Models.Core
 {
     public class PPerawatanH
     {

@@ -86,9 +86,10 @@
                         new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember", Align = ColumnAlign.Right },
                         new TableColumn { Caption = "Point", DataField = "point" },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
                                     },
                     dataSource,
-                    "/treatment/add"
+                    "/treatment-item/add"
                 );
             }
             catch (Exception ex)

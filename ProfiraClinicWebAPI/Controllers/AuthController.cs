@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProfiraClinic.Models.Api;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
 using ProfiraClinicWebAPI.Model;
-using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,13 +26,7 @@ namespace ProfiraClinicWebAPI.Controllers
             var authenticatedUser = _authService.Authenticate(model.Username, model.Password);
             if (authenticatedUser == null || authenticatedUser.Equals(null))
                 return Unauthorized();
-            if (!string.IsNullOrEmpty(authenticatedUser.KodeLokasi) && !string.IsNullOrEmpty(model.KodeLokasi))
-            {
-                if (model.KodeLokasi != authenticatedUser.KodeLokasi)
-                    return BadRequest("Invalid Kode Lokasi");
-            }
-
-                var token = _authService.GenerateToken(authenticatedUser);
+            var token = _authService.GenerateToken(authenticatedUser, model.KodeLokasi);
             return Ok(new { Token = token });
         }
 
@@ -58,8 +54,37 @@ namespace ProfiraClinicWebAPI.Controllers
             var loginModel = new LoginModel();
             loginModel.Username = model.Username;
 
-            var token = _authService.GenerateToken(loginModel);
+            var token = _authService.GenerateToken(loginModel, model.KodeLokasi);
             return Ok(new { Token = token });
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangeOwnPasswordDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.NewPassword))
+                return BadRequest("Invalid request");
+
+            // Get username from JWT claims
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser.FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            // Verify old password
+            if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.Password))
+                return BadRequest("Current password is incorrect");
+
+            // Hash new password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.UPDDT = DateTime.Now;
+
+            _context.MUser.Update(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Password updated successfully" });
         }
 
         private string GenerateJwtToken()

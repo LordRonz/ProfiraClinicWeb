@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
-using ProfiraClinicWebAPI.Helper;
+using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    public class GroupBarangController
-    : BaseCrudController<GroupBarang>
+    public class GroupBarangController : BaseCrudController<GroupBarang>
     {
         public GroupBarangController(AppDbContext ctx) : base(ctx) { }
 
@@ -24,5 +24,143 @@ namespace ProfiraClinicWebAPI.Controllers
         protected override IOrderedQueryable<GroupBarang> ApplyOrder(
             IQueryable<GroupBarang> q)
             => q.OrderBy(d => d.KodeGroupBarang);
+
+        public class AddGroupBarangDto
+        {
+            public string? KodeGroupBarang { get; set; }
+            public string? NamaGroupBarang { get; set; }
+        }
+
+        [HttpPost("Add")]
+        public async Task<IActionResult> AddGroupBarang([FromBody] AddGroupBarangDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (string.IsNullOrWhiteSpace(dto.KodeGroupBarang))
+                return BadRequest("KodeGroupBarang is required");
+            if (string.IsNullOrWhiteSpace(dto.NamaGroupBarang))
+                return BadRequest("NamaGroupBarang is required");
+
+            var sqlParameters = new[]
+            {
+                new SqlParameter("@KodeGroupBarang", dto.KodeGroupBarang),
+                new SqlParameter("@NamaGroupBarang", dto.NamaGroupBarang),
+                new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
+            };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_MGroupBarang_Add @KodeGroupBarang, @NamaGroupBarang, @USRID",
+                    sqlParameters
+                );
+
+                return Ok(new
+                {
+                    message = "Group barang added successfully",
+                    data = new { dto.KodeGroupBarang, dto.NamaGroupBarang }
+                });
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Failed to add group barang",
+                    data = new { error = ex.Message }
+                });
+            }
+        }
+
+        [HttpPost("Edit")]
+        public async Task<IActionResult> EditGroupBarang([FromBody] EditGroupBarangDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (string.IsNullOrWhiteSpace(dto.KodeGroupBarang))
+                return BadRequest("KodeGroupBarang is required");
+            if (string.IsNullOrWhiteSpace(dto.NamaGroupBarang))
+                return BadRequest("NamaGroupBarang is required");
+            if (string.IsNullOrWhiteSpace(dto.Aktif))
+                return BadRequest("Aktif is required");
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeGroupBarang", dto.KodeGroupBarang),
+        new SqlParameter("@NamaGroupBarang", dto.NamaGroupBarang),
+        new SqlParameter("@Aktif", dto.Aktif),
+        new SqlParameter("@USRID", user.USRID ?? (object)DBNull.Value),
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_MGroupBarang_Edit @KodeGroupBarang, @NamaGroupBarang, @Aktif, @USRID",
+                    sqlParameters
+                );
+
+                return Ok(new
+                {
+                    message = "Group barang updated successfully",
+                    data = new { dto.KodeGroupBarang, dto.NamaGroupBarang, dto.Aktif }
+                });
+            }
+            catch (SqlException ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Failed to update group barang",
+                    data = new { error = ex.Message }
+                });
+            }
+        }
+
+        /// <summary>
+        /// DTO for editing Group Barang
+        /// </summary>
+        public class EditGroupBarangDto
+        {
+            public string? KodeGroupBarang { get; set; }
+            public string? NamaGroupBarang { get; set; }
+            public string? Aktif { get; set; }  // '1' or '0'
+        }
+
+        protected override IQueryable<GroupBarang> ApplyDeleteFilter(
+    IQueryable<GroupBarang> q,
+    string filter)
+        {
+            // delete by code; you can broaden this as needed
+            return q.Where(x => x.KodeGroupBarang == filter);
+        }
+
+        [HttpGet("GetByCode/{code}")]
+        public async Task<IActionResult> GetByCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return BadRequest(new { statusCode = 400, message = "KodeGroupBarang is required." });
+
+            var item = await _context.GroupBarang
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.KodeGroupBarang == code);
+
+            if (item == null)
+                return NotFound(new { statusCode = 404, message = $"Group paket '{code}' not found." });
+            return Ok(item);
+        }
     }
 }

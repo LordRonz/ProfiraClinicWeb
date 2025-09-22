@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors]
     public class ImagesController : ControllerBase
     {
         private readonly string _imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
@@ -50,6 +52,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // GET: api/images/{filename}
         [HttpGet("{filename}")]
+        [EnableCors]
         public IActionResult GetImage(string filename)
         {
             var safeFileName = SanitizeFileName(filename);
@@ -95,6 +98,7 @@ namespace ProfiraClinicWebAPI.Controllers
         /// GET /api/assets/rme/{fileName}
         /// </summary>
         [HttpGet("MasterGambar/{fileName}")]
+        [EnableCors]
         public IActionResult GetFileRme(string fileName)
         {
             var safeFileName = SanitizeFileName(fileName);

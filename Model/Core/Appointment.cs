@@ -6,6 +6,7 @@ namespace ProfiraClinic.Models.Core
     public class Appointment
     {
         [Column(TypeName = "bigint")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long IDAppointment { get; set; }
 
         [Column(TypeName = "nchar(10)")]

@@ -1,8 +1,5 @@
-﻿using ProfiraClinicWeb.Helpers;
-using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+﻿using ProfiraClinic.Models.Api;
+using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
 {
@@ -74,6 +71,24 @@ namespace ProfiraClinicWeb.Services
             }
 
             return authResult.Data.Token;
+        }
+
+        public async Task<string> ChangePasswordAsync(ChangeOwnPasswordDto model)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/auth/change-password", model);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Change password failed: {response.StatusCode} - {error}");
+            }
+
+            var authResult = await response.Content.ReadFromJsonAsync<ApiResponse<AuthResponse>>();
+            if (authResult == null || string.IsNullOrEmpty(authResult.Data.Token))
+            {
+                throw new HttpRequestException("Registration succeeded but token was not returned.");
+            }
+
+            return "Success";
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using ProfiraClinic.Models.Api;
 
 namespace ProfiraClinicWeb.Services
 {
@@ -49,6 +50,20 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<BarangHeader>> CreateBarangHeaderAsync(BarangHeader paket)
         {
             var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/add", paket);
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                var errorMsg = await responseMessage.Content.ReadAsStringAsync();
+                return new ApiResponse<BarangHeader>((int)responseMessage.StatusCode, $"Error creating BarangHeader: {errorMsg}");
+            }
+            var created = await responseMessage
+                .Content
+                .ReadFromJsonAsync<ApiResponse<BarangHeader>>();
+            return created!;
+        }
+
+        public async Task<ApiResponse<BarangHeader>> CreateItemsAsync(CreateBarangItemDto paket)
+        {
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/CreateBarangItem", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();

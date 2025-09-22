@@ -1,0 +1,140 @@
+﻿@page "/product-item-2/add"
+
+@using ProfiraClinic.Models.Api
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject NavigationManager NavigationManager
+@inject GroupBarangApiService GroupBarangApiService
+@inject BarangHeaderApiService BarangApiService
+
+<MudCard Class="p-4 h-100">
+    <MudForm @ref="form" Class="table-form">
+        <MudGrid GutterSize="3">
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Kode Barang"
+                              @bind-Value="barang.KodeBarang"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              Margin="Margin.Dense" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Nama Barang"
+                              @bind-Value="barang.NamaBarang"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              Margin="Margin.Dense" />
+            </MudItem>
+
+            <MudItem xs="12" sm="12">
+                <MudTextField T="string"
+                              Label="Keterangan Barang"
+                              @bind-Value="barang.KeteranganBarang"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudAutocomplete T="GroupBarang"
+                                 Label="Pilih Group Barang"
+                                 @bind-Value="selectedGroupBarang"
+                                 SearchFunc="SearchGroup"
+                                 Clearable="true"
+                                 ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupBarang} ({gp.NamaGroupBarang})")"
+                                 Dense="true"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Unit Dasar"
+                              @bind-Value="barang.UnitDasar"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              Margin="Margin.Dense" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Unit 1" @bind-Value="barang.Unit1" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string" Label="Unit 2" @bind-Value="barang.Unit2" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudNumericField T="decimal" Label="Konversi Unit 1" @bind-Value="barang.KonversiUnit1" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudNumericField T="decimal" Label="Konversi Unit 2" @bind-Value="barang.KonversiUnit2" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+        </MudGrid>
+
+        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+            <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">Kembali</MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       Disabled="!form.IsValid"
+                       OnClick="SubmitAsync">Simpan</MudButton>
+        </MudStack>
+    </MudForm>
+</MudCard>
+
+@code {
+    MudForm form;
+    private CreateBarangItemDto barang = new();
+    private List<GroupBarang> groupBarangs = new();
+    private GroupBarang selectedGroupBarang;
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout?.ChangeTitleAndRoute("Barang", "Tambah Barang");
+
+        // Load list of Group Barang for dropdown
+        var result = await GroupBarangApiService.GetGroupBarangsAsync();
+        if (result.StatusCode == 0 && result.Data != null)
+            groupBarangs = result.Data.Items ?? new List<GroupBarang>();
+
+        barang.Aktif = "1";
+        barang.USRID = ""; // fill from auth context if needed
+    }
+
+    private void OnGroupChanged(GroupBarang g)
+    {
+        selectedGroupBarang = g;
+        barang.KodeGroupBarang = g?.KodeGroupBarang;
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/product-item-2");
+
+    private async Task SubmitAsync()
+    {
+        var result = await BarangApiService.CreateItemsAsync(barang);
+        if (result.StatusCode < 300)
+        {
+            NavigationManager.NavigateTo("/product-item-2");
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(result.Message);
+        }
+    }
+
+    private Task<IEnumerable<GroupBarang>> SearchGroup(string value, CancellationToken cancelToken)
+    {
+        if (string.IsNullOrEmpty(value))
+            return Task.FromResult(groupBarangs.AsEnumerable());
+
+        var result = groupBarangs.Where(g =>
+            (g.KodeGroupBarang?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (g.NamaGroupBarang?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return Task.FromResult(result);
+    }
+}

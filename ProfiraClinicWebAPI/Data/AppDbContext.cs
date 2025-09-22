@@ -91,5 +91,6 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<TRMPenandaanGambarDetail> TRMPenandaanGambarDetail { get; set; }
 
         public DbSet<TRMPenandaanGambar> TRMPenandaanGambar { get; set; }
+        public DbSet<PerawatanDetail> PerawatanDetail { get; set; }
     }
 }

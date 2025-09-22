@@ -3,18 +3,18 @@ using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
 {
-    public class PerawatanHeaderApiService
+    public class PerawatanDetailApiService
     {
         private readonly HttpClient _httpClient;
 
-        public PerawatanHeaderApiService(HttpClient httpClient)
+        public PerawatanDetailApiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<PagedResult<PPerawatanH>>> GetTindakansAsync()
+        public async Task<ApiResponse<PagedResult<PerawatanDetail>>> GetPerawatanDetailsAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<PPerawatanH>>>("api/Tindakan/GetList");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<PerawatanDetail>>>("api/PerawatanDetail/GetList");
 
             if (response == null)
             {
@@ -24,9 +24,9 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
-        public async Task<ApiResponse<PPerawatanH>> GetTindakanByCodeAsync(String id)
+        public async Task<ApiResponse<PerawatanDetail>> GetPerawatanDetailByCodeAsync(String id)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PPerawatanH>>($"api/Tindakan/GetByCode/{id}");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PerawatanDetail>>($"api/PerawatanDetail/GetByCode/{id}");
 
             if (response == null)
             {
@@ -36,27 +36,27 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
-        public async Task<ApiResponse<PPerawatanH>> CreateTindakanAsync(PPerawatanH perawatan)
+        public async Task<ApiResponse<PerawatanDetail>> CreatePerawatanDetailAsync(PerawatanDetail perawatan)
         {
             // POST the paket object as JSON to the API.
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/Tindakan/add", perawatan);
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/PerawatanDetail/add", perawatan);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
                 // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<PPerawatanH>((int)responseMessage.StatusCode, $"Error creating Tindakan: {errorMsg}");
+                return new ApiResponse<PerawatanDetail>((int)responseMessage.StatusCode, $"Error creating PerawatanDetail: {errorMsg}");
             }
 
             // Deserialize the created paket.
-            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<PPerawatanH>>();
+            var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<PerawatanDetail>>();
             return createdUserGroupResponse;
         }
 
-        public async Task<ApiResponse<object>> UpdateTindakanAsync(string kodePaket, PPerawatanH perawatan)
+        public async Task<ApiResponse<object>> UpdatePerawatanDetailAsync(string kodePaket, PerawatanDetail perawatan)
         {
             // The endpoint expects a PUT request with the paket identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/Tindakan/edit/{kodePaket}", perawatan);
+            var responseMessage = await _httpClient.PutAsJsonAsync($"api/PerawatanDetail/edit/{kodePaket}", perawatan);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -65,7 +65,7 @@ namespace ProfiraClinicWeb.Services
             }
 
             // If no content is returned from the update call, we can return a successful ApiResponse.
-            return new ApiResponse<object>((int)responseMessage.StatusCode, "Tindakan updated successfully");
+            return new ApiResponse<object>((int)responseMessage.StatusCode, "PerawatanDetail updated successfully");
         }
     }
 }
