@@ -6,10 +6,10 @@ namespace ProfiraClinic.Models.Api
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
-        public T Data { get; set; }
+        public T? Data { get; set; }
         public ErrorType? ErrorType { get; set; }
 
-        public Response(int statusCode, string message, T data = default, ErrorType? errorType = null)
+        public Response(int statusCode, string message, T? data = default, ErrorType? errorType = null)
         {
             StatusCode = statusCode;
             Message = message;

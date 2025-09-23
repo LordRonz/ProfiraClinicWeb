@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider @rendermode="InteractiveServer" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider @rendermode="InteractiveServer" />
+<MudDialogProvider @rendermode="InteractiveServer" />
+
+
+<style>
+#main_content{
+        align-items:center;
+        background-color: #BAE0F3;
+        display:flex;
+        height: 100vh;
+        justify-content: center; 
+        width: 100vw;
+}
+</style>
+<div id="main_content">
+    @Body
+</div>
+
+@code {
+}

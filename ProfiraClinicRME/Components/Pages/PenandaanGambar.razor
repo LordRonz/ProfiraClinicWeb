@@ -1,0 +1,260 @@
+﻿@page "/penandaan-gambar";
+@inherits BasePage
+
+@using Excubo.Blazor.Canvas
+@using Microsoft.JSInterop
+@using ProfiraClinic.Models.Api
+@using ProfiraClinicRME.Components.Section
+@using ProfiraClinicRME.Components.Widget
+@using ProfiraClinicRME.Model
+@using ProfiraClinicRME.Utils
+@using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Json
+@using System.Text.RegularExpressions
+
+@inject HttpClient httpClient
+@inject IAppointmentService SvcAppointment
+@inject IImageService SvcImage
+@inject IJSRuntime JS;
+@inject IPenandaanGambarService SvcPenandaanGambar
+@inject ProfiraClinicRME.Utils.BrowserService Service
+
+<TopbarUser Route="PENANDAAN GAMBAR"
+            Title="Perawatan Pasien / Penandaan Gambar"
+            ShowBack="true"
+            ShowSave="true"
+            Appointment="_apo" 
+            OnSave="SaveForm"
+            />
+<MudGrid Class="p-3 minh-100">
+    <MudItem xs="12" md="8">
+        <MudPaper Elevation="4" Class="pa-4 rounded-3 minh-100">
+            <MudGrid>
+                <MudItem xs="3">
+                    <MudGrid  Class="">
+                        @foreach(var markedImage in _listMarkedImage)
+                        {
+                            <MudItem xs="12">
+                                <img id="@markedImage.IdGambar" crossorigin="anonymous" class="pg-img" src="@markedImage.Url" @onclick="() => DrawImage(markedImage.IdGambar)" />
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudItem>
+                <MudItem xs="9">
+                    <DrawingWidget @ref="@_drawingWidget" 
+                        OnSave="SaveImage"
+                        />
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="4">
+        <MudPaper Elevation="4" Class="pa-3 rounded-3 minh-100">
+            <MudTextField T="string" Placeholder="Isi keterangan gambar di sini..." Lines="10"></MudTextField>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+<MudGrid Class="p-3 minh-100">
+    <MudItem xs="12">
+        <Note EntityType="@PenandaanGambarFull" ListData="@_listRekaman">
+            <NoteContent>
+                <MudGrid Class="p-2">
+                    @foreach(var item in context.Details)
+                    {
+
+                            <MudItem xs="6" md="4">
+
+                            <label>@item.KodeGambar</label>
+                            <img class="pg-img" src="@(_baseUrl + item.IdGambar)" />
+
+
+                        </MudItem>
+                    }
+                </MudGrid>
+            </NoteContent>
+        </Note>
+    </MudItem>
+</MudGrid>
+<style>
+    .pg-img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        border: solid 1px #469146;
+    }
+</style>
+
+@inject ProtectedLocalStorage LocalStore
+@code {
+
+
+    private bool _hidePosition;
+    private List<PenandaanGambarFull> _listRekaman = new List<PenandaanGambarFull>();
+    private List<TemplateImageDto> _listTemplate = new List<TemplateImageDto>();
+    private bool _loading;
+    private string _baseUrl;
+    private string clr = "black";
+    private TRMAppointment? _apo = null;
+    private int Height { get; set; } = 0;
+    private int Width { get; set; } = 0;
+    private DrawingWidget _drawingWidget;
+    private List<MarkedImage> _listMarkedImage = [];
+    private string _openedImageId = "";
+
+    private class MarkedImage
+    {
+        public string IdGambar { get; set; } = "";
+
+        public string KodeGambar { get; set; } = "";
+
+        public string Url { get; set; } = "";
+    }
+
+    private class Position
+    {
+        public double Left { get; set; }
+        public double Top { get; set; }
+    }
+
+    public PenandaanGambar()
+    {
+        _classPath = "App::Page::PenandaanGambar";
+        LogTrace.Info("init", path: _classPath);
+    }
+
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var resApo = SvcAppointment.GetCurrent();
+        if (resApo.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
+            return;
+        }
+        _apo = resApo.Data;
+
+
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        //get template
+        var resImageTemplate = await SvcImage.GetListTemplateAsync();
+        if (resImageTemplate.Status != ServiceResultEnum.FOUND)
+        {
+            addSnackbar("Gagal memuat template gambar.", Severity.Error);
+            return;
+        }
+        _listTemplate = resImageTemplate.Data;
+
+        //get existing data by nomor appointment
+
+
+        //populate image 
+        var _idCounter = 0;
+        foreach(var item in _listTemplate)
+        {
+            _idCounter++;
+            var newMarkedImage = new MarkedImage()
+            {
+                IdGambar = $"img-{_idCounter:D2}",
+                KodeGambar = item.FileName,
+                Url = _baseUrl + item.Url
+            };
+            _listMarkedImage.Add(newMarkedImage);
+        }
+
+        //load rekam data dummy
+        List<PenandaanGambarDetail> listDetail = [
+            new PenandaanGambarDetail(){
+                IdDetail = 1,
+                IdGambar = "test1.jpg",
+                KodeGambar = "left_face.jpg"
+            },
+            new PenandaanGambarDetail(){
+                IdDetail = 2,
+                IdGambar = "test2.jpg",
+                KodeGambar = "front_face.jpg"
+            },
+            new PenandaanGambarDetail(){
+                IdDetail = 3,
+                IdGambar = "test3.jpg",
+                KodeGambar = "right_face.jpg"
+            }
+        ];
+
+        var pgf = new PenandaanGambarFull()
+        {
+            NomorTransaksi = "PG/2025/08/0001",
+            Keterangan = "ini keterangan.",
+            Details = listDetail
+        };
+
+        _listRekaman = [pgf];
+        _baseUrl = SvcImage.GetBaseUrlForUserImage();
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+    }
+
+
+
+
+    private async Task DrawImage(string IdImage)
+    {
+        LogTrace.Info("start", path: _classPath);
+        _openedImageId = IdImage;
+
+        // var result = await _drawingWidget.CallJsFunction();
+        // await JS.InvokeVoidAsync("DrawingWidget.setTargetImage", "test", "left_face.jpg");
+        await _drawingWidget.DrawImage(IdImage);
+        // addSnackbar($"helllo {result?.Message}", Severity.Info);
+    }
+
+    private async Task SaveImage()
+    {
+        LogTrace.Info("start", path: _classPath);
+
+        string blobName = await _drawingWidget.GenBlob();
+        if (blobName == "")
+        {
+            addSnackbar("Gagal menyimpan gambar.", Severity.Error);
+            return;
+        }
+
+        var resUpload = await SvcImage.UploadBlob(blobName, "test.jpg");
+        if(resUpload.Status != ServiceResultEnum.SUCCESS)
+        {
+            addSnackbar("Gagal mengunggah gambar.", Severity.Error);
+            return;
+        }
+
+        await _drawingWidget.CopyToImage(_openedImageId)
+
+
+        addSnackbar("Gambar berhasil disimpan dengan id " + blobName, Severity.Success);
+    }
+
+    
+
+    private async Task SaveForm()
+    {
+        await JS.InvokeVoidAsync("canvas2Image");
+    }
+
+
+
+
+    
+
+
+}

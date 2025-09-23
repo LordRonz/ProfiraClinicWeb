@@ -47,39 +47,39 @@ namespace ProfiraClinic.Models.Core
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string? PenyakitDahulu { get; set; }
+        public string? PenyakitDahulu { get; set; } = "";
 
         [Column(TypeName = "char(7)")]
         [MaxLength(7)]
-        public string? chkPenyakit { get; set; }
+        public string chkPenyakit { get; set; } = "0000000";
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string? PenyakitSekarang { get; set; }
+        public string PenyakitSekarang { get; set; } = "";
 
         [Column(TypeName = "char(2)")]
         [MaxLength(2)]
-        public string? chkAlergiObat { get; set; }
+        public string chkAlergiObat { get; set; } = "0";
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string? KetAlergiObat { get; set; }
+        public string KetAlergiObat { get; set; } = "";
 
         [Column(TypeName = "char(2)")]
         [MaxLength(2)]
-        public string? chkAlergiMakanan { get; set; }
+        public string chkAlergiMakanan { get; set; } = "0";
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string? KetAlergiMakanan { get; set; }
+        public string KetAlergiMakanan { get; set; } = "";
 
         [Column(TypeName = "char(4)")]
         [MaxLength(4)]
-        public string? chkResiko { get; set; }
+        public string chkResiko { get; set; } = "0000";
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]
-        public string? KetResiko { get; set; }
+        public string KetResiko { get; set; } = "";
 
         [Column(TypeName = "datetime")]
         public DateTime? UPDDT { get; set; } // Date time input
