@@ -1,15 +1,16 @@
 ﻿@inject NavigationManager Nav
 
-<div class="d-flex justify-content-around align-items-center my-4">
-    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/diagnosis.png" Title="Diagnosa/ICD" Href="/diagnosa" Class="p-4"></MenuItem>
-    <MenuItem Click="GoToAnamnesis" Src="/images/dokter/menu/anamnesis.png" Title="Anamnesis" Href="/anamnesis"></MenuItem>
-    @* <MenuItem Src="/images/dokter/menu/rekam-medis.png" Title="Rekam Medis"></MenuItem> *@
-    <MenuItem Click="GoToPemeriksaan" Src="/images/dokter/menu/stetoskop.png" Title="Pemeriksaan" Href="/pemeriksaan" Class="p-0"></MenuItem>
-    <MenuItem Click="GoToPenandaanGambar" Src="/images/dokter/menu/pencil.png" Title="Penandaan Gambar" Href="/penandaan-gambar"></MenuItem>
-    <MenuItem  Click="GoToCPPT" Src="/images/dokter/menu/notes.png" Title="CPPT" Class="p-0" Href="/cppt"></MenuItem>
+<MudGrid Class="flex-wrap justify-space-around align-centery my-4">
+
+    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/diagnosis.png" Title="Diagnosa/ICD" Href="/diagnosa" />
+    <MenuItem Click="GoToAnamnesis" Src="/images/dokter/menu/anamnesis.png" Title="Anamnesis" Href="/anamnesis"/>
+    @* <MenuItem Src="/images/dokter/menu/rekam-medis.png" Title="Rekam Medis"/> *@
+    <MenuItem Click="GoToPemeriksaan" Src="/images/dokter/menu/stetoskop.png" Title="Pemeriksaan" Href="/pemeriksaan" />
+    <MenuItem Click="GoToPenandaanGambar" Src="/images/dokter/menu/pencil.png" Title="Penandaan Gambar" Href="/penandaan-gambar"/>
+    <MenuItem  Click="GoToCPPT" Src="/images/dokter/menu/notes.png" Title="CPPT"  Href="/cppt"/>
     <MenuItem Disabled Click="GoToKontrol" Src="/images/dokter/menu/palang-merah.png" Title="Kontrol" Href="/perawatan" />
-    <MenuItem Disabled Click="GoToTindakanPerawatan" Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/perawatan" Class="p-0" />
-</div>
+    <MenuItem Disabled Click="GoToTindakanPerawatan" Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/perawatan" />
+</MudGrid>
 
 @code {
     [CascadingParameter]

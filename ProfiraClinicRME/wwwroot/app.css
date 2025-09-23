@@ -54,7 +54,7 @@ h1:focus {
     border-color: #929292;
 }
 
-/* misc */
+/* custom */
 html, body {
     height: 100%;
     margin: 0;
@@ -84,6 +84,10 @@ html, body {
 
 .bg-wave-fixed.patient {
     background-image: url("images/wave.png");
+}
+
+.h-100 {
+    height: 100% !important;
 }
 
 .master-modal {
@@ -178,6 +182,19 @@ html, body {
         max-width: 1024px;
     }
 }
+
+/* menu */
+.menu-disabled {
+    pointer-events: none; /* Disables all pointer events, including clicks */
+    cursor: default; /* Changes the cursor to an arrow */
+    color: grey; /* Makes the link appear inactive */
+    text-decoration: none; /* Optional: Remove underline */
+}
+
+.menu-shadow {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
 /* note component */
 .note-content {
     background-color: rgba(250, 242, 242, 1);

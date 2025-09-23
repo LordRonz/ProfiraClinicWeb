@@ -1,23 +1,21 @@
-﻿<a @onclick="DoAction" href="@Href" class="d-flex justify-content-center align-items-center flex-column gap-2 @(Disabled?"disabled-link":"")">
-    <div class="@("justify-content-center align-items-center d-flex item-shadow rounded-circle " + Class)" style="width: 110px; height: 110px; background-color: rgba(0, 0, 0, 0.25);">
-        <MudImage Src="@Src" Class="w-100" />
-    </div>
-    <p class="m-0">@Title</p>
-</a>
-<style>
-    .disabled-link {
-        pointer-events: none; /* Disables all pointer events, including clicks */
-        cursor: default; /* Changes the cursor to an arrow */
-        color: grey; /* Makes the link appear inactive */
-        text-decoration: none; /* Optional: Remove underline */
-    }
-</style>
+﻿<MudItem xs="4" sm="3" md="2">
+    <a @onclick="DoAction" href="@Href" class="@(Disabled ? "menu-disabled" : "")">
+        <MudGrid Class="flex-column justify-content-center align-center">
+            <MudItem>
+                <div class="menu-shadow rounded-circle " style="width: 110px; height: 110px; background-color: rgba(0, 0, 0, 0.25);">
+                    <MudImage Src="@Src" Class="w-100" />
+                </div>
+            </MudItem>
+            <MudItem Style="text-align:center">
+                @Title
+            </MudItem>
+
+        </MudGrid>
+    </a>
+</MudItem>
 @code {
     [Parameter]
     public string Src { get; set; } = "/images/menu/treatment.png";
-
-    [Parameter]
-    public string Class { get; set; } = "p-3";
 
     [Parameter]
     public string Href { get; set; } = "/produk";
@@ -34,21 +32,13 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        
+
     }
 
     private async Task DoAction()
     {
-
-
         await Click.InvokeAsync();
     }
 
 
 }
-
-<style>
-    .item-shadow {
-        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    }
-</style>
