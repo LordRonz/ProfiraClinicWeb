@@ -35,6 +35,7 @@ OnSave="@DoSave"
                                 displayData = [
                                     ["Kunjungan", context.NomorAppointment ?? ""],
                                     ["Keterangan Anamnesis", context.KeteranganAnamnesis ?? ""],
+                                    ["Lokasi", context.KETLK ?? ""],
                                     ["Dokter", context.NamaKaryawan ?? ""],
                                     [DateUtility.FormatDate(context.UPDDT, true), ""]
                                 ];
@@ -131,6 +132,7 @@ OnSave="@DoSave"
                                     ["Penyakit Sekarang" , context.DisplayPenyakitSekarang],
                                     ["Alergi Makanan", context.KetAlergiMakanan],
                                     ["Faktor Resiko", context.DisplayResiko],
+                                    ["Lokasi", context.KetLokasi ?? ""],
                                     ["Dokter", context.NamaKaryawan ?? ""],
                                     [DateUtility.FormatDate(context.UPDDT, true), ""]
                                 ];
