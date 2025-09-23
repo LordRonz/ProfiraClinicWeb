@@ -1,9 +1,12 @@
 ﻿@page "/package"
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Components.Dialog
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
 @inject GroupPaketApiService ApiService
+@inject ISnackbar Snackbar
+@inject IDialogService Dialog
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" />
@@ -55,8 +58,8 @@
                 var dataSource = Pakets.Select(el =>
                     (object)new
                     {
-                        view = $"paket/{el.KodeGroupPaket}",
-                        edit = $"paket/{el.KodeGroupPaket}/edit",
+                        view = $"package/{el.KodeGroupPaket}",
+                        edit = $"package/{el.KodeGroupPaket}/edit",
                         kodeGroupPaket = el.KodeGroupPaket,
                         namaGroupPaket = el.NamaGroupPaket,
                         aktif = el.Aktif == "1" ? "Ya" : "Tidak",
@@ -65,11 +68,11 @@
 
                 PackageTableConfig = new TableConfig(
                     new List<TableColumn> {
-                        new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
                         new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
                         new TableColumn { Caption = "Kode Group Paket", DataField = "kodeGroupPaket" },
                         new TableColumn { Caption = "Nama Group Paket", DataField = "namaGroupPaket" },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete, ActionField = "kodeGroupPaket", Action = OnDelete },
                             },
                     dataSource,
                     "/package/add"
@@ -83,4 +86,42 @@
             StateHasChanged();
         }
     }
+
+    private void addSnackbar(string message, Severity severity = Severity.Error)
+    {
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add(message, severity);
+    }
+
+    private async Task<bool> OnDelete(string kodeGroupPaket)
+    {
+        System.Diagnostics.Debug.WriteLine("OnDelete Group Paket");
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = $"Yakin ingin menghapus '{kodeGroupPaket}'?"
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = Dialog.Show<ConfirmDialog>("Hapus Group Paket", parameters, options);
+        var result = await dialog.Result;
+
+        if (result?.Canceled == true) return false;
+
+        var resp = await ApiService.DeleteGroupPaketByIdAsync(kodeGroupPaket);
+        if (resp.StatusCode < 300)
+        {
+            Pakets.RemoveAll(p => p.KodeGroupPaket == kodeGroupPaket);
+            StateHasChanged();
+            Snackbar.Add("Berhasil dihapus.", Severity.Success);
+            return true;
+        }
+        else
+        {
+            Snackbar.Add(resp.Message ?? "Gagal menghapus.", Severity.Error);
+            return false;
+        }
+    }
+
 }

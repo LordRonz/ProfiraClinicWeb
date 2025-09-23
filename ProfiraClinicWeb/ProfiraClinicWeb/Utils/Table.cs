@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices.Marshalling;
-using static ProfiraClinicWeb.Components.Table.Table;
 
 namespace ProfiraClinicWeb.Utils
 {
@@ -29,7 +27,8 @@ namespace ProfiraClinicWeb.Utils
         public ColumnType? Type { get; set; } = ColumnType.Data;
         public string? CustomIcon { get; set; }
         public MudBlazor.Color? Color { get; set; }
-        public Func<object, Task>? Action { get; set; }
+        public Func<string, Task<bool>>? Action { get; set; }
+        public string? ActionField { get; set; }
         public ColumnAlign Align { get; set; } = ColumnAlign.Left;
     }
 
@@ -49,7 +48,7 @@ namespace ProfiraClinicWeb.Utils
             return data;*/
             return _dataSource.ConvertAll(x => ToDict(x));
         }
- 
+
         public List<TableColumn> GetColumn()
         {
             return _column;
@@ -76,7 +75,7 @@ namespace ProfiraClinicWeb.Utils
 
         public void AddFilter(string column)
         {
-            _filters.Add(new TableFilter { Column = column, FieldName = _column.FirstOrDefault(x => x.DataField==column)?.Caption ?? column });
+            _filters.Add(new TableFilter { Column = column, FieldName = _column.FirstOrDefault(x => x.DataField == column)?.Caption ?? column });
         }
 
         private static Dictionary<string, string> ToDict(object dataSource)

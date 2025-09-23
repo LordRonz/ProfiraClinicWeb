@@ -1,6 +1,5 @@
 using BlazorReports.Extensions;
 using MudBlazor.Services;
-using ProfiraClinicWeb.Client.Pages;
 using ProfiraClinicWeb.Components;
 using ProfiraClinicWeb.Data;
 using ProfiraClinicWeb.Helpers;
@@ -101,6 +100,12 @@ builder.Services.AddHttpClient<PaketDetailApiService>(client =>
     .AddHttpMessageHandler<AuthRedirectHandler>();
 
 builder.Services.AddHttpClient<PerawatanHeaderApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+}).AddHttpMessageHandler<BearerTokenHandler>()
+    .AddHttpMessageHandler<AuthRedirectHandler>();
+
+builder.Services.AddHttpClient<PerawatanDetailApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
 }).AddHttpMessageHandler<BearerTokenHandler>()

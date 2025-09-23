@@ -1,4 +1,4 @@
-﻿@page "/package/add"
+﻿@page "/treatment/add"
 
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
@@ -7,32 +7,27 @@
 @using ProfiraClinicWeb.Services
 @using MudBlazor
 @inject HttpClient httpClient
-@inject GroupPaketApiService ApiService
+@inject GroupPerawatanApiService ApiService
 @inject NavigationManager NavigationManager
 
 
 <MudCard Class="p-4 h-100">
     <MudForm @ref="form" Class="table-form">
         <MudGrid GutterSize="3">
-            <!-- Row 1: Nama Paket (max half width) -->
+            <!-- Row 1: User ID & Nama User -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
                               Label="Nama Paket"
-                              @bind-Value="groupPaket.NamaGroupPaket"
+                              @bind-Value="treatment.NamaGroupPerawatan"
                               Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Class="mb-0" />
+                              Margin="Margin.Dense" Class="mb-3" />
             </MudItem>
-            <MudItem xs="12" Style="height: 0 !important;" Class="p-0" />
-
-            <!-- Row 2: Kode Group (max half width) -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
                               Label="Kode Group"
-                              @bind-Value="groupPaket.KodeGroupPaket"
+                              @bind-Value="treatment.KodeGroupPerawatan"
                               Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Class="mb-4" />
+                              Margin="Margin.Dense" Class="mb-4" />
             </MudItem>
         </MudGrid>
 
@@ -52,14 +47,13 @@
 </MudCard>
 
 
-
 @code {
     [Parameter]
     public string Id { get; set; }
 
     // The patient model used for data binding.
     private Customer patient = new Customer();
-    private GroupPaket groupPaket = new GroupPaket();
+    private GroupPerawatan treatment = new GroupPerawatan();
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
@@ -78,12 +72,12 @@
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/package");
+        NavigationManager.NavigateTo("/treatment");
     }
 
     protected override async Task OnInitializedAsync()
     {
-        Layout.ChangeTitleAndRoute("Group Paket", "Tambah Group Paket");
+        Layout.ChangeTitleAndRoute("Group Perawatan", "Tambah Group Perawatan");
         patient.KodeCustomer = "INITIAL";
     }
 
@@ -91,12 +85,12 @@
     private async Task SubmitAsync()
     {
         // Call the API service update method.
-        groupPaket.USRID = "";
-        groupPaket.Aktif = "1";
-        var result = await ApiService.CreateGroupPaketAsync(groupPaket);
+        treatment.USRID = "";
+        treatment.Aktif = "1";
+        var result = await ApiService.CreateGroupPerawatanAsync(treatment);
         if (result.StatusCode < 300)
         {
-            NavigationManager.NavigateTo("/package");
+            NavigationManager.NavigateTo("/treatment");
         }
         else
         {

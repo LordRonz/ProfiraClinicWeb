@@ -117,23 +117,23 @@
 
     public async Task OnSubmit()
     {
-        var customer = await dbContext.MKaryawan.Where(c => c.UserName == userName).FirstOrDefaultAsync();
-        if (customer == null)
-        {
-            addSnackbar("User not found");
-            return;
-        }
-        if (!BC.Verify(userPass, customer.UserPassword))
-        {
-            addSnackbar("Invalid username or password");
-            return;
-        }
+        // var customer = await dbContext.MKaryawan.Where(c => c.Ref_USRID == userName).FirstOrDefaultAsync();
+        // if (customer == null)
+        // {
+        //     addSnackbar("User not found");
+        //     return;
+        // }
+        // if (!BC.Verify(userPass, customer.UserPassword))
+        // {
+        //     addSnackbar("Invalid username or password");
+        //     return;
+        // }
 
-        var token = ProfiraClinicWeb.Utils.Auth.GenerateToken(customer.UserName);
+        // var token = ProfiraClinicWeb.Utils.Auth.GenerateToken(customer.Ref_USRID);
 
-        await ProtectedSessionStore.SetAsync("token", token);
+        // await ProtectedSessionStore.SetAsync("token", token);
 
-        await ProtectedSessionStore.SetAsync("user", customer);
+        // await ProtectedSessionStore.SetAsync("user", customer);
 
         addSnackbar("Logged In", Severity.Success);
 

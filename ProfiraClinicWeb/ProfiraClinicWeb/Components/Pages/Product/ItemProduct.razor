@@ -79,9 +79,10 @@
                         new TableColumn { Caption = "Disc Member", DataField = "discMember", Align = ColumnAlign.Right },
                         new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember", Align = ColumnAlign.Right },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },
+                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
                                         },
                     dataSource,
-                    "/pasien/add"
+                    "/product-item/add"
                 );
             }
             catch (Exception ex)

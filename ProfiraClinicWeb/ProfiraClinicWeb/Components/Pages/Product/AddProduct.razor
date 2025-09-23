@@ -1,4 +1,4 @@
-﻿@page "/package/add"
+﻿@page "/product/add"
 
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
@@ -7,32 +7,25 @@
 @using ProfiraClinicWeb.Services
 @using MudBlazor
 @inject HttpClient httpClient
-@inject GroupPaketApiService ApiService
+@inject GroupBarangApiService ApiService
 @inject NavigationManager NavigationManager
-
 
 <MudCard Class="p-4 h-100">
     <MudForm @ref="form" Class="table-form">
         <MudGrid GutterSize="3">
-            <!-- Row 1: Nama Paket (max half width) -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
-                              Label="Nama Paket"
-                              @bind-Value="groupPaket.NamaGroupPaket"
+                              Label="Nama Group Barang"
+                              @bind-Value="groupBarang.NamaGroupBarang"
                               Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Class="mb-0" />
+                              Margin="Margin.Dense" Class="mb-3" />
             </MudItem>
-            <MudItem xs="12" Style="height: 0 !important;" Class="p-0" />
-
-            <!-- Row 2: Kode Group (max half width) -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
                               Label="Kode Group"
-                              @bind-Value="groupPaket.KodeGroupPaket"
+                              @bind-Value="groupBarang.KodeGroupBarang"
                               Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Class="mb-4" />
+                              Margin="Margin.Dense" Class="mb-4" />
             </MudItem>
         </MudGrid>
 
@@ -51,56 +44,36 @@
     </MudForm>
 </MudCard>
 
-
-
 @code {
-    [Parameter]
-    public string Id { get; set; }
+    MudForm form;
 
-    // The patient model used for data binding.
-    private Customer patient = new Customer();
-    private GroupPaket groupPaket = new GroupPaket();
+    private GroupBarang groupBarang = new();
+
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
-    // Local UI-bound properties.
-    private DateTime? date = DateTime.Today;
-
-    MudForm form;
-
-    // File upload handling.
-    IList<IBrowserFile> files = new List<IBrowserFile>();
-    private void UploadFiles(IBrowserFile file)
+    protected override async Task OnInitializedAsync()
     {
-        files.Add(file);
-        // TODO: Implement file upload logic as needed.
+        Layout.ChangeTitleAndRoute("Group Barang", "Tambah Group Barang");
+        // defaults
+        groupBarang.Aktif = "1";
+        groupBarang.USRID = ""; // set from your auth context if needed
     }
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/package");
+        NavigationManager.NavigateTo("/product");
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        Layout.ChangeTitleAndRoute("Group Paket", "Tambah Group Paket");
-        patient.KodeCustomer = "INITIAL";
-    }
-
-    // Called when the "Simpan" button is clicked.
     private async Task SubmitAsync()
     {
-        // Call the API service update method.
-        groupPaket.USRID = "";
-        groupPaket.Aktif = "1";
-        var result = await ApiService.CreateGroupPaketAsync(groupPaket);
+        var result = await ApiService.CreateGroupBarangAsync(groupBarang);
         if (result.StatusCode < 300)
         {
-            NavigationManager.NavigateTo("/package");
+            NavigationManager.NavigateTo("/product");
         }
         else
         {
-            // Here you can display a snackbar or alert message with result.Message.
             System.Diagnostics.Debug.WriteLine(result.Message);
         }
     }
@@ -147,35 +120,16 @@
         top: -3px;
     }
 
-    .active-tab {
-        background-color: rgba(162, 238, 240, 1);
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .tab-panel {
-        border: 1px solid rgba(202, 199, 199, 1);
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .tab-header {
-        border: 1px solid rgba(202, 199, 199, 1);
-        border-top: none;
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
     .section {
         width: 100%;
-        overflow: hidden; /* clip rounded corners */
+        overflow: hidden;
         border-radius: 8px;
     }
 
     .section-header {
         display: flex;
         align-items: center;
-        background-color: #a2eef0; /* your blue */
+        background-color: #a2eef0;
         padding: 0.75rem 1rem;
         font-weight: 500;
     }

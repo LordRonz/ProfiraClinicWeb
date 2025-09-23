@@ -70,13 +70,21 @@ namespace ProfiraClinicWeb.Services
             GroupBarang paket)
         {
             var responseMessage = await _httpClient
-                .PutAsJsonAsync($"api/GroupBarang/edit/{kodeGroup}", paket);
+                .PostAsJsonAsync($"api/GroupBarang/edit", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
                 return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating GroupBarang: {errorMsg}");
             }
             return new ApiResponse<object>((int)responseMessage.StatusCode, "GroupBarang updated successfully");
+        }
+
+        public async Task<ApiResponse<GroupBarang>> DeleteGroupBarangByIdAsync(string id)
+        {
+            var response = await _httpClient
+                .DeleteFromJsonAsync<ApiResponse<GroupBarang>>($"api/GroupBarang/Del/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
+            return response;
         }
     }
 }

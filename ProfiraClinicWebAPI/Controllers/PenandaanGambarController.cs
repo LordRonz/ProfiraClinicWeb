@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Services;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -12,6 +13,36 @@ namespace ProfiraClinicWebAPI.Controllers
     {
         public string? KodeCustomer { get; set; }
     }
+
+    public class PenandaanGambarListItemDto
+    {
+        public string NomorTransaksi { get; set; }
+        public string? TRCD { get; set; }
+        public string? TRSC { get; set; }
+        public string KodeLokasi { get; set; }
+        public string TahunTransaksi { get; set; }
+        public string BulanTransaksi { get; set; }
+        public DateTime TanggalTransaksi { get; set; }
+        public string? NomorAppointment { get; set; }
+        public string? KodeCustomer { get; set; }
+        public string? KodeKaryawan { get; set; }
+        public string? KodePoli { get; set; }
+        public string? Keterangan { get; set; }
+        public DateTime? UPDDT { get; set; }
+        public string? USRID { get; set; }
+        public List<PenandaanGambarListDetailDto> Detail { get; set; } = new();
+    }
+
+    public class PenandaanGambarListDetailDto
+    {
+        public int IDDetail { get; set; }
+        public string KodeGambar { get; set; }
+        public string IDGambar { get; set; }
+        public string? KETLK { get; set; }
+        public string? NamaCustomer { get; set; }
+        public string? NamaKaryawan { get; set; }
+    }
+
 
     [ApiController]
     [Route("api/[controller]")]
@@ -55,6 +86,8 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound("User not found");
 
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+
             var karyawan = await _context.MKaryawan
                                 .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
@@ -63,7 +96,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@KodeLokasi", appDto.KodeLokasi ?? kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
         new SqlParameter("@TanggalTransaksi", appDto.TanggalTransaksi ?? DateTime.Now),
         new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
         new SqlParameter("@KodeCustomer", appDto.KodeCustomer ?? (object)DBNull.Value),
@@ -94,20 +127,53 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         [HttpPost("EditPenandaanGambarHeader")]
-        public async Task<IActionResult> EditPenandaanGambarHeader([FromBody] TRMPenandaanGambarHeader header)
+        public async Task<IActionResult> EditPenandaanGambarHeader([FromBody] EditPenandaanGambarHeaderDto dto)
         {
-            if (header == null || string.IsNullOrEmpty(header.NomorTransaksi))
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(u => u.USRID == userName);
+
+            if (user == null)
+                return NotFound("User not found");
+
+            if (dto == null || string.IsNullOrWhiteSpace(dto.NomorTransaksi))
                 return BadRequest("NomorTransaksi is required");
 
-            var existing = await _context.TRMPenandaanGambarHeader.FindAsync(header.NomorTransaksi);
-            if (existing == null) return NotFound("Header not found");
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
 
-            _context.Entry(existing).CurrentValues.SetValues(header);
-            existing.UPDDT = DateTime.Now;
+            var karyawan = await _context.MKaryawan
+                                .FirstOrDefaultAsync(k => k.USRID == user.KodeUser);
 
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Header updated successfully", data = existing });
+            if (dto.KodeKaryawan == null && karyawan == null)
+                return NotFound("Karyawan not found");
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeLokasi",       kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
+        new SqlParameter("@TanggalTransaksi", DateTime.Now),
+        new SqlParameter("@NomorAppointment", dto.NomorAppointment ?? (object)DBNull.Value),
+        new SqlParameter("@KodeCustomer",     dto.KodeCustomer ?? (object)DBNull.Value),
+        new SqlParameter("@KodeKaryawan",     dto.KodeKaryawan ?? karyawan?.KodeKaryawan ?? (object)DBNull.Value),
+        new SqlParameter("@KodePoli",         _kodePoli ?? (object)DBNull.Value),
+        new SqlParameter("@Keterangan",       dto.Keterangan ?? (object)DBNull.Value),
+        new SqlParameter("@USRID",            user.USRID ?? (object)DBNull.Value),
+        new SqlParameter("@NomorTransaksi",   dto.NomorTransaksi)
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_PenandaanGambar_Header_Edit " +
+                "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, @KodeCustomer, " +
+                "@KodeKaryawan, @KodePoli, @Keterangan, @USRID, @NomorTransaksi",
+                sqlParameters
+            );
+
+            return Ok(new { message = "Header updated successfully", nomorTransaksi = dto.NomorTransaksi });
         }
+
 
         // ===============================
         // Penandaan Gambar Detail
@@ -156,19 +222,31 @@ namespace ProfiraClinicWebAPI.Controllers
 
 
         [HttpPost("EditPenandaanGambarDetail")]
-        public async Task<IActionResult> EditPenandaanGambarDetail([FromBody] TRMPenandaanGambarDetail detail)
+        public async Task<IActionResult> EditPenandaanGambarDetail([FromBody] TRMPenandaanGambarDetail dto)
         {
-            if (detail == null || string.IsNullOrEmpty(detail.NomorTransaksi))
+            if (dto == null || string.IsNullOrEmpty(dto.NomorTransaksi))
                 return BadRequest("NomorTransaksi is required");
 
-            var existing = await _context.TRMPenandaanGambarDetail.FindAsync(detail.NomorTransaksi);
-            if (existing == null) return NotFound("Detail not found");
+            if (dto.IDGambar == null || dto.KodeGambar == null)
+                return BadRequest("KodeGambar and IDGambar are required");
 
-            _context.Entry(existing).CurrentValues.SetValues(detail);
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi),
+        new SqlParameter("@KodeGambar", dto.KodeGambar ?? (object)DBNull.Value),
+        new SqlParameter("@IDGambar", dto.IDGambar ?? (object)DBNull.Value),
+        new SqlParameter("@IDDetail", dto.IDDetail)
+    };
 
-            await _context.SaveChangesAsync();
-            return Ok(new { message = "Detail updated successfully", data = existing });
+            await _context.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.usp_TRM_PenandaanGambar_Detail_Edit " +
+                "@NomorTransaksi, @KodeGambar, @IDGambar, @IDDetail",
+                sqlParameters
+            );
+
+            return Ok(new { message = "Detail updated successfully", data = dto });
         }
+
 
         [HttpPost("GetListTrm")]
         public async Task<IActionResult> GetListTrm([FromBody] PenandaanGambarListDto penandaanGambarDto)
@@ -191,15 +269,82 @@ namespace ProfiraClinicWebAPI.Controllers
                 .FromSqlRaw("EXEC dbo.usp_TRM_PenandaanGambar_List @KodeCustomer", sqlParameters)
                 .ToListAsync();
 
-            var result = new Pagination<TRMPenandaanGambar>
+            var items = list
+    .GroupBy(h => h.NomorTransaksi)
+    .Select(g =>
+    {
+        var h = g.First();
+        return new PenandaanGambarListItemDto
+        {
+            NomorTransaksi = h.NomorTransaksi,
+            TRCD = h.TRCD,
+            TRSC = h.TRSC,
+            KodeLokasi = h.KodeLokasi,
+            TahunTransaksi = h.TahunTransaksi,
+            BulanTransaksi = h.BulanTransaksi,
+            TanggalTransaksi = h.TanggalTransaksi,
+            NomorAppointment = h.NomorAppointment,
+            KodeCustomer = h.KodeCustomer,
+            KodeKaryawan = h.KodeKaryawan,
+            KodePoli = h.KodePoli,
+            Keterangan = h.Keterangan,
+            UPDDT = h.UPDDT,
+            USRID = h.USRID,
+            Detail = g
+                .Where(d => d.IDDetail != null && d.KodeGambar != null)
+                .Select(d => new PenandaanGambarListDetailDto
+                {
+                    IDDetail = d.IDDetail ?? 0,
+                    KodeGambar = d.KodeGambar,
+                    IDGambar = d.IDGambar,
+                    KETLK = d.KETLK,
+                    NamaCustomer = d.NamaCustomer,
+                    NamaKaryawan = d.NamaKaryawan
+                })
+                .ToList()
+        };
+    })
+    .ToList();
+
+            var result = new Pagination<PenandaanGambarListItemDto>
             {
-                TotalCount = 0,
+                TotalCount = items.Count,
                 Page = 0,
-                PageSize = 0,
-                Items = list
+                PageSize = items.Count,
+                Items = items
             };
 
             return Ok(result);
+
+        }
+
+        [HttpPost("GetByNomorAppointment")]
+        public async Task<IActionResult> GetByNomorAppointment([FromBody] GetByNomorAppointmentDto dto)
+        {
+            var nomorAppointment = dto.NomorAppointment;
+            if (string.IsNullOrWhiteSpace(nomorAppointment))
+                return BadRequest(new { message = "NomorAppointment is required." });
+
+            var header = await _context.TRMPenandaanGambarHeader
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
+
+            if (header == null)
+                return Ok(null);
+
+            var detail = await _context.TRMPenandaanGambarDetail
+                .AsNoTracking()
+                .Where(d => d.NomorTransaksi == header.NomorTransaksi).ToListAsync();
+
+            dynamic response = new System.Dynamic.ExpandoObject();
+
+            foreach (var prop in header.GetType().GetProperties())
+            {
+                ((IDictionary<string, object>)response)[prop.Name] = prop.GetValue(header);
+            }
+
+            response.detail = detail;
+            return Ok(response);
         }
     }
 }

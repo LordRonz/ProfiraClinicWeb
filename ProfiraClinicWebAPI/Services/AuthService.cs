@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ProfiraClinicWebAPI.Config;
 using ProfiraClinicWebAPI.Data;
@@ -7,14 +6,18 @@ using ProfiraClinicWebAPI.Model;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BCrypt.Net;
 
 namespace ProfiraClinicWebAPI.Services
 {
+    public static class JwtClaimTypes
+    {
+        public const string KodeLokasi = "kode_lokasi";
+    }
+
     public interface IAuthService
     {
         LoginModel? Authenticate(string username, string password);
-        string GenerateToken(LoginModel user);
+        string GenerateToken(LoginModel user, string? kodeLokasiParam);
     }
 
     public class AuthService(IConfiguration config, IOptions<List<Client>> clientsOptions, AppDbContext context) : IAuthService
@@ -40,7 +43,7 @@ namespace ProfiraClinicWebAPI.Services
             };
         }
 
-        public string GenerateToken(LoginModel user)
+        public string GenerateToken(LoginModel user, string? k)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -49,6 +52,7 @@ namespace ProfiraClinicWebAPI.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Username),
                 new Claim(ClaimTypes.Role, "Client"),
+                new Claim(JwtClaimTypes.KodeLokasi, k ?? user.KodeLokasi ?? string.Empty)
             };
 
             var token = new JwtSecurityToken(

@@ -46,15 +46,9 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string? KodeKaryawan { get; set; } // Kode Dokter / Terapis
 
-        [Column(TypeName = "char(10)")]
-        [MaxLength(10)]
-        public string? KodeDiagnosa { get; set; } // Relasi dengan Table MDiagnosa
-
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
         public string? KodePoli { get; set; } // Relasi dengan Table MDiagnosa
-
-        public int? NomorUrut { get; set; }
 
         [Column(TypeName = "varchar(1024)")]
         [MaxLength(1024)]

@@ -1,0 +1,14 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="() => MudDialog.Close(MudBlazor.DialogResult.Ok(true))">Hapus</MudButton>
+        <MudButton Color="MudBlazor.Color.Secondary" OnClick="() => MudDialog.Cancel()">Batal</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public string ContentText { get; set; } = string.Empty;
+}

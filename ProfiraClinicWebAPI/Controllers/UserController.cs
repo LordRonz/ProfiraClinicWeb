@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using ProfiraClinicWebAPI.Services;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -38,7 +39,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return item;
         }
-        
+
         [HttpPost("add")]
         public async Task<ActionResult<User>> CreateUser([FromBody] User newUser)
         {
@@ -89,7 +90,7 @@ namespace ProfiraClinicWebAPI.Controllers
             {
                 return BadRequest("User data is null.");
             }
-            
+
             if (kode != updatedUser.KodeUserGroup)
             {
                 return BadRequest("KodeUser mismatch between route and body.");
@@ -141,16 +142,20 @@ namespace ProfiraClinicWebAPI.Controllers
             if (user == null)
                 return NotFound();
 
+            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+
             user.Password = null;
 
             var karyawan = await _context.MKaryawan.FirstOrDefaultAsync(k => k.RefUserId == user.USRID);
 
+            var kodeLokasi = kdLok ?? user.KodeLokasi;
+
             MKlinik? clinic = null;
-            if (!string.IsNullOrEmpty(user.KodeLokasi))
+            if (!string.IsNullOrEmpty(kodeLokasi))
             {
                 clinic = await _context.MKlinik
                                        .AsNoTracking()
-                                       .FirstOrDefaultAsync(k => k.KDLOK == user.KodeLokasi);
+                                       .FirstOrDefaultAsync(k => k.KDLOK == kodeLokasi);
             }
 
             var dto = new CurrentUser

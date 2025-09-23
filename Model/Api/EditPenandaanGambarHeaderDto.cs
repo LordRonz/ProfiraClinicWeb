@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ProfiraClinic.Models.Api
 {
     public class EditPenandaanGambarHeaderDto
+
         ()
     {
         public string KodeLokasi { get; set; } = "";
@@ -16,6 +17,5 @@ namespace ProfiraClinic.Models.Api
         public string KodeKaryawan { get; set; } = "";
         public string Keterangan { get; set; } = "";
         public string NomorTransaksi { get; set; } = "";
-
     }
 }
