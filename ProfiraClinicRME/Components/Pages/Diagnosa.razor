@@ -57,7 +57,7 @@ OnSave="DoSave" />
                 <MudTextField @bind-Value="@_trmDiagnosaInForm.KeteranganDiagnosa" 
                 ShrinkLabel 
                 T="string" 
-                Label="Diagnosa" 
+                Label="Deskripsi" 
                 Variant="Variant.Outlined" Lines="10" />
             </MudItem>
         </MudGrid>
@@ -74,6 +74,7 @@ OnSave="DoSave" />
                             ["ICD", $"{context.KodeDiagnosa}  {context.NamaDiagnosa}"],
                             ["Kategori" , context.KategoriDiagnosa ?? ""],
                             ["Diagnosa", context.KeteranganDiagnosa ?? ""],
+                            ["Lokasi", context.KETLK ?? ""],
                             ["Dokter", context.NamaKaryawan ?? ""],
                             [DateUtility.FormatDate(context.UPDDT, true), ""]
                         ];
@@ -140,15 +141,19 @@ OnSave="DoSave" />
 
         //ambil rekam medis diagnosa
         var resDiagnosa = await SvcDiagnosa.GetListAsync(_apo.KodeCustomer);
-        if (resDiagnosa.Status == ServiceResultEnum.FOUND)
+        switch (resDiagnosa.Status)
         {
-            _listRekamMedis = resDiagnosa.Data.Items;
-
-            // _displayTRMDiagnosa = _listTRMDiagnosa.FirstOrDefault();
-        }
-        else
-        {
-            addSnackbar("Gagal memuat Rekam Medis Diagnosa.", Severity.Error);
+            case ServiceResultEnum.FOUND:
+                _listRekamMedis = resDiagnosa.Data.Items;
+                break;
+            case ServiceResultEnum.NOT_FOUND:
+                addSnackbar("Tidak ditemukan Rekam Medis sebelumnya", Severity.Info);
+                break;
+            default:
+                var msg = "Gagal memuat Rekam Medis Diagnosa.";
+                LogTrace.Error(msg, resDiagnosa, _classPath);
+                addSnackbar(msg, Severity.Error);
+                break;
         }
 
         //cek apakah sudah ada diagnosa untuk appointment ini
