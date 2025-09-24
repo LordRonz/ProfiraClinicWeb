@@ -77,5 +77,21 @@ namespace ProfiraClinicWebAPI.Controllers
                 return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
         }
+
+        [HttpDelete("del/{code}")]
+        public async Task<IActionResult> DeletePerawatanHeader(string code)
+        {
+            var item = await _context.PPerawatanH
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.KodePerawatan == code);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            item.Aktif = "0";
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

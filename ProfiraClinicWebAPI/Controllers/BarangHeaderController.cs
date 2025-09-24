@@ -108,5 +108,21 @@ VALUES
                 });
             }
         }
+
+        [HttpDelete("del/{code}")]
+        public async Task<IActionResult> DeleteBarangHeader(string code)
+        {
+            var item = await _context.BarangHeader
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.KodeBarang == code);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            item.Aktif = "0";
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

@@ -151,6 +151,23 @@ namespace ProfiraClinicWebAPI.Controllers
             if (dto.KodeKaryawan == null && karyawan == null)
                 return NotFound("Karyawan not found");
 
+            try
+            {
+                var delParam = new[]
+                {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_PenandaanGambar_Del @NomorTransaksi",
+                    delParam
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
             var sqlParameters = new[]
             {
         new SqlParameter("@KodeLokasi",       kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
@@ -229,6 +246,23 @@ namespace ProfiraClinicWebAPI.Controllers
 
             if (dto.IDGambar == null || dto.KodeGambar == null)
                 return BadRequest("KodeGambar and IDGambar are required");
+
+            try
+            {
+                var delParam = new[]
+                {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_PenandaanGambar_Del @NomorTransaksi",
+                    delParam
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
 
             var sqlParameters = new[]
             {

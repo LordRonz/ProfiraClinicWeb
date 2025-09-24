@@ -99,16 +99,17 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // DELETE: api/Patient/{id}
         // Delete a paketHeader record.
-        [HttpDelete("del/{id}")]
-        public async Task<IActionResult> DeletePaketHeader(long id)
+        [HttpDelete("del/{code}")]
+        public async Task<IActionResult> DeletePaketHeader(string code)
         {
-            var paketHeader = await _context.PaketHeader.FindAsync(id);
-            if (paketHeader == null)
+            var item = await _context.PaketHeader
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.KodePaket == code);
+            if (item == null)
             {
                 return NotFound();
             }
-
-            _context.PaketHeader.Remove(paketHeader);
+            item.Aktif = "0";
             await _context.SaveChangesAsync();
 
             return NoContent();
