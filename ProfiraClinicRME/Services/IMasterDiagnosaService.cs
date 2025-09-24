@@ -17,6 +17,8 @@ namespace ProfiraClinicRME.Services
         // Retrieves all clinics.
         public Task<ServiceResult<Pagination<MasterDiagnosa>>> GetListAsync(int pageNum, int pageSize);
 
+        public Task<ServiceResult<Pagination<MDiagnosaExt>>> GetListByStringAsync(int pageNum, int pageSize, string param);
+
 
 
     }

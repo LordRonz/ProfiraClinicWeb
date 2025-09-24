@@ -28,31 +28,18 @@ OnSave="DoSave" />
     <MudCard Class="px-4 py-8">
         <MudGrid Class="gap-y-2" Style="max-width: 85%;">
             <MudItem xs="4" Class="p-1">
-                <MudSelect @bind-Value="@_selMasterDiagnosa"
-                Adornment="Adornment.End"
-                AdornmentIcon="@Icons.Material.Filled.Search"
-                AnchorOrigin="Origin.BottomCenter"
-                Clearable=true
-                Label="Kode ICD"
-                ShrinkLabel
-                T="MasterDiagnosa"
-                Variant="Variant.Outlined">
-                    @foreach (var item in _listMasterDiagnosa)
-                    {
-                        <MudSelectItem Value="@item">
-                            @item.KodeDiagnosa
-                        </MudSelectItem>
-
-                    }
-                </MudSelect>
-            </MudItem>
-            <MudItem xs="8" Class="p-1">
-                <MudTextField Value="@(_selMasterDiagnosa?.NamaDiagnosa)"
-                Disabled=true
-                ShrinkLabel
-                T="string"
-                Label="Deskripsi" Variant="Variant.Outlined" />
-
+                <MudAutocomplete 
+                    Value="@_selMasterDiagnosa"
+                    ValueChanged="@DoUpdateDiagnosaICD"
+                    Adornment="Adornment.End"
+                    AdornmentIcon="@Icons.Material.Filled.Search"
+                    AnchorOrigin="Origin.BottomCenter"
+                    T="MDiagnosaExt" 
+                    Label="ICD" 
+                    SearchFunc="@DoSearchICD" 
+                    Strict=false
+                    Variant="Variant.Outlined" 
+                    ShowProgressIndicator="true" />
             </MudItem>
             <MudItem xs="5" Class="p-1">ho
                 <MudSelect 
@@ -105,8 +92,8 @@ OnSave="DoSave" />
     private bool _hidePosition;
     private bool _loading;
     private TRMAppointment? _apo = null;
-    private MasterDiagnosa? _selMasterDiagnosa;
-    private List<MasterDiagnosa> _listMasterDiagnosa = [];
+    private MDiagnosaExt? _selMasterDiagnosa;
+    private List<MDiagnosaExt> _listMasterDiagnosa = [];
     private List<TRMDiagnosa> _listRekamMedis = [];
     private TRMDiagnosa _trmDiagnosaInForm = new TRMDiagnosa();
     private string _saveMode = "add";
@@ -131,7 +118,7 @@ OnSave="DoSave" />
         await base.OnInitializedAsync();
 
         //ambil data master diagnosa
-        var resMasterDiagnosa = await SvcMasterDiagnosa.GetListAsync(1, 15);
+        var resMasterDiagnosa = await SvcMasterDiagnosa.GetListByStringAsync(1,10,"");
         if (resMasterDiagnosa.Status == ServiceResultEnum.FOUND)
         {
             _listMasterDiagnosa = resMasterDiagnosa.Data.Items;
@@ -181,7 +168,7 @@ OnSave="DoSave" />
         await InvokeAsync(StateHasChanged);
     }
 
-    private void DoUpdateDiagnosaICD(MasterDiagnosa? item)
+    private void DoUpdateDiagnosaICD(MDiagnosaExt? item)
     {
         _trmDiagnosaInForm.KeteranganDiagnosa = item?.NamaDiagnosa ?? "";
         _trmDiagnosaInForm.KodeDiagnosa = item?.KodeDiagnosa ?? "";
@@ -225,6 +212,21 @@ OnSave="DoSave" />
 
     }
 
+    private async Task<IEnumerable<MDiagnosaExt>> DoSearchICD(string searchText, CancellationToken token)
+    {
+        LogTrace.Debug("start", searchText, _classPath);
+        // Forward the CancellationToken to methods which supported, such as HttpClient and DbContext
+        var resSearch =  await SvcMasterDiagnosa.GetListByStringAsync(1,10, searchText);
+        if(resSearch.Status == ServiceResultEnum.FOUND)
+        {
+            _listMasterDiagnosa = resSearch.Data.Items;
+        }
+        else
+        {
+            _listMasterDiagnosa = [];
+        }
+        return _listMasterDiagnosa;
+    }
 
     // protected override async Task OnAfterRenderAsync(bool firstrender)
     // {

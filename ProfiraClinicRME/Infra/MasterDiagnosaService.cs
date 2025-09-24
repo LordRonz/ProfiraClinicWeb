@@ -37,5 +37,21 @@ namespace ProfiraClinicRME.Infra
             return svcResult;
         }
 
+        // Retrieves all clinics.
+        public async Task<ServiceResult<Pagination<MDiagnosaExt>>> GetListByStringAsync(int pageNum, int pageSize, string searchText)
+        {
+            var request= new RequestParamDto
+            {
+                Param = searchText
+            };
+            LogTrace.Debug("param", request, _classPath);
+
+            Response<Pagination<MDiagnosaExt>?> apiResponse = await _svcApi.Send<RequestParamDto, Pagination<MDiagnosaExt>>("post", $"api/MasterDiagnosa/GetListByString?page={pageNum}&pageSize={pageSize}", request);
+
+            ServiceResult<Pagination<MDiagnosaExt>> svcResult = _repo.ProcessResult<Pagination<MDiagnosaExt>>(apiResponse, RepoProcessEnum.GET);
+
+            return svcResult;
+        }
+
     }
 }
