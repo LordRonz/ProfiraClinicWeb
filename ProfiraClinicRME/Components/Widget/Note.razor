@@ -2,31 +2,34 @@
 @inherits BaseWidget
 
 <div>
-    <div class="d-flex header-note justify-content-between px-4 py-2">
-        <div class="d-flex align-items-center justify-content-center gap-3">
+    <div class="d-flex header-note justify-space-between px-4 py-2">
+        <div class="col-xs-12 col-sm-3 d-flex align-items-center justify-start gap-1">
             <MudIcon Icon="@Icons.Material.Filled.Note" Color="MudBlazor.Color.Default" />
             <h2 class="m-0" style="font-size: 16px;">Catatan Medis</h2>
         </div>
-        <MudButton Size="MudBlazor.Size.Small"
-                   StartIcon="fa fa-arrow-left"
-                   IconSize="@MudBlazor.Size.Small"
-                   Class="back-btn mt-2 align-items-center flex-shrink-1 flex-grow-0"
-                   Style="margin: 0px !important;"
-                   Disabled="_prevDisabled"
-                   OnClick="DoPrev">
-            Sebelum
-        </MudButton>
-        <MudButton 
-            Size="MudBlazor.Size.Small" 
-            StartIcon="fa fa-arrow-right" 
-            IconSize="@MudBlazor.Size.Small" 
-            Class="back-btn mt-2 align-items-center flex-shrink-1 flex-grow-0" 
-            Style="margin: 0px !important;"
-            Disabled="_nextDisabled"
-            OnClick="DoNext"
-        >
-            Sesudah
+        <div class="col-xs-12 gap-1 col-sm-3 d-flex align-items-center justify-space-between">
+
+            <MudButton Size="MudBlazor.Size.Small"
+                       StartIcon="fa fa-arrow-left"
+                       IconSize="@MudBlazor.Size.Small"
+                       Class="back-btn mt-2 align-items-center flex-shrink-1 flex-grow-0"
+                       Style="margin: 0px !important;"
+                       Disabled="_prevDisabled"
+                       OnClick="DoPrev">
+                Sebelum
             </MudButton>
+            <MudButton 
+                Size="MudBlazor.Size.Small" 
+                StartIcon="fa fa-arrow-right" 
+                IconSize="@MudBlazor.Size.Small" 
+                Class="back-btn mt-2 align-items-center flex-shrink-1 flex-grow-0" 
+                Style="margin: 0px !important;"
+                Disabled="_nextDisabled"
+                OnClick="DoNext"
+            >
+                    Sesudah
+            </MudButton>
+        </div>
 
     </div>
     <div style="background-color: rgba(250, 242, 242, 1);" class="p-4">
