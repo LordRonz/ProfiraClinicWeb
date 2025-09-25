@@ -1,0 +1,106 @@
+@page "/tindakan-perawatan"
+@inherits BasePage
+
+@using System.Net.Http.Json
+@using ProfiraClinicRME.Utils;
+@using ProfiraClinicRME.Components.Section
+
+@inject IAppointmentService SvcAppointment
+@inject HttpClient httpClient
+
+<TopbarUser Route="TINDAKAN PERAWATAN"
+            Title="Perawatan Pasien / Tindakan Perawatan"
+            ShowBack="true"
+            ShowSave="true"
+            Appointment="CurrentAppointment" />
+
+<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
+    <MudGrid Class="gap-y-2" Style="max-width: 85%;">
+        <MudItem xs="3" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="No. Transaksi" Variant="Variant.Outlined" AdornmentIcon="@Icons.Material.Filled.Search" />
+        </MudItem>
+        <MudItem xs="2" Class="p-1">
+            <MudDatePicker Label="Tanggal" Variant="Variant.Outlined" ShrinkLabel />
+        </MudItem>
+        <MudItem xs="6" Class="p-1">
+        </MudItem>
+        <MudItem xs="8" Class="p-1" id="hasil-pemeriksaan-field">
+            <MudField Label="Hasil Pemeriksaan" Variant="Variant.Outlined" ShrinkLabel><img id="front_face" height="150" src="images/penandaan_gambar/front_face.jpg" alt="Front Face" /></MudField>
+        </MudItem>
+        <MudItem xs="8" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Diagnosis" Variant="Variant.Outlined" Lines="10" />
+        </MudItem>
+        <MudItem xs="8" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Perawatan/Produk" Variant="Variant.Outlined" Lines="10" />
+        </MudItem>
+        <MudItem xs="8" Class="p-1">
+            <MudTextField ShrinkLabel T="string" Label="Keterangan" Variant="Variant.Outlined" Lines="10" />
+        </MudItem>
+    </MudGrid>
+</MudCard>
+
+@code {
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
+
+    private bool _hidePosition;
+    private bool _loading;
+
+    public TableConfig DoctorTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    [CascadingParameter]
+    public ProfiraClinicRME.Components.Layout.MainLayout Layout { get; set; }
+
+    public TindakanPerawatan()
+    {
+        _classPath = "App::Page::TindakanPerawatan";
+        LogTrace.Info("init", path: _classPath);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var patients = new List<object>()
+        {
+            (object) new { view="/pasien/1", tanggalKunjungan = "DR01", noKunjungan = "dr. Fifin" },
+            (object) new { view="/pasien/2", tanggalKunjungan = "DR02", noKunjungan = "dr. Agnes" },
+            (object) new { view="/pasien/3", tanggalKunjungan = "DR03", noKunjungan = "dr. Ruth" },
+        };
+
+        DoctorTableConfig = new TableConfig(new List<TableColumn> {
+                new TableColumn { Caption="View", DataField="view", Type=ColumnType.View },
+                new TableColumn { Caption="Tanggal Kunjungan", DataField="tanggalKunjungan" },
+                new TableColumn { Caption="No. Kunjungan", DataField="noKunjungan" },
+        }, patients);
+    }
+
+}
+
+<style>
+    .pemeriksaan-input .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    #hasil-pemeriksaan-field .mud-input-root {
+        height: 150px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .pemeriksaan-input .mud-input-label-outlined {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .pemeriksaan-input .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>

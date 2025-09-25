@@ -129,8 +129,9 @@
     </MudCard>
 </MudCard>
 
-@inject ProtectedLocalStorage LocalStore
 @code {
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
 
     private bool _hidePosition;
     private bool _loading;
@@ -150,14 +151,7 @@
     {
         base.OnInitialized();
 
-        //ambil data appointment
-        var resApo = SvcAppointment.GetCurrent();
-        if (resApo.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return;
-        }
-        _apo = resApo.Data;
+
     }
 
     protected override async Task OnInitializedAsync()

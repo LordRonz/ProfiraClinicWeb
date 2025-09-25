@@ -19,8 +19,6 @@ namespace ProfiraClinicRME.Services
 
         public Task<ServiceResult<string>> SetAppointmentOnProgress(TRMAppointment apo);
 
-        public ServiceResult<bool> SetCurrent(TRMAppointment appointment);
-        public ServiceResult<TRMAppointment> GetCurrent();
 
     }
 }

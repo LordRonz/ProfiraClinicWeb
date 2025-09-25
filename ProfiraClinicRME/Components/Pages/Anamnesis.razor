@@ -150,14 +150,16 @@ OnSave="@DoSave"
 
 
 @code {
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
+
     private bool _hidePosition;
     private bool _loading;
     private List<TRMAnamnesis> _listRekamAnamnesis = [];
     private List<RiwayatAdaptor> _listRekamRiwayat = [];
     private int _activePanelIndex = 0;
     private string _saveModeAnamnesis = "add";
-    private string _saveModeRiwayat= "add";
-    private TRMAppointment? _apo = null;
+    private string _saveModeRiwayat = "add";
     private TRMAnamnesis _anamnesisInForm = new();
     private RiwayatAdaptor _riwayatInForm = new(new TRMRiwayat());
 
@@ -171,22 +173,16 @@ OnSave="@DoSave"
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        var resApo = SvcAppointment.GetCurrent();
-        if (resApo.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return;
-        }
-        _apo = resApo.Data;
+
     }
 
     protected override async Task OnInitializedAsync()
     {
         //ambil rekam medis anamnesis
-        var resRekamAnamnesis = await SvcAnamnesis.GetListAsync(_apo.KodeCustomer);
+        var resRekamAnamnesis = await SvcAnamnesis.GetListAsync(CurrentAppointment.KodeCustomer);
         if (resRekamAnamnesis.Status == ServiceResultEnum.FOUND)
         {
-            _listRekamAnamnesis  = resRekamAnamnesis.Data.Items;
+            _listRekamAnamnesis = resRekamAnamnesis.Data.Items;
         }
         else
         {
@@ -194,7 +190,7 @@ OnSave="@DoSave"
         }
 
         //cek apakah sudah ada anamnesis untuk appointment ini
-        var resCheckAnamnesis = await SvcAnamnesis.GetByNomorAppointment(_apo.NomorAppointment);
+        var resCheckAnamnesis = await SvcAnamnesis.GetByNomorAppointment(CurrentAppointment.NomorAppointment);
         if (resCheckAnamnesis.Status == ServiceResultEnum.FOUND)
         {
             _saveModeAnamnesis = "edit";
@@ -202,15 +198,15 @@ OnSave="@DoSave"
             addSnackbar("Memuat ulang data Anamnesis.", Severity.Info);
 
         }
-        _anamnesisInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
-        _anamnesisInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
-        _anamnesisInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
-        _anamnesisInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        _anamnesisInForm.NomorAppointment = CurrentAppointment.NomorAppointment ?? "";
+        _anamnesisInForm.KodeKaryawan = CurrentAppointment.KodeKaryawan ?? "";
+        _anamnesisInForm.KodeCustomer = CurrentAppointment.KodeCustomer ?? "";
+        _anamnesisInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "";
 
 
 
         //ambil  riwayat
-        var resRekamRiwayat = await SvcRiwayat.GetListAsync(_apo.KodeCustomer);
+        var resRekamRiwayat = await SvcRiwayat.GetListAsync(CurrentAppointment.KodeCustomer);
         if (resRekamRiwayat.Status == ServiceResultEnum.FOUND)
         {
             _listRekamRiwayat = resRekamRiwayat.Data.Items;
@@ -222,7 +218,7 @@ OnSave="@DoSave"
         }
 
         //cek apakah sudah ada riwayat  untuk appointment ini
-        var resCheckRiwayat = await SvcRiwayat.GetByNomorAppointment(_apo.NomorAppointment);
+        var resCheckRiwayat = await SvcRiwayat.GetByNomorAppointment(CurrentAppointment.NomorAppointment);
         if (resCheckRiwayat.Status == ServiceResultEnum.FOUND)
         {
             _saveModeRiwayat = "edit";
@@ -231,14 +227,14 @@ OnSave="@DoSave"
 
         }
 
-        if(resCheckRiwayat.Status != ServiceResultEnum.FOUND & resRekamRiwayat.Status == ServiceResultEnum.FOUND )
+        if (resCheckRiwayat.Status != ServiceResultEnum.FOUND & resRekamRiwayat.Status == ServiceResultEnum.FOUND)
         {
             _riwayatInForm = _listRekamRiwayat.Last();
         }
-        _riwayatInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
-        _riwayatInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
-        _riwayatInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
-        _riwayatInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        _riwayatInForm.NomorAppointment = CurrentAppointment.NomorAppointment ?? "";
+        _riwayatInForm.KodeKaryawan = CurrentAppointment.KodeKaryawan ?? "";
+        _riwayatInForm.KodeCustomer = CurrentAppointment.KodeCustomer ?? "";
+        _riwayatInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "";
 
         await InvokeAsync(StateHasChanged);
     }
@@ -247,7 +243,7 @@ OnSave="@DoSave"
     private async Task DoSave()
     {
         LogTrace.Info("start", path: _classPath);
-        _anamnesisInForm.KodeLokasi = _apo?.KodeLokasi ?? "-";
+        _anamnesisInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "-";
         _anamnesisInForm.TanggalTransaksi = DateTime.Now;
         //keadaan umum binded
         //tk kesadaran binded
@@ -258,7 +254,7 @@ OnSave="@DoSave"
         string msgFail = "";
 
         //save anamnesis
-        if(_activePanelIndex == 0)
+        if (_activePanelIndex == 0)
         {
             if (_saveModeAnamnesis == "add")
             {
@@ -296,14 +292,15 @@ OnSave="@DoSave"
         {
             addSnackbar(msgSuccess, Severity.Info);
             // await Task.Delay(1000);
-            // Nav.NavigateTo("/perawatan/" + _apo?.IDAppointment);
-            if(_activePanelIndex == 0)
+            // Nav.NavigateTo("/perawatan/" + CurrentAppointment.IDAppointment);
+            if (_activePanelIndex == 0)
             {
                 _saveModeAnamnesis = "edit";
-            } else
+            }
+            else
             {
                 _saveModeRiwayat = "edit";
-                
+
             }
         }
         else

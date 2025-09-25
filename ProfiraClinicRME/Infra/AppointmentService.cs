@@ -25,36 +25,6 @@ namespace ProfiraClinicRME.Infra
             _repo = new BaseRepo<TRMAppointment>();
         }
 
-        /// <summary>
-        /// set current appointment on progress for the session
-        /// </summary>
-        /// <param name="apo"></param>
-        /// <returns></returns>
-        public ServiceResult<bool> SetCurrent(TRMAppointment apo)
-        {
-            ServiceResult<bool> result = new ServiceResult<bool>();
-            result.Status = ServiceResultEnum.SUCCESS;
-            _current = apo;
-            LogTrace.Info("Fin", _current, _classPath);
-            return result;
-        }
-
-        public ServiceResult<TRMAppointment> GetCurrent()
-        {
-            var result = new ServiceResult<TRMAppointment>();
-
-            if (_current == null)
-            {
-                result.Status = ServiceResultEnum.NOT_FOUND;
-                result.Message = "Current appointment not set.";
-                LogTrace.Error("Current appointment not set", _classPath);
-                return result;
-            }
-            result.Status = ServiceResultEnum.FOUND;
-            result.Data = _current;
-            LogTrace.Info("Fin", _current, _classPath);
-            return result;
-        }
 
         // Retrieves all clinics.
         public async Task<ServiceResult<Pagination<TRMAppointment>>> GetListOnWaitAsync(string KodeLokasi, DateTime tglAppointment, string KodeKaryawan)

@@ -11,6 +11,7 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Net.Http.Json
 @using System.Text.RegularExpressions
+@using ProfiraClinicRME.Infra
 
 @inject HttpClient httpClient
 @inject IAppointmentService SvcAppointment
@@ -18,12 +19,14 @@
 @inject IJSRuntime JS;
 @inject IPenandaanGambarService SvcPenandaanGambar
 @inject ProfiraClinicRME.Utils.BrowserService Service
+@inject AuthService AuthApiService
+@inject IUserService SvcUser
 
 <TopbarUser Route="PENANDAAN GAMBAR"
             Title="Perawatan Pasien / Penandaan Gambar"
             ShowBack="true"
             ShowSave="true"
-            Appointment="_apo" 
+            Appointment="CurrentAppointment" 
             OnSave="SaveForm"
             />
 <MudGrid Class="p-3 minh-100">
@@ -88,7 +91,8 @@
 
 @inject ProtectedLocalStorage LocalStore
 @code {
-
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
 
     private bool _hidePosition;
     private List<PenandaanGambarFull> _listRekam = [];
@@ -96,7 +100,6 @@
     private bool _loading;
     private string _baseUrl;
     private string clr = "black";
-    private TRMAppointment? _apo = null;
     private int Height { get; set; } = 0;
     private int Width { get; set; } = 0;
     private DrawingWidget _drawingWidget;
@@ -140,13 +143,6 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        var resApo = SvcAppointment.GetCurrent();
-        if (resApo.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return;
-        }
-        _apo = resApo.Data;
 
         _baseUrl = SvcImage.GetBaseUrlForUserImage();
     }
@@ -156,15 +152,9 @@
     {
         await base.OnInitializedAsync();
 
+        // var token = await AuthApiService.LoginAsync(new LoginModel { Username = "DRFIFIN", Password = "12345678", KodeLokasi = "LOKASI1" });
+        // var resUser = await SvcUser.UpdateCurrentUserAsync();
 
-        //ambil data appointment
-        var resAppointment = SvcAppointment.GetCurrent();
-        if (resAppointment.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return;
-        };
-        _apo = resAppointment.Data;
 
         //get template
         var resImageTemplate = await SvcImage.GetListTemplateAsync();
@@ -177,7 +167,7 @@
 
 
         //ambil rekam medis penandaan gambar
-        var resRekam = await SvcPenandaanGambar.GetListAsync(_apo.KodeCustomer);
+        var resRekam = await SvcPenandaanGambar.GetListAsync(CurrentAppointment.KodeCustomer);
         if (resRekam.Status == ServiceResultEnum.FOUND)
         {
             _listRekam = resRekam.Data!.Items;
@@ -192,17 +182,17 @@
 
 
         //get existing data by nomor appointment
-        var resCheck = await SvcPenandaanGambar.GetByNomorAppointment(_apo.NomorAppointment);
+        var resCheck = await SvcPenandaanGambar.GetByNomorAppointment(CurrentAppointment.NomorAppointment);
         if (resCheck.Status == ServiceResultEnum.FOUND)
         {
             _entityInForm = resCheck.Data!;
             addSnackbar("Memuat ulang data Penandaan.", Severity.Info);
 
         }
-        _entityInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
-        _entityInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
-        _entityInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
-        _entityInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        _entityInForm.NomorAppointment = CurrentAppointment?.NomorAppointment ?? "";
+        _entityInForm.KodeKaryawan = CurrentAppointment?.KodeKaryawan ?? "";
+        _entityInForm.KodeCustomer = CurrentAppointment?.KodeCustomer ?? "";
+        _entityInForm.KodeLokasi = CurrentAppointment?.KodeLokasi ?? "";
 
         //todo: populate image from the following source, highest proprty first: rekam medis, template
         //assumption latest rekam medis is also the current appointment
@@ -336,6 +326,7 @@
     private async Task SaveForm()
     {
         var isNewHeader = _entityInForm.NomorTransaksi == "" ? true : false;
+        LogTrace.Debug("start: " + (isNewHeader ? "baru" : "lama"), _entityInForm, _classPath);
         var msg = "";
 
         bool isError = false;

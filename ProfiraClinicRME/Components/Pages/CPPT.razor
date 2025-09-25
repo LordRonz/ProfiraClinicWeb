@@ -16,7 +16,7 @@
     Title="Catatan Perkembangan Pasien Terintegrasi (CPPT)"
     ShowBack="true"
     ShowSave="true"
-    Appointment="_apo"
+    Appointment="CurrentAppointment"
     OnSave="@DoSave"
 />
 
@@ -68,11 +68,13 @@
 
 
 @code {
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
+
     private bool _hidePosition;
     private bool _loading;
     private List<TRMCPPT> _listRekamMedis = [];
     private string _saveMode = "add";
-    private TRMAppointment? _apo = null;
     private TRMCPPT _trmCPPTInForm = new ();
 
     public CPPT()
@@ -84,13 +86,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        var resApo = SvcAppointment.GetCurrent();
-        if (resApo.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return;
-        }
-        _apo = resApo.Data;
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -98,7 +94,7 @@
         await base.OnInitializedAsync();
 
         //ambil rekam medis cppt
-        var resDiagnosa = await SvcCPPT.GetListAsync(_apo.KodeCustomer);
+        var resDiagnosa = await SvcCPPT.GetListAsync(CurrentAppointment.KodeCustomer);
         if (resDiagnosa.Status == ServiceResultEnum.FOUND)
         {
             _listRekamMedis = resDiagnosa.Data.Items;
@@ -109,7 +105,7 @@
         }
 
         //cek apakah sudah ada cppt untuk appointment ini
-        var resCheck = await SvcCPPT.GetByNomorAppointment(_apo.NomorAppointment);
+        var resCheck = await SvcCPPT.GetByNomorAppointment(CurrentAppointment.NomorAppointment);
         if (resCheck.Status == ServiceResultEnum.FOUND)
         {
             _saveMode = "edit";
@@ -117,10 +113,10 @@
             addSnackbar("Memuat ulang data CPPT.", Severity.Info);
 
         }
-        _trmCPPTInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
-        _trmCPPTInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
-        _trmCPPTInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
-        _trmCPPTInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        _trmCPPTInForm.NomorAppointment = CurrentAppointment.NomorAppointment ?? "";
+        _trmCPPTInForm.KodeKaryawan = CurrentAppointment.KodeKaryawan ?? "";
+        _trmCPPTInForm.KodeCustomer = CurrentAppointment.KodeCustomer ?? "";
+        _trmCPPTInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "";
         await InvokeAsync(StateHasChanged);
 
     }
@@ -129,7 +125,7 @@
     private async Task DoSave()
     {
         LogTrace.Info("start", path: _classPath);
-        _trmCPPTInForm.KodeLokasi = _apo?.KodeLokasi ?? "-";
+        _trmCPPTInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "-";
         _trmCPPTInForm.TanggalTransaksi = DateTime.Now;
         //keadaan umum binded
         //tk kesadaran binded
@@ -152,7 +148,7 @@
         {
             addSnackbar(msg, Severity.Info);
             await Task.Delay(1000);
-            Nav.NavigateTo("/perawatan/" + _apo?.IDAppointment);
+            Nav.NavigateTo("/perawatan/" + CurrentAppointment.IDAppointment);
         }
         else
         {

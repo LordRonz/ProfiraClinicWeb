@@ -13,6 +13,8 @@
 @inject ICustomerService SvcCustomer
 @inject IAppointmentService SvcAppointment
 @inject IUserService SvcUser
+@inject NavigationManager Nav;
+
 
 <TopbarUser Route="Perawatan"
             Title="@_title"
@@ -57,15 +59,13 @@
                         <MudGrid Class="flex-row">
                             <MudItem xs="12" md="6">
                                 <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">No Appointment</MudText>
-                                    <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_apo?.NomorAppointment</MudText>
+                                    <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@CurrentAppointment.NomorAppointment</MudText>
                             </MudItem>
                         </MudGrid>
                     </MudGrid>
                 </div>
             </div>
-            <div class="h-100 justify-content-center align-items-center mt-5">
-                <ProfiraClinicRME.Components.Menu.Menu />
-            </div>
+            <ProfiraClinicRME.Components.Menu.Menu />
         </div>
     }
 </MudCard>
@@ -74,10 +74,15 @@
     [Parameter]
     public string IdApo { get; set; } = "";
 
+    [CascadingParameter(Name = "CurrentUser")]
+    public CurrentUser CurrentUser { get; set; }
+
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
+
     private bool _hidePosition;
     private bool _loading;
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
-    private TRMAppointment? _apo = null;
     private Customer? _customer;
     private string _age { get; set; } = "-";
     private string _jnsKelamin = "-";
@@ -98,15 +103,24 @@
     {
         base.OnInitialized();
         _customer = new Customer();
-        var resApo = SvcAppointment.GetCurrent();
-        if (resApo.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return; 
-        }
-        _apo = resApo.Data;
-        _currentUser = SvcUser.Current;
-        _title = $"Perawatan Pasien / Doctor on Duty :  {_currentUser?.Karyawan?.NamaKaryawan ?? "-"}";
+
+        // if (CurrentAppointment is null)
+        // {
+        //     var msg = "Current appointment data not valid.";
+        //     LogTrace.Error(msg);
+        //     Nav.NavigateTo("/dashboard",forceLoad:false);
+        //     throw new Exception(msg);
+        // }
+
+
+        // if (CurrentUser is null || CurrentUser?.Klinik is null)
+        // {
+        //     var msg = "Current user data not valid.";
+        //     LogTrace.Error(msg);
+        //     throw new Exception(msg);
+        // }
+
+        _title = $"Perawatan Pasien / Doctor on Duty :  {CurrentUser.Karyawan?.NamaKaryawan ?? "-"}";
 
     }
 
@@ -116,25 +130,30 @@
     {
         LogTrace.Info("start", path: _classPath);
 
-        var resApo = SvcAppointment.GetCurrent();
-        if (resApo.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
-            return;
-        }
+        // var resApo = SvcAppointment.GetCurrent();
+        // if (resApo.Status != ServiceResultEnum.FOUND)
+        // {
+        //     addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
+        //     return;
+        // }
 
         ///todo: temporary inject , wait api correction
-        var apo = resApo.Data;
+        // var apo = resApo.Data;
+        // if (CurrentAppointment is null) return;
 
-        var resCust = await SvcCustomer.GetByCodeAsync(apo.KodeCustomer);
+
+        var resCust = await SvcCustomer.GetByCodeAsync(CurrentAppointment.KodeCustomer??"");
 
         if (resCust.Status != ServiceResultEnum.FOUND)
         {
+            LogTrace.Error("Customer not found.", CurrentAppointment.KodeCustomer ?? "", _classPath);
             addSnackbar("Data pasien tidak ditemukan.", Severity.Error);
             return;
         }
-        _customer = resCust.Data;
-        _jnsKelamin = UIHelper.GetJenisKelamin(_customer.JenisKelamin);
+
+        _customer = resCust.Data!;
+        LogTrace.Info("Customer found", _customer, _classPath);
+        _jnsKelamin = UIHelper.GetJenisKelamin(_customer.JenisKelamin??"n/a");
         _age = DateUtility.FormatAge(_customer.TanggalLahir, DateTime.Now);
 
     }

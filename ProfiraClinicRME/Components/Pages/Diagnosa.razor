@@ -89,10 +89,11 @@ OnSave="DoSave" />
 
 
 @code {
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
 
     private bool _hidePosition;
     private bool _loading;
-    private TRMAppointment? _apo = null;
     private MDiagnosaExt? _selMasterDiagnosa;
     private List<MDiagnosaExt> _listMasterDiagnosa = [];
     private List<TRMDiagnosa> _listRekamMedis = [];
@@ -109,14 +110,13 @@ OnSave="DoSave" />
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        var resApo = SvcAppointment.GetCurrent();
 
-        _apo = resApo.Data;
     }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
 
         //ambil data master diagnosa
         var resMasterDiagnosa = await SvcMasterDiagnosa.GetListByStringAsync(1,10,"");
@@ -129,18 +129,8 @@ OnSave="DoSave" />
             addSnackbar("Gagal memuat data ICD.", Severity.Error);
         }
 
-        //ambil data appointment
-        var resAppointment = SvcAppointment.GetCurrent();
-        if (resAppointment.Status != ServiceResultEnum.FOUND)
-        {
-            addSnackbar("Terjadi kesalahan sistem.", Severity.Error);
-            return;
-        }
-        ;
-        _apo = resAppointment.Data;
-
         //ambil rekam medis diagnosa
-        var resDiagnosa = await SvcDiagnosa.GetListAsync(_apo.KodeCustomer);
+        var resDiagnosa = await SvcDiagnosa.GetListAsync(CurrentAppointment.KodeCustomer);
         switch (resDiagnosa.Status)
         {
             case ServiceResultEnum.FOUND:
@@ -157,7 +147,7 @@ OnSave="DoSave" />
         }
 
         //cek apakah sudah ada diagnosa untuk appointment ini
-        var resCheck = await SvcDiagnosa.GetByNomorAppointment(_apo.NomorAppointment);
+        var resCheck = await SvcDiagnosa.GetByNomorAppointment(CurrentAppointment.NomorAppointment);
         if (resCheck.Status == ServiceResultEnum.FOUND)
         {
             _saveMode = "edit";
@@ -166,10 +156,10 @@ OnSave="DoSave" />
             addSnackbar("Memuat ulang data Diagnosa.", Severity.Info);
 
         }
-        _trmDiagnosaInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
-        _trmDiagnosaInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
-        _trmDiagnosaInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
-        _trmDiagnosaInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        _trmDiagnosaInForm.NomorAppointment = CurrentAppointment.NomorAppointment ?? "";
+        _trmDiagnosaInForm.KodeKaryawan = CurrentAppointment.KodeKaryawan ?? "";
+        _trmDiagnosaInForm.KodeCustomer = CurrentAppointment.KodeCustomer ?? "";
+        _trmDiagnosaInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "";
         await InvokeAsync(StateHasChanged);
     }
 
@@ -207,7 +197,7 @@ OnSave="DoSave" />
         {
             addSnackbar(msg, Severity.Info);
             await Task.Delay(1000);
-            Nav.NavigateTo("/perawatan/" + _apo?.IDAppointment);
+            Nav.NavigateTo("/perawatan/" + CurrentAppointment.IDAppointment);
         }
         else
         {

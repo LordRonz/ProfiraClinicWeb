@@ -137,7 +137,6 @@
         }
 
         await SesMan.SetCurrentAppointment(apo);
-        SvcAppointment.SetCurrent(apo);
 
         //update status tindakan
         var resSetStatus = await SvcAppointment.SetAppointmentOnProgress(apo);

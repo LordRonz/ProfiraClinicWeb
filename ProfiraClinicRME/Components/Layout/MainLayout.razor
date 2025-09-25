@@ -18,7 +18,7 @@
 @inject ProtectedSessionStorage ProtectedSessionStore
 @inject ISessionManager SesMan
 
-@if (SesMan.NeedLoadState)
+@if (SesMan.NeedLoadState || !SesMan.IsAuthenticated())
 {
     <h1>Loading ...</h1>
     return;
@@ -29,7 +29,7 @@
 <MudDialogProvider @rendermode="InteractiveServer" />
 <MudSnackbarProvider @rendermode="InteractiveServer" />
 
-<MudLayout Class="bg-wave-fixed doctor" >
+<MudLayout Class="bg-wave-fixed doctor">
     @* Top navbar *@
 
 
@@ -52,7 +52,7 @@
                 <div class="mr-8">
                     <MudIcon Icon="@Icons.Material.Filled.Search" Style="color: #fff;" />
                 </div>
-                    
+
                 <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
                     <MudText Typo="Typo.body2">@_user?.UserName</MudText>
                     <MudAvatar>
@@ -73,7 +73,7 @@
             </div>
             <SectionOutlet SectionId="TopbarButtonBlock" />
 
-                
+
         </div>
     </MudAppBar>
 
@@ -81,14 +81,13 @@
 
     <MudMainContent Class="h-100">
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100 px-2 pb-4">
-            @if(SesMan.IsAuthenticated())
-            {
-                <CascadingValue Name="CurrentUser" Value="_user">
-                    <CascadingValue Name="CurrentAppointment" Value="_appointment">
-                        @Body
-                    </CascadingValue>
+
+            <CascadingValue Name="CurrentUser" Value="_user">
+                <CascadingValue Name="CurrentAppointment" Value="_appointment">
+                    @Body
                 </CascadingValue>
-            } 
+            </CascadingValue>
+
         </MudContainer>
     </MudMainContent>
 </MudLayout>
@@ -104,6 +103,8 @@
     string path = "";
 
     Karyawan Kary;
+
+    private string _relativePath = "";
 
     private CurrentUser? _user;
 
@@ -130,15 +131,15 @@
     $"bg-wave-fixed wave-blue";
 
     MudTheme MyCustomTheme = new MudTheme()
+    {
+        Typography = new Typography()
         {
-            Typography = new Typography()
+            Default = new Default()
             {
-                Default = new Default()
-                {
-                    FontFamily = new[] { "Poppins", "Helvetica", "Arial", "sans-serif" }
-                }
+                FontFamily = new[] { "Poppins", "Helvetica", "Arial", "sans-serif" }
             }
-        };
+        }
+    };
 
     private string _classPath = "App::Page::MainLayout";
 
@@ -152,25 +153,10 @@
     protected override void OnInitialized()
     {
         LogTrace.Info("start", path: _classPath);
-        // _user = SvcUser.Current;
 
-        LogTrace.Debug("SesMan need load state", SesMan.NeedLoadState, _classPath);
         if (SesMan.NeedLoadState) return;
 
-
-
-        LogTrace.Info("user obtained", _user,  _classPath);
-        // if (!SesMan.IsAuthenticated())
-        // {
-        //     Nav.NavigateTo("/", forceLoad: false);
-        // }
-
-        // isDoctor = Nav.ToBaseRelativePath(Nav.Uri).StartsWith("dokter");
-        path = Nav.Uri.Substring(Nav.BaseUri.Length);
-
-
-
-        // Nav.LocationChanged += _onLocationChanged;
+        Nav.LocationChanged += _onLocationChanged;
     }
 
     protected override async Task OnInitializedAsync()
@@ -184,14 +170,16 @@
     protected override void OnParametersSet()
     {
 
-        var relativePath = Nav.ToBaseRelativePath(Nav.Uri);
-        LogTrace.Info($"start: path {relativePath}", path: _classPath);
-        
+        _relativePath = Nav.ToBaseRelativePath(Nav.Uri);
+        LogTrace.Info($"start: path {_relativePath}", path: _classPath);
+
         if (SesMan.NeedLoadState) return;
+
+        //normal flow
         _user = SesMan.GetCurrentUser();
         _appointment = SesMan.GetCurrentAppointment();
-        LogTrace.Debug("cur appo:", _appointment, _classPath);
 
+        LogTrace.Debug("cur appo:", _appointment, _classPath);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -204,26 +192,31 @@
     {
         LogTrace.Debug("start", new { firstRender }, path: _classPath);
 
-        // if (Redirector.ShouldRedirect && Redirector.TargetUrl != null)
-        // {
-        //     Redirector.ShouldRedirect = false;    reset flag
-        //     var url = Redirector.TargetUrl;
-        //     Redirector.TargetUrl = null;
-
-        //     Nav.NavigateTo(url, forceLoad: true);
-        // }
         if (firstRender)
         {
-            if(SesMan.NeedLoadState) await SesMan.LoadState();
-            if(!SesMan.IsAuthenticated())
+            if (SesMan.NeedLoadState)
             {
-                Nav.NavigateTo("/", forceLoad: true);
+                await SesMan.LoadState();
+                _relativePath = Nav.ToBaseRelativePath(Nav.Uri);
+
+                LogTrace.Info("load user data", path: _classPath);
+                if (SesMan.IsAuthenticated() == false)
+                {
+                    Nav.NavigateTo("/", forceLoad: true);
+                }
+                _user = SesMan.GetCurrentUser();
+
+                _appointment = SesMan.GetCurrentAppointment();
+                if (_appointment is null & _relativePath != "dashboard")
+                {
+                    Nav.NavigateTo("/dashboard", forceLoad: true);
+                    return;
+                }
+                StateHasChanged();
+
             }
 
-            LogTrace.Info("load user data", path: _classPath);
-            _user = SesMan.GetCurrentUser();
-            _appointment = SesMan.GetCurrentAppointment();
-            StateHasChanged();
+
             LogTrace.Debug("after first render", path: _classPath);
         }
     }
@@ -232,10 +225,8 @@
     private void _onLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         ShowSave = false;
-        // PasienName = "";
-        // PasienUsia = "";
-        
-        LogTrace.Info("going to", e.Location , path: _classPath);
+
+        LogTrace.Info("going to", e.Location, path: _classPath);
         StateHasChanged();
     }
 
