@@ -1,15 +1,15 @@
 ﻿@inject NavigationManager Nav
 
-<MudGrid Class="flex-wrap justify-space-around align-centery my-4">
+<MudGrid Class="flex-wrap justify-center gap-2 align-centery my-4">
 
-    <MenuItem Click="GoToDiagnosa" Src="/images/dokter/menu/diagnosis.png" Title="Diagnosa/ICD" Href="/diagnosa" />
-    <MenuItem Click="GoToAnamnesis" Src="/images/dokter/menu/anamnesis.png" Title="Anamnesis" Href="/anamnesis"/>
+    <MenuItem  Src="/images/dokter/menu/diagnosis.png" Title="Diagnosa/ICD" Href="/diagnosa" />
+    <MenuItem  Src="/images/dokter/menu/anamnesis.png" Title="Anamnesis" Href="/anamnesis"/>
     @* <MenuItem Src="/images/dokter/menu/rekam-medis.png" Title="Rekam Medis"/> *@
     <MenuItem Click="GoToPemeriksaan" Src="/images/dokter/menu/stetoskop.png" Title="Pemeriksaan" Href="/pemeriksaan" />
     <MenuItem Click="GoToPenandaanGambar" Src="/images/dokter/menu/pencil.png" Title="Penandaan Gambar" Href="/penandaan-gambar"/>
     <MenuItem  Click="GoToCPPT" Src="/images/dokter/menu/notes.png" Title="CPPT"  Href="/cppt"/>
     <MenuItem Disabled Click="GoToKontrol" Src="/images/dokter/menu/palang-merah.png" Title="Kontrol" Href="/perawatan" />
-    <MenuItem Disabled Click="GoToTindakanPerawatan" Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/perawatan" />
+    <MenuItem  Src="/images/dokter/menu/doctor.png" Title="Tindakan Perawatan" Href="/tindakan-perawatan" />
 </MudGrid>
 
 @code {
@@ -42,10 +42,7 @@
 
     private async void GoToTindakanPerawatan()
     {
-        // Layout.ChangeTitleAndRoute("Diagnosa", "Perawatan Pasien / Diagnosa");
-
-        // Nav.NavigateTo("/tindakan-perawatan");
-
+        Nav.NavigateTo("/tindakan-perawatan");
     }
 
     private async void GoToAnamnesis()
