@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 using ProfiraClinic.Models;
 using ProfiraClinic.Models.Api;
@@ -24,6 +25,8 @@ namespace ProfiraClinicRME.Infra
 
         private string _baseUrl = "";
 
+        private readonly JsonSerializerOptions _option;
+
         private BaseRepo<PenandaanGambarFull> _repo;
         // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
         public ImageService(ApiService svcApi, IJSRuntime js, IConfiguration configuration)
@@ -33,7 +36,13 @@ namespace ProfiraClinicRME.Infra
             _repo = new BaseRepo<PenandaanGambarFull>();
             _baseUrl = configuration["ApiSettings:BaseAddress"] ?? "";
 
-
+            _option = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                AllowTrailingCommas = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            };
         }
 
 
@@ -46,11 +55,14 @@ namespace ProfiraClinicRME.Infra
         public async Task<ServiceResult<FileNameDto>> UploadBlob(string blobName, string fileName)
         {
             LogTrace.Info("start", new { blobName, fileName}, _classPath);
-            ServiceResult<FileNameDto> svcResult = new();
-            svcResult.Status = ServiceResultEnum.FAIL;
+            ServiceResult<FileNameDto> svcResult = new()
+            {
+                Status = ServiceResultEnum.FAIL
+            };
+
             var uploadUrl = _baseUrl + "api/Images/Upload";
 
-            OpStatus opStatus = new OpStatus();
+            OpStatus opStatus = new ();
             try
             {
 
@@ -84,14 +96,8 @@ namespace ProfiraClinicRME.Infra
 
 
             var jsonString = JsonSerializer.Serialize(opStatus.Data);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
-            };
-            var apiResponse = JsonSerializer.Deserialize<Response<FileNameDto>>(jsonString, options);
+
+            var apiResponse = JsonSerializer.Deserialize<Response<FileNameDto>>(jsonString, _option);
             if(apiResponse is null)
             {
                 svcResult.Message = "Unknown Response data struct";

@@ -17,16 +17,17 @@
 @inject NavigationManager Nav
 @inject ProtectedLocalStorage LocalStore
 
+
 <TopbarUser Route="DIAGNOSA / ICD"
-Title="Perawatan Pasien / Diagnosa"
-Appointment="_apo"
-ShowBack="true"
-ShowSave="true"
-OnSave="DoSave" />
+    Title="Perawatan Pasien / Diagnosa"
+    Appointment="CurrentAppointment"
+    ShowBack="true"
+    ShowSave="true"
+    OnSave="DoSave" />
 
 <MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
     <MudCard Class="px-4 py-8">
-        <MudGrid Class="gap-y-2" Style="max-width: 85%;">
+        <MudGrid Class="gap-y-2 flex-column" Style="max-width: 85%;" >
             <MudItem xs="4" Class="p-1">
                 <MudAutocomplete 
                     Value="@_selMasterDiagnosa"
@@ -41,7 +42,7 @@ OnSave="DoSave" />
                     Variant="Variant.Outlined" 
                     ShowProgressIndicator="true" />
             </MudItem>
-            <MudItem xs="5" Class="p-1">ho
+            <MudItem xs="5" Class="p-1">
                 <MudSelect 
                 @bind-Value="@_trmDiagnosaInForm.KategoriDiagnosa"
                 T="string" 
@@ -137,10 +138,10 @@ OnSave="DoSave" />
                 _listRekamMedis = resDiagnosa.Data.Items;
                 break;
             case ServiceResultEnum.NOT_FOUND:
-                addSnackbar("Tidak ditemukan Rekam Medis sebelumnya", Severity.Info);
+                addSnackbar("Tidak ditemukan riwayat Diagnosa", Severity.Info);
                 break;
             default:
-                var msg = "Gagal memuat Rekam Medis Diagnosa.";
+                var msg = "Gagal memuat riwayat Diagnosa.";
                 LogTrace.Error(msg, resDiagnosa, _classPath);
                 addSnackbar(msg, Severity.Error);
                 break;
@@ -223,33 +224,4 @@ OnSave="DoSave" />
         return _listMasterDiagnosa;
     }
 
-    // protected override async Task OnAfterRenderAsync(bool firstrender)
-    // {
-    //     await base.OnAfterRenderAsync(firstrender);
-    //     var age = await LocalStore.GetAsync<string>("age");
-    //     var name = await LocalStore.GetAsync<string>("name");
-
-
-    // }
 }
-
-<style>
-    .pemeriksaan-input .mud-input-root {
-        height: 30px !important;
-        padding: 0px 10px !important;
-        font-size: 12px !important;
-    }
-
-    .pemeriksaan-input .mud-input-label {
-        font-size: 14px !important;
-        line-height: 14px !important;
-    }
-
-    .pemeriksaan-input .mud-input-label-outlined {
-        transform: translate(12px, 10px) scale(1);
-    }
-
-    .pemeriksaan-input .mud-input-label-inputcontrol {
-        top: -3px;
-    }
-</style>

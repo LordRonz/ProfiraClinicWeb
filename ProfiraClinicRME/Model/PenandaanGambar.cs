@@ -6,7 +6,7 @@ namespace ProfiraClinicRME.Model
     {
 
 
-        public List<TRMPenandaanGambarDetail> Detail { get; set; } = new List<TRMPenandaanGambarDetail>();
+        public List<TRMPenandaanGambarDetail> Detail { get; set; } = [];
     }
 
 

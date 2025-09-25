@@ -144,7 +144,7 @@ namespace ProfiraClinicRME.Infra
                 {
                     //apiResponse.Message = "Unknown Error";
                     //apiResponse.ErrorType = ErrorType.UNKNOWN;
-                    LogTrace.Error("fin: sys err", new { httpStat, serializedObj}, _classPath);
+                    LogTrace.Error("fin: sys err", new { httpStat, reqUrlPath, serializedObj }, _classPath);
                     return apiResponse;
                 }
 
