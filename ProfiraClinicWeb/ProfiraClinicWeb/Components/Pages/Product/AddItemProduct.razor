@@ -1,0 +1,163 @@
+﻿@page "/product-item/add"
+
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject NavigationManager NavigationManager
+@inject BarangHeaderApiService ApiService
+
+<MudCard Class="p-4 h-100">
+    <MudForm @ref="form" Class="table-form">
+        <MudGrid GutterSize="3">
+
+            <!-- Kode Barang (from dropdown) -->
+            <MudItem xs="12" sm="6">
+                <MudAutocomplete T="BarangListDto"
+                                 Label="Pilih Barang"
+                                 @bind-Value="selectedBarang"
+                                 SearchFunc="SearchBarang"
+                                 ToStringFunc="@(b => b is null ? null : $"{b.KodeBarang} - {b.NamaBarang}")"
+                                 Dense="true"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Clearable="true"
+                                 ResetValueOnEmptyText="true"
+                                 Required="true" />
+            </MudItem>
+
+            <!-- Unit Jual -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Unit Jual"
+                              @bind-Value="barang.UnitJual"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              Margin="Margin.Dense" />
+            </MudItem>
+
+            <!-- Harga Jual -->
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal"
+                                 Label="Harga Jual"
+                                 @bind-Value="barang.HargaJual"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Required="true"
+                                 Min="0"
+                                 Immediate="true" />
+            </MudItem>
+
+            <!-- Disc Member -->
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal"
+                                 Label="Disc Member"
+                                 @bind-Value="barang.DiscMember"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Min="0"
+                                 Immediate="true" />
+            </MudItem>
+
+            <!-- Disc Non Member -->
+            <MudItem xs="12" sm="4">
+                <MudNumericField T="decimal"
+                                 Label="Disc Non Member"
+                                 @bind-Value="barang.DiscNonMember"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense"
+                                 Min="0"
+                                 Immediate="true" />
+            </MudItem>
+
+        </MudGrid>
+
+        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+            <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">Kembali</MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       Disabled="!form.IsValid"
+                       OnClick="SubmitAsync">Simpan</MudButton>
+        </MudStack>
+    </MudForm>
+</MudCard>
+
+@code {
+    private MudForm form;
+    private BarangHeader barang = new();
+
+    // dropdown data + selection
+    private List<BarangListDto> masterBarang = new();
+    private BarangListDto? selectedBarang;
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Layout?.ChangeTitleAndRoute("Barang Header", "Tambah Barang Header");
+
+        // Load master items for dropdown
+        var listResp = await ApiService.GetBarangItemsAsync();
+        if (listResp.StatusCode == 0 && listResp.Data != null)
+            masterBarang = listResp.Data;
+        else
+            masterBarang = new();
+
+        // defaults expected by backend/SP
+        barang.Aktif = "1";
+        barang.USRID = "";        // fill from auth if needed
+        barang.HargaJual = 0m;
+        barang.DiscMember = 0m;
+        barang.DiscNonMember = 0m;
+    }
+
+    private Task<IEnumerable<BarangListDto>> SearchBarang(string value, CancellationToken _)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(masterBarang.AsEnumerable());
+
+        var query = value.Trim();
+        var filtered = masterBarang.Where(b =>
+            (b.KodeBarang?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (b.NamaBarang?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return Task.FromResult(filtered);
+    }
+
+    private void OnBarangChanged(BarangListDto? b)
+    {
+        selectedBarang = b;
+        barang.KodeBarang = b?.KodeBarang ?? string.Empty;
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/product-item");
+
+    private async Task SubmitAsync()
+    {
+        await form.Validate();
+        if (!form.IsValid || selectedBarang == null) return;
+
+        barang.KodeBarang = selectedBarang.KodeBarang;
+
+        // Ensure kode is set from dropdown
+        if (string.IsNullOrWhiteSpace(barang.KodeBarang))
+            return;
+
+        var result = await ApiService.CreateBarangHeaderAsync(barang);
+        if (result.StatusCode < 300)
+        {
+            NavigationManager.NavigateTo("/product-item");
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine(result.Message);
+        }
+    }
+}
+
+/* Optional: match your compact form style */
+<style>
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size

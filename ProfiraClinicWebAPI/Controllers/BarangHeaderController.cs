@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
+using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -108,6 +109,78 @@ VALUES
                 });
             }
         }
+
+        [HttpPost("Edit")]
+        public async Task<IActionResult> EditBarang([FromBody] EditBarangHeaderDto dto)
+        {
+            if (dto == null)
+                return BadRequest("Invalid payload.");
+
+            if (string.IsNullOrWhiteSpace(dto.KodeBarang))
+                return BadRequest("KodeBarang is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.UnitJual))
+                return BadRequest("UnitJual is required.");
+
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound("User not found");
+
+            // Defaults & normalization
+            var aktif = string.IsNullOrWhiteSpace(dto.Aktif) ? "1" : dto.Aktif.Trim();
+            var usrId = string.IsNullOrWhiteSpace(dto.USRID) ? (user.USRID ?? string.Empty) : dto.USRID;
+
+            // Build parameters exactly as SP expects
+            var parameters = new[]
+            {
+        new SqlParameter("@KodeBarang", dto.KodeBarang),
+        new SqlParameter("@UnitJual", dto.UnitJual),
+        new SqlParameter("@HargaJual", dto.HargaJual),
+        new SqlParameter("@DiscMember", dto.DiscMember),
+        new SqlParameter("@DiscNonMember", dto.DiscNonMember),
+        new SqlParameter("@Aktif", aktif),
+        new SqlParameter("@USRID", usrId)
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PBarang_Edit " +
+                    "@KodeBarang, @UnitJual, @HargaJual, @DiscMember, @DiscNonMember, @Aktif, @USRID",
+                    parameters);
+
+                return Ok(new
+                {
+                    message = "Barang header edited successfully.",
+                    data = new
+                    {
+                        dto.KodeBarang,
+                        dto.UnitJual,
+                        dto.HargaJual,
+                        dto.DiscMember,
+                        dto.DiscNonMember,
+                        Aktif = aktif,
+                        USRID = usrId
+                    }
+                });
+            }
+            catch (SqlException ex)
+            {
+                // SP uses RAISERROR for business rules; surface it cleanly
+                return BadRequest(new
+                {
+                    message = "Failed to edit barang item.",
+                    error = ex.Message
+                });
+            }
+        }
+
 
         [HttpDelete("del/{code}")]
         public async Task<IActionResult> DeleteBarangHeader(string code)
