@@ -17,7 +17,7 @@
     <MudForm @ref="headerForm" Class="section-body table-form">
         <MudGrid>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
