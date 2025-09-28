@@ -197,5 +197,82 @@ VALUES
 
             return NoContent();
         }
+
+        public class CreateBarangHeaderDto
+        {
+            public string? KodeBarang { get; set; }
+            public string? UnitJual { get; set; }
+            public decimal HargaJual { get; set; }
+            public decimal DiscMember { get; set; }
+            public decimal DiscNonMember { get; set; }
+            public string? USRID { get; set; }
+        }
+
+        // POST: api/BarangHeader/AddHeader
+        [HttpPost("CreateBarangHeader")]
+        public async Task<IActionResult> CreateBarangHeader([FromBody] CreateBarangHeaderDto dto)
+        {
+            if (dto == null)
+                return BadRequest("Invalid payload.");
+
+            if (string.IsNullOrWhiteSpace(dto.KodeBarang))
+                return BadRequest("KodeBarang is required.");
+            if (string.IsNullOrWhiteSpace(dto.UnitJual))
+                return BadRequest("UnitJual is required.");
+
+            // Use authenticated user if available
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            var user = await _context.MUser
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.USRID == userName);
+
+            if (user == null)
+                return NotFound("User not found");
+
+            var usrId = string.IsNullOrWhiteSpace(dto.USRID) ? (user.USRID ?? string.Empty) : dto.USRID!;
+
+            var parameters = new[]
+            {
+                new SqlParameter("@KodeBarang", dto.KodeBarang!),
+                new SqlParameter("@UnitJual", dto.UnitJual!),
+                new SqlParameter("@HargaJual", dto.HargaJual),
+                new SqlParameter("@DiscMember", dto.DiscMember),
+                new SqlParameter("@DiscNonMember", dto.DiscNonMember),
+                new SqlParameter("@USRID", usrId)
+            };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PBarang_Add @KodeBarang, @UnitJual, @HargaJual, @DiscMember, @DiscNonMember, @USRID",
+                    parameters);
+
+                return Ok(new
+                {
+                    message = "Barang header created successfully.",
+                    data = new
+                    {
+                        dto.KodeBarang,
+                        dto.UnitJual,
+                        dto.HargaJual,
+                        dto.DiscMember,
+                        dto.DiscNonMember,
+                        USRID = usrId
+                    }
+                });
+            }
+            catch (SqlException ex)
+            {
+                // SP uses RAISERROR for business-rule failures; surface it nicely
+                return BadRequest(new
+                {
+                    message = "Failed to create barang header.",
+                    error = ex.Message
+                });
+            }
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace ProfiraClinicWeb.Services
 
         public async Task<ApiResponse<BarangHeader>> CreateBarangHeaderAsync(BarangHeader paket)
         {
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/add", paket);
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/CreateBarangHeader", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();

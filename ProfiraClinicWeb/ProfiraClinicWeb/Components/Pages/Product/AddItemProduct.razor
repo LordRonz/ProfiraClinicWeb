@@ -94,7 +94,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Layout?.ChangeTitleAndRoute("Barang Header", "Tambah Barang Header");
+        Layout?.ChangeTitleAndRoute("Parameter Harga Jual", "Tambah Parameter Harga Jual");
 
         // Load master items for dropdown
         var listResp = await ApiService.GetBarangItemsAsync();
@@ -160,4 +160,19 @@
     .table-form .mud-input-root {
         height: 30px !important;
         padding: 0px 10px !important;
-        font-size
+        font-size: 12px !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>
