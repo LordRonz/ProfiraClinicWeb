@@ -68,7 +68,10 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AppUserOnly", p => p.RequireRole("User"))
+    .AddPolicy("ClientOnly", p => p.RequireRole("ClientUser"))
+    .AddPolicy("HasKodeLokasi", p => p.RequireClaim(JwtClaimTypes.KodeLokasi).Build());
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new ApiResponseWrapperAttribute());

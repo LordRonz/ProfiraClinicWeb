@@ -28,6 +28,7 @@ namespace ProfiraClinicWebAPI.Controllers
         public string? KodeKaryawan { get; set; }
         public string? KodePoli { get; set; }
         public string? Keterangan { get; set; }
+        public string? KetLk { get; set; }
         public DateTime? UPDDT { get; set; }
         public string? USRID { get; set; }
         public List<PenandaanGambarListDetailDto> Detail { get; set; } = new();
@@ -322,6 +323,7 @@ namespace ProfiraClinicWebAPI.Controllers
             KodeKaryawan = h.KodeKaryawan,
             KodePoli = h.KodePoli,
             Keterangan = h.Keterangan,
+            KetLk = h.KETLK,
             UPDDT = h.UPDDT,
             USRID = h.USRID,
             Detail = g

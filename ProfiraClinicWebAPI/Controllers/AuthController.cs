@@ -13,6 +13,13 @@ using System.Text;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
+    public class LoginControllerModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string? KodeLokasi { get; set; }
+    }
+
     [ApiController]
     [Route("api/auth")]
     public class AuthController(IAuthService authService, AppDbContext context) : ControllerBase
@@ -21,7 +28,7 @@ namespace ProfiraClinicWebAPI.Controllers
         private readonly AppDbContext _context = context;
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel model)
+        public IActionResult Login([FromBody] LoginControllerModel model)
         {
             var authenticatedUser = _authService.Authenticate(model.Username, model.Password);
             if (authenticatedUser == null || authenticatedUser.Equals(null))
