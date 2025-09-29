@@ -79,18 +79,14 @@ namespace ProfiraClinicWebAPI.Controllers
         }
 
         [HttpDelete("del/{code}")]
-        public async Task<IActionResult> DeletePerawatanHeader(string code)
+        public async override Task<IActionResult> Delete(string code)
         {
-            var item = await _context.PPerawatanH
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.KodePerawatan == code);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            item.Aktif = "0";
-            await _context.SaveChangesAsync();
-
+            var affected = await _context.PPerawatanH
+        .Where(p => p.KodePerawatan == code)
+        .ExecuteUpdateAsync(setters => setters
+            .SetProperty(p => p.Aktif, "0")
+            .SetProperty(p => p.UpdDt, DateTime.Now));
+            if (affected == 0) return NotFound();
             return NoContent();
         }
     }

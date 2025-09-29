@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Helper;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
@@ -35,12 +37,80 @@ namespace ProfiraClinicWebAPI.Controllers
             => _context.MCustomer;
 
         protected override IQueryable<Customer> ApplySearch(
-            IQueryable<Customer> q,
-            string likeParam)
-            => q.Where(d => (EF.Functions.Like(d.KodeCustomer, likeParam) ||
-                             EF.Functions.Like(d.AlamatDomisili, likeParam) ||
-                             EF.Functions.Like(d.NamaCustomer, likeParam) ||
-                             EF.Functions.Like(d.NomorHP, likeParam)));
+    IQueryable<Customer> q,
+    string likeParam)
+        {
+            var like = likeParam ?? string.Empty;
+            var token = like.Replace("%", "").Trim();
+
+            // Flags + parsed values
+            bool hasExactDate = false, hasMonthYear = false, hasYear = false, hasYearRange = false;
+            DateTime exactDate = default;
+            (int Year, int Month) monthYear = default;
+            int year = 0;
+            DateTime rangeStart = default, rangeEndExclusive = default;
+
+            // 1) Year range: "2010-2012"
+            var mRange = Regex.Match(token, @"^\s*(\d{4})\s*-\s*(\d{4})\s*$");
+            if (mRange.Success)
+            {
+                var y1 = int.Parse(mRange.Groups[1].Value, CultureInfo.InvariantCulture);
+                var y2 = int.Parse(mRange.Groups[2].Value, CultureInfo.InvariantCulture);
+                var yMin = Math.Min(y1, y2);
+                var yMax = Math.Max(y1, y2);
+                rangeStart = new DateTime(yMin, 1, 1);
+                rangeEndExclusive = new DateTime(yMax + 1, 1, 1); // exclusive
+                hasYearRange = true;
+            }
+            else
+            {
+                // 2) Exact date?
+                var exactFormats = new[] { "yyyy-MM-dd", "dd/MM/yyyy", "dd-MM-yyyy", "yyyyMMdd", "M/d/yyyy", "d/M/yyyy" };
+                if (DateTime.TryParseExact(token, exactFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedExact) ||
+                    DateTime.TryParse(token, CultureInfo.CurrentCulture, DateTimeStyles.None, out parsedExact))
+                {
+                    exactDate = parsedExact.Date;
+                    hasExactDate = true;
+                }
+                else
+                {
+                    // 3) Month + year? (supports "MM/yyyy", "yyyy-MM", "MMM yyyy", "MMMM yyyy")
+                    var monthYearFormats = new[] { "MM/yyyy", "yyyy-MM", "MMM yyyy", "MMMM yyyy" };
+                    if (DateTime.TryParseExact(token, monthYearFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var my))
+                    {
+                        monthYear = (my.Year, my.Month);
+                        hasMonthYear = true;
+                    }
+                    else
+                    {
+                        // 4) Year only? "2012"
+                        if (Regex.IsMatch(token, @"^\d{4}$") && int.TryParse(token, out var y))
+                        {
+                            year = y;
+                            hasYear = true;
+                        }
+                    }
+                }
+            }
+
+            return q.Where(d =>
+                // text search
+                EF.Functions.Like(d.KodeCustomer, like) ||
+                EF.Functions.Like(d.AlamatDomisili, like) ||
+                EF.Functions.Like(d.NamaCustomer, like) ||
+                EF.Functions.Like(d.NomorHP, like) ||
+
+                // date-aware search
+                (d.TanggalLahir != null && (
+                    (hasExactDate && EF.Functions.DateDiffDay(d.TanggalLahir.Value, exactDate) == 0) ||
+                    (hasMonthYear && d.TanggalLahir.Value.Year == monthYear.Year &&
+                                     d.TanggalLahir.Value.Month == monthYear.Month) ||
+                    (hasYear && d.TanggalLahir.Value.Year == year) ||
+                    (hasYearRange && d.TanggalLahir.Value >= rangeStart &&
+                                     d.TanggalLahir.Value < rangeEndExclusive)
+                ))
+            );
+        }
 
         protected override IOrderedQueryable<Customer> ApplyOrder(
             IQueryable<Customer> q)

@@ -38,7 +38,9 @@
                 <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                <div class="d-flex align-items-center gap-2">
+                        <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" /><span>(Rp)</span>
+                    </div>
             </MudItem>
             <MudItem xs="12" sm="4">
                 <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />

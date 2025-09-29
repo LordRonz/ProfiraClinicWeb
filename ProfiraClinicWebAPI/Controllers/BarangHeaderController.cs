@@ -183,18 +183,14 @@ VALUES
 
 
         [HttpDelete("del/{code}")]
-        public async Task<IActionResult> DeleteBarangHeader(string code)
+        public async override Task<IActionResult> Delete(string code)
         {
-            var item = await _context.BarangHeader
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.KodeBarang == code);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            item.Aktif = "0";
-            await _context.SaveChangesAsync();
-
+            var affected = await _context.BarangHeader
+        .Where(p => p.KodeBarang == code)
+        .ExecuteUpdateAsync(setters => setters
+            .SetProperty(p => p.Aktif, "0")
+            .SetProperty(p => p.UPDDT, DateTime.Now));
+            if (affected == 0) return NotFound();
             return NoContent();
         }
 
