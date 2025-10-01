@@ -58,7 +58,7 @@
 
         var resApo = await SvcAppointment.GetListOnWaitAsync(CurrentUser.KodeLokasi ?? "", DateTime.Today, CurrentUser.Karyawan?.KodeKaryawan);
 
-        var test = DateUtility.FormatDate(DateTime.Today);
+        var test = DateUtility.FormatDate(DateTime.Today, DateUtility.FormatMode.Date);
         // Check if status code indicates success
 
         if (resApo.Status == ServiceResultEnum.FOUND)
@@ -80,7 +80,8 @@
                     TglLahir = DateUtility.FormatDate(item.TanggalLahir),
                     Usia = DateUtility.FormatAge(item.TanggalLahir, DateTime.Now),
                     Tindakan = UIHelper.GetStatusTindakan(item.StatusTindakan),
-                    JanjiTemu = DateUtility.FormatTime(item.JamAppointment)
+                    JanjiTemu = DateUtility.FormatTime(item.JamAppointment),
+                    Reception = DateUtility.FormatDate(item.Reception, DateUtility.FormatMode.Time),
                 };
                 tableData.Add(dataRow);
             }
@@ -94,6 +95,7 @@
                         Caption="Pilih", DataField="view", Type=ColumnType.View, CustomIcon="fa fa-hand-pointer", Action=SetCurrentAppointment
                     },
                     new TableColumn { Caption = "Janji Temu", DataField = "JanjiTemu" },
+                    new TableColumn { Caption= "Jam Kedatangan", DataField  ="Reception"},
                     new TableColumn { Caption="Member ID", DataField="MemberID" },
                     new TableColumn { Caption = "Nama Pasien", DataField = "NamaPasien" },
                     new TableColumn { Caption = "Alamat", DataField = "AlamatDomisili" },
