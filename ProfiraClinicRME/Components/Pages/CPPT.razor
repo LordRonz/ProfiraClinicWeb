@@ -56,7 +56,7 @@
                             ["Instruksi", context.Instruksi ?? ""],
                             ["Lokasi", context.KETLK ?? ""],
                             ["Dokter", context.NamaKaryawan ?? ""],
-                            [DateUtility.FormatDate(context.UPDDT, true), ""]
+                            [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
                         ];
                     }
                 }

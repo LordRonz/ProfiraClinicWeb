@@ -21,13 +21,32 @@
             return (years, months, days);
         }
 
-        public static string FormatDate(DateTime? dtSource, bool withTime = false)
+        public enum FormatMode
+        {
+            DateTime,
+            Date,
+            Time
+        }
+
+        public static string FormatDate(DateTime? dtSource, FormatMode mode=FormatMode.Date)
         {
             if (dtSource is null) return "-";
-            string format = withTime ? "dd'/'MM'/'yyyy hh':'mm':'ss tt" : "dd'/'MM'/'yyyy";
+            string format = "";
+            switch (mode)
+            {
+                case FormatMode.DateTime:
+                    format = "dd'/'MM'/'yyyy hh':'mm tt";
+                    break;
+                case FormatMode.Date:
+                    format = "dd'/'MM'/'yyyy";
+                    break;
+                default:
+                    format = "hh':'mm tt";
+                    break;
+            }
+
             var x =  ((DateTime)dtSource).ToString(format);
-                return x;
-            
+            return x;
         }
 
         public static string FormatTime(TimeSpan? dtSource)

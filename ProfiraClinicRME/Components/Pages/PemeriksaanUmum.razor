@@ -117,7 +117,7 @@
                             ["Frekuensi Nafas", $"{context.FrekuensiNapas}x/menit"],
                             ["Frekuensi Nadi", $"{context.FrekuensiNadi}x/menit"],
                             ["Dokter", context.NamaKaryawan ?? ""],
-                            [DateUtility.FormatDate(context.UPDDT, true), ""]
+                            [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
                         ];
                         
                     }
