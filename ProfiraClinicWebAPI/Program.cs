@@ -9,6 +9,7 @@ using ProfiraClinicWebAPI.Factory;
 using ProfiraClinicWebAPI.Filters;
 using ProfiraClinicWebAPI.Helper;
 using ProfiraClinicWebAPI.Services;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -133,6 +134,12 @@ builder.Services.AddSingleton<ProblemDetailsFactory, CustomProblemDetailsFactory
 builder.Services.AddControllers();
 
 builder.Services.AddHostedService<QueuedHostedService>();
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 
 ConfigurationHelper.Configuration = builder.Configuration;
