@@ -13,8 +13,8 @@
 @inject IPemeriksaanUmumService SvcPemeriksaanUmum
 @inject NavigationManager Nav
 
-<TopbarUser Title="Pemeriksaan"
-            Route="Perawatan Pasien / Pemeriksaan"
+<TopbarUser Route="Perawatan Pasien >> Pemeriksaan"
+            Title="Pemeriksaan"
             ShowBack="true"
             ShowSave="true"
             Appointment="_apo"
@@ -90,9 +90,9 @@
         <MudTabPanel Text="Fisik">
             <div style="max-width: 15%;" class="d-flex flex-column gap-y-2">
                 <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.BeratBadan" Label="Berat Badan (kg)" Variant="Variant.Outlined" />
-                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.TinggiBadan"  Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.TinggiBadan" Label="Tinggi Badan (cm)" Variant="Variant.Outlined" />
                 <MudTextField ShrinkLabel T="int?" @bind-Value="@_trmPemeriksaanUmumInForm.IndexTubuh" Label="Index Massa Tubuh" Variant="Variant.Outlined" />
-                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.LingkarKepala"  Label="Lingkar Kepala (cm)" Variant="Variant.Outlined" />
+                <MudTextField ShrinkLabel T="decimal?" @bind-Value="@_trmPemeriksaanUmumInForm.LingkarKepala" Label="Lingkar Kepala (cm)" Variant="Variant.Outlined" />
             </div>
         </MudTabPanel>
     </MudTabs>
@@ -103,27 +103,27 @@
                 @{
 
                     string[][] displayData = [[]];
-                    if(context is not null)
+                    if (context is not null)
                     {
                         displayData = [
-                            ["Kunjungan", context.NomorAppointment],
-                            ["Keadaan Umum", context.KeadaanUmum],
-                            ["Tingkat Kesadaran", context.TingkatKesadaran],
-                            ["Kesadaran", context.Kesadaran ?? ""],
-                            ["Sistolik", context.Sistolik?.ToString() ?? ""],
-                            ["Diastolik", context.Distolik?.ToString() ?? ""],
-                            ["Suhu", $"{context.Suhu} C"],
-                            ["Saturasi O2", context.Saturasi?.ToString() ?? ""],
-                            ["Frekuensi Nafas", $"{context.FrekuensiNapas}x/menit"],
-                            ["Frekuensi Nadi", $"{context.FrekuensiNadi}x/menit"],
-                            ["Dokter", context.NamaKaryawan ?? ""],
-                            [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
+                        ["Kunjungan", context.NomorAppointment],
+                                ["Keadaan Umum", context.KeadaanUmum],
+                                ["Tingkat Kesadaran", context.TingkatKesadaran],
+                                ["Kesadaran", context.Kesadaran ?? ""],
+                                ["Sistolik", context.Sistolik?.ToString() ?? ""],
+                                ["Diastolik", context.Distolik?.ToString() ?? ""],
+                                ["Suhu", $"{context.Suhu} C"],
+                                ["Saturasi O2", context.Saturasi?.ToString() ?? ""],
+                                ["Frekuensi Nafas", $"{context.FrekuensiNapas}x/menit"],
+                                ["Frekuensi Nadi", $"{context.FrekuensiNadi}x/menit"],
+                                ["Dokter", context.NamaKaryawan ?? ""],
+                                [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
                         ];
-                        
+
                     }
                 }
                 <TableGen Data="@displayData" />
-                
+
             </NoteContent>
         </Note>
     </MudCard>
@@ -138,7 +138,7 @@
     private List<TRMPemeriksaanUmum> _listRekamMedis = [];
     private string _saveMode = "add";
     private TRMAppointment? _apo = null;
-    private TRMPemeriksaanUmum _trmPemeriksaanUmumInForm = new ();
+    private TRMPemeriksaanUmum _trmPemeriksaanUmumInForm = new();
 
 
     public PemeriksaanUmum()

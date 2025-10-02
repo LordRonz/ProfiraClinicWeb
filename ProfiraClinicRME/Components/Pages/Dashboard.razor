@@ -44,9 +44,10 @@
 
     }
 
+
     protected override async Task OnInitializedAsync()
     {
-        LogTrace.Info("init", path: _classPath);
+        await base.OnInitializedAsync();
 
         if (CurrentUser is null || CurrentUser?.Klinik is null)
         {
@@ -55,6 +56,9 @@
             throw new Exception(msg);
         }
         LogTrace.Info("current user", CurrentUser, _classPath);
+
+        _title += CurrentUser.Klinik.KETLK;
+
 
         var resApo = await SvcAppointment.GetListOnWaitAsync(CurrentUser.KodeLokasi ?? "", DateTime.Today, CurrentUser.Karyawan?.KodeKaryawan);
 
@@ -151,7 +155,7 @@
         }
 
 
-        Nav.NavigateTo("/Perawatan/" + apo.IDAppointment);
+        Nav.NavigateTo("/rekam-medis/" + apo.IDAppointment);
         return;
     }
 }

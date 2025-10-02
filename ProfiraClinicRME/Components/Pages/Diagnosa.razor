@@ -18,8 +18,8 @@
 @inject ProtectedLocalStorage LocalStore
 
 
-<TopbarUser Route="DIAGNOSA / ICD"
-    Title="Perawatan Pasien / Diagnosa"
+<TopbarUser Route="Dashboard >> Rekam Medis >> Diagnosa/ICD"
+    Title="Diagnosa/ICD "
     Appointment="CurrentAppointment"
     ShowBack="true"
     ShowSave="true"
@@ -58,7 +58,7 @@
                 <MudTextField @bind-Value="@_trmDiagnosaInForm.KeteranganDiagnosa" 
                 ShrinkLabel 
                 T="string" 
-                Label="Deskripsi" 
+                Label="Keterangan" 
                 Variant="Variant.Outlined" Lines="10" />
             </MudItem>
         </MudGrid>
@@ -74,7 +74,7 @@
                             ["Kunjungan", context.NomorAppointment ?? ""],
                             ["ICD", $"{context.KodeDiagnosa}  {context.NamaDiagnosa}"],
                             ["Kategori" , context.KategoriDiagnosa ?? ""],
-                            ["Diagnosa", context.KeteranganDiagnosa ?? ""],
+                            ["Keterangan", context.KeteranganDiagnosa ?? ""],
                             ["Lokasi", context.KETLK ?? ""],
                             ["Dokter", context.NamaKaryawan ?? ""],
                             [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
