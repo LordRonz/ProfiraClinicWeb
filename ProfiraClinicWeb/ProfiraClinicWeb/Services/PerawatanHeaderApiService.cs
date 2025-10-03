@@ -67,5 +67,13 @@ namespace ProfiraClinicWeb.Services
             // If no content is returned from the update call, we can return a successful ApiResponse.
             return new ApiResponse<object>((int)responseMessage.StatusCode, "Tindakan updated successfully");
         }
+
+        public async Task<ApiResponse<PPerawatanH>> DeletePerawatanHeaderByIdAsync(string id)
+        {
+            var response = await _httpClient
+                .DeleteFromJsonAsync<ApiResponse<PPerawatanH>>($"api/Tindakan/Del/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
+            return response;
+        }
     }
 }

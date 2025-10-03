@@ -1,9 +1,12 @@
 ﻿@page "/package-item"
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Components.Dialog
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
 @inject PaketHeaderApiService ApiService
+@inject ISnackbar Snackbar
+@inject IDialogService Dialog
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" />
@@ -82,8 +85,8 @@
                         new TableColumn { Caption = "Disc Member", DataField = "discMember", Align = ColumnAlign.Right },
                         new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember", Align = ColumnAlign.Right },
                         new TableColumn { Caption = "Masa Paket", DataField = "masaPaket", Align = ColumnAlign.Right },
-                        new TableColumn { Caption = "Aktif?", DataField = "aktif" },
-                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
+                        new TableColumn { Caption = "Aktif?", DataField = "aktif" }, 
+                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete, ActionField = "kodePaketHeader", Action = OnDelete },
                     },
                     dataSource,
                     "/package-item/add"
@@ -95,6 +98,36 @@
                 System.Diagnostics.Debug.WriteLine($"Error loading paket: {ex.Message}");
             }
             StateHasChanged();
+        }
+    }
+
+    private async Task<bool> OnDelete(string kodePaket)
+    {
+        System.Diagnostics.Debug.WriteLine("OnDelete Paket");
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = $"Yakin ingin menghapus '{kodePaket}'?"
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = Dialog.Show<ConfirmDialog>("Hapus Paket", parameters, options);
+        var result = await dialog.Result;
+
+        if (result?.Canceled == true) return false;
+
+        var resp = await ApiService.DeletePaketHeaderByIdAsync(kodePaket);
+        if (resp.StatusCode < 300)
+        {
+            Pakets.RemoveAll(p => p.KodePaket == kodePaket);
+            StateHasChanged();
+            Snackbar.Add("Berhasil dihapus.", Severity.Success);
+            return true;
+        }
+        else
+        {
+            Snackbar.Add(resp.Message ?? "Gagal menghapus.", Severity.Error);
+            return false;
         }
     }
 }

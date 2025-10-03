@@ -1,10 +1,6 @@
-﻿using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Api;
+using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using ProfiraClinic.Models.Api;
 
 namespace ProfiraClinicWeb.Services
 {
@@ -49,7 +45,7 @@ namespace ProfiraClinicWeb.Services
 
         public async Task<ApiResponse<BarangHeader>> CreateBarangHeaderAsync(BarangHeader paket)
         {
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/add", paket);
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/BarangHeader/CreateBarangHeader", paket);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
@@ -76,11 +72,10 @@ namespace ProfiraClinicWeb.Services
         }
 
         public async Task<ApiResponse<object>> UpdateBarangHeaderAsync(
-            string kodeBarang,
-            BarangHeader paketHeader)
+            BarangHeader barangheader)
         {
             var responseMessage = await _httpClient
-                .PutAsJsonAsync($"api/BarangHeader/edit/{kodeBarang}", paketHeader);
+                .PostAsJsonAsync($"api/BarangHeader/edit", barangheader);
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();

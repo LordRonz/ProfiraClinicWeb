@@ -2,9 +2,12 @@
 @using System.Net.Http.Json
 @using ProfiraClinic.Models
 @using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Components.Dialog
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
 @inject PerawatanHeaderApiService ApiService
+@inject ISnackbar Snackbar
+@inject IDialogService Dialog
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
     <ProfiraClinicWeb.Components.Table.Table Config="PackageTableConfig" AddButtonText="Perawatan Baru" />
@@ -86,7 +89,7 @@
                         new TableColumn { Caption = "Disc Non Member", DataField = "discNonMember", Align = ColumnAlign.Right },
                         new TableColumn { Caption = "Point", DataField = "point" },
                         new TableColumn { Caption = "Aktif?", DataField = "aktif" },
-                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
+                        new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete, ActionField = "kodePerawatan", Action = OnDelete },
                                     },
                     dataSource,
                     "/treatment-item/add"
@@ -98,6 +101,36 @@
                 System.Diagnostics.Debug.WriteLine($"Error loading paket: {ex.Message}");
             }
             StateHasChanged();
+        }
+    }
+
+    private async Task<bool> OnDelete(string kodePerawatan)
+    {
+        System.Diagnostics.Debug.WriteLine("OnDelete Perawatan");
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = $"Yakin ingin menghapus '{kodePerawatan}'?"
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = Dialog.Show<ConfirmDialog>("Hapus Perawatan", parameters, options);
+        var result = await dialog.Result;
+
+        if (result?.Canceled == true) return false;
+
+        var resp = await ApiService.DeletePerawatanHeaderByIdAsync(kodePerawatan);
+        if (resp.StatusCode < 300)
+        {
+            Perawatans.RemoveAll(p => p.KodePerawatan == kodePerawatan);
+            StateHasChanged();
+            Snackbar.Add("Berhasil dihapus.", Severity.Success);
+            return true;
+        }
+        else
+        {
+            Snackbar.Add(resp.Message ?? "Gagal menghapus.", Severity.Error);
+            return false;
         }
     }
 }

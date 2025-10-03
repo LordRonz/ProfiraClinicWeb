@@ -67,5 +67,13 @@ namespace ProfiraClinicWeb.Services
             // If no content is returned from the update call, we can return a successful ApiResponse.
             return new ApiResponse<object>((int)responseMessage.StatusCode, "PaketHeader updated successfully");
         }
+
+        public async Task<ApiResponse<PaketHeader>> DeletePaketHeaderByIdAsync(string id)
+        {
+            var response = await _httpClient
+                .DeleteFromJsonAsync<ApiResponse<PaketHeader>>($"api/PaketHeader/Del/{id}")
+                ?? throw new HttpRequestException("Failed to retrieve response from API.");
+            return response;
+        }
     }
 }

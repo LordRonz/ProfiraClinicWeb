@@ -28,6 +28,7 @@ namespace ProfiraClinicWebAPI.Controllers
         public string? KodeKaryawan { get; set; }
         public string? KodePoli { get; set; }
         public string? Keterangan { get; set; }
+        public string? KetLk { get; set; }
         public DateTime? UPDDT { get; set; }
         public string? USRID { get; set; }
         public List<PenandaanGambarListDetailDto> Detail { get; set; } = new();
@@ -151,6 +152,23 @@ namespace ProfiraClinicWebAPI.Controllers
             if (dto.KodeKaryawan == null && karyawan == null)
                 return NotFound("Karyawan not found");
 
+            try
+            {
+                var delParam = new[]
+                {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_PenandaanGambar_Del @NomorTransaksi",
+                    delParam
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
             var sqlParameters = new[]
             {
         new SqlParameter("@KodeLokasi",       kdLok ?? user.KodeLokasi ?? (object)DBNull.Value),
@@ -230,6 +248,23 @@ namespace ProfiraClinicWebAPI.Controllers
             if (dto.IDGambar == null || dto.KodeGambar == null)
                 return BadRequest("KodeGambar and IDGambar are required");
 
+            try
+            {
+                var delParam = new[]
+                {
+        new SqlParameter("@NomorTransaksi", dto.NomorTransaksi ?? (object)DBNull.Value)
+    };
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_PenandaanGambar_Del @NomorTransaksi",
+                    delParam
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
             var sqlParameters = new[]
             {
         new SqlParameter("@NomorTransaksi", dto.NomorTransaksi),
@@ -288,6 +323,7 @@ namespace ProfiraClinicWebAPI.Controllers
             KodeKaryawan = h.KodeKaryawan,
             KodePoli = h.KodePoli,
             Keterangan = h.Keterangan,
+            KetLk = h.KETLK,
             UPDDT = h.UPDDT,
             USRID = h.USRID,
             Detail = g

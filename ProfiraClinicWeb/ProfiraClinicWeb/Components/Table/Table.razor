@@ -15,7 +15,7 @@
             <MudButton OnClick="OnExpandCollapseClick" FullWidth="true" Class="w-100 filter-btn">Filter <MudIcon Icon="@(_expanded? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown)" Title="Arrow" /> </MudButton>
             <MudCollapse Expanded="_expanded" Class="px-4">
                 <div class="d-flex justify-content-start align-items-start gap-4">
-                    <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll @bind-Value="value" @bind-SelectedValues="options" OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
+                    @* <MudSelect ShrinkLabel MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" SelectAll @bind-Value="value" @bind-SelectedValues="options" OuterClass="flex-grow-0" MultiSelection T="string" Style="border-radius: 20px; background-color: #FFF; max-width: 300px; min-width: 200px;" Label="Filter by" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" Margin="Margin.Dense" DisableUnderLine Class="mt-4 filter-field flex-shrink-1 flex-grow-0">
                         @foreach (TableColumn col in _columns)
                         {
                             @if (col.Type == ColumnType.Data)
@@ -23,14 +23,14 @@
                                 <MudSelectItem Style="height: 30px" T="string" Value="@col.DataField">@col.Caption</MudSelectItem>
                             }
                         }
-                    </MudSelect>
+                    </MudSelect> *@
                     @if (!UseServerData || ServerDataFunc == null)
                     {
-                        <MudTextField ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
+                        <MudTextField Placeholder="Search..." ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" @bind-Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
                     }
                     else
                     {
-                        <MudTextField DebounceInterval="2000" T="string" ValueChanged="OnSearchChanged" ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
+                        <MudTextField Placeholder="Search..." DebounceInterval="2000" T="string" ValueChanged="OnSearchChanged" ShrinkLabel Style="border-radius: 20px; background-color: #FFF; max-width: 400px; min-width: 300px;" Margin="Margin.Dense" DisableUnderLine Variant="Variant.Outlined" @ref="tableFilterRef" Value="searchString1" Class="mt-4 filter-field flex-shrink-1 flex-grow-0" Clearable Immediate></MudTextField>
                     }
                 </div>
             </MudCollapse>
@@ -247,6 +247,11 @@ else
             // Pin Items to a stable reference; if GetData() returns a new list each time,
             // lift it in the PARENT so the reference is stable, or snapshot it once here:
             _data = Config.GetData();
+            options = Config.GetColumn()
+                .Select(p => p.DataField)
+                .ToHashSet();
+
+            _filterPredicate = FilterFunc1;
         }
     }
 
@@ -276,23 +281,34 @@ else
             return true;
 
         var filters = Config.GetFilters();
-        foreach (var filter in filters)
+
+        if (filters == null || !filters.Any())
         {
-            foreach (var item in element)
+            foreach (var kv in element)
             {
-                if (filter != null && filter.Column != item.Key)
-                {
-                    continue;
-                }
-                if (item.Value.ToLower().Contains(searchString))
-                {
+                if (!string.IsNullOrEmpty(kv.Value) &&
+                    kv.Value.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
                     return true;
-                }
             }
+            return false;
+        }
+
+        var includeCols = new HashSet<string>(
+            filters.Where(f => f != null).Select(f => f.Column),
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        foreach (var kv in element)
+        {
+            if (includeCols.Contains(kv.Key) &&
+                !string.IsNullOrEmpty(kv.Value) &&
+                kv.Value.IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
         }
 
         return false;
     }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
