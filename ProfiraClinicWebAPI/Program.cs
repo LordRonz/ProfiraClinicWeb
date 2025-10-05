@@ -8,6 +8,7 @@ using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Factory;
 using ProfiraClinicWebAPI.Filters;
 using ProfiraClinicWebAPI.Helper;
+using ProfiraClinicWebAPI.Middlewares;
 using ProfiraClinicWebAPI.Services;
 using Serilog;
 using System.Text;
@@ -135,10 +136,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddHostedService<QueuedHostedService>();
 
+builder.Host.UseSerilog();
+
 Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
 
@@ -166,6 +167,10 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSerilogRequestLogging();
+
+app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 app.MapControllers();
 
