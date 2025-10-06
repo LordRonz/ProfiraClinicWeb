@@ -72,7 +72,7 @@ namespace ProfiraClinicWeb.Services
         }
 
         public async Task<ApiResponse<object>> UpdateBarangHeaderAsync(
-            BarangHeader barangheader)
+            EditBarangHeaderDto barangheader)
         {
             var responseMessage = await _httpClient
                 .PostAsJsonAsync($"api/BarangHeader/edit", barangheader);
