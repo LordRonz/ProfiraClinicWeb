@@ -151,41 +151,6 @@ namespace ProfiraClinicWebAPI.Controllers
             }
         }
 
-
-
-
-        [HttpPost("GetListTrm")]
-        public async Task<IActionResult> GetListTrm([FromBody] TRMPerawatanHeaderListDto diagDto)
-        {
-            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userName))
-                return Unauthorized();
-
-            // 2) look it up
-            var user = await _context.MUser
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.USRID == userName);
-
-            var sqlParameters = new[]
-            {
-                new SqlParameter("@KodeCustomer",  diagDto.KodeCustomer ?? (object)DBNull.Value),
-            };
-
-            var list = await _context.TRMPerawatanHeader
-                .FromSqlRaw("EXEC dbo.usp_TRM_TRMPerawatanHeader_List @KodeCustomer", sqlParameters)
-                .ToListAsync();
-
-            var result = new Pagination<TRMPerawatanHeader>
-            {
-                TotalCount = 0,
-                Page = 0,
-                PageSize = 0,
-                Items = list
-            };
-
-            return Ok(result);
-        }
-
         [HttpPost("GetByNomorTransaksi")]
         public async Task<IActionResult> GetByNomorTransaksi([FromBody] GetByNomorTransaksiDto dto)
         {

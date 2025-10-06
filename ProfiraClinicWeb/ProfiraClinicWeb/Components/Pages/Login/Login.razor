@@ -17,12 +17,14 @@
             <MudImage Src="@GetLady()" Width="400" ObjectFit="ObjectFit.Cover"></MudImage>
         </div>
         <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-items-center justify-content-center min-vh-100 flex-column gap-4 m-0">
-            <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-3" Elevation="3">
+            <MudImage Src="/images/login-logo.webp" Width="145" ObjectFit="ObjectFit.Cover"></MudImage>
+            <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-content-center align-items-center w-100 bg-white bg-opacity-75 rounded-4" Elevation="3">
                 <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-3 w-100">
-                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-                    <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+                    <MudTextField Underline="false" Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
+                    <MudTextField Underline="false" Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense" DisableUnderLine="true" Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
 
                     <MudSelect T="string"
+                               Underline="false"
                                @bind-Value="selectedKlinikCode"
                                OuterClass="bg-transparent rounded-pill"
                                InputClass="bg-transparent"
@@ -30,7 +32,8 @@
                                DisableUnderLine="true"
                                Variant="Variant.Filled"
                                Label="Pilih clinic"
-                               AnchorOrigin="Origin.BottomCenter">
+                               AnchorOrigin="Origin.BottomCenter"
+                               Margin="Margin.Dense">
                         @if (kliniks == null || !kliniks.Any())
                         {
                             <MudSelectItem Value="@("")">Loading clinics...</MudSelectItem>
@@ -46,7 +49,7 @@
                     <MudCheckBox @bind-Value="@rememberMe" Dense="true">
                         Remember me
                     </MudCheckBox>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-3" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto rounded-4" FullWidth="true" OnClick="(() => OnSubmit())">Login</MudButton>
                 </MudForm>
             </MudPaper>
         </MudContainer>
@@ -82,7 +85,7 @@
 
     string GetLady()
     {
-        return isDoctor ? "/images/login_lady.png" : "/images/ashley.png";
+        return isDoctor ? "/images/login_lady.png" : "/images/ashley.webp";
     }
 
     string GetContainerClass()
@@ -183,5 +186,9 @@
 
     .mud-input-label-inputcontrol {
         top: -10px;
+    }
+
+    .mud-input-slot.mud-select-input {
+        top: 14px;
     }
 </style>

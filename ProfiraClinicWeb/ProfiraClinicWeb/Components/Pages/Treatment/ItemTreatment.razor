@@ -23,7 +23,7 @@
     public TableConfig PackageTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
     // Holds the list of patients
-    private List<PPerawatanH> Perawatans = new List<PPerawatanH>();
+    private List<PerawatanHeader> Perawatans = new List<PerawatanHeader>();
 
     // This method sets up the page title.
     protected override void OnInitialized()
@@ -62,7 +62,7 @@
                     (object)new
                     {
                         view = $"treatment/{el.KodePerawatan}",
-                        edit = $"treatment/{el.KodePerawatan}/edit",
+                        edit = $"treatment-item/{el.KodePerawatan}/edit",
                         kategoriRawat = el.KategoriPerawatan,
                         kodeGroupPerawatan = el.KodeGroupPerawatan,
                         jenisPerawatan = el.KodeJenis,
