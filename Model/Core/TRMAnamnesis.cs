@@ -53,6 +53,10 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(1024)]
         public string? KeteranganAnamnesis { get; set; } // Penjelasan Subyektif
 
+        [Column(TypeName = "varchar(1024)")]
+        [MaxLength(1024)]
+        public string? Preferensi { get; set; }
+
         [Column(TypeName = "datetime")]
         public DateTime? UPDDT { get; set; } // Date time input
 

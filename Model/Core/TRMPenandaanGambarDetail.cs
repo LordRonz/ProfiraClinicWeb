@@ -13,9 +13,9 @@ namespace ProfiraClinic.Models.Core
 
         public int IDDetail { get; set; } = 0; // IDDetail
 
-        [Column(TypeName = "char(10)")]
-        [MaxLength(10)]
-        public string KodeGambar { get; set; } = ""; // Relasi dengan Table Customer
+        [Column(TypeName = "char(255)")]
+        [MaxLength(255)]
+        public string KodeGambar { get; set; } // Relasi dengan Table Customer
 
         [Column(TypeName = "char(255)")]
         [MaxLength(255)]

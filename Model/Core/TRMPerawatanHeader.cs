@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
-    public class TRMPenandaanGambar
+    public class TRMPerawatanHeader
     {
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]
@@ -41,17 +41,18 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string? KodeCustomer { get; set; } // Relasi dengan Table Customer
 
-        [Column(TypeName = "char(10)")]
-        [MaxLength(10)]
-        public string? KodeKaryawan { get; set; } // Kode Dokter / Terapis
 
         [Column(TypeName = "char(5)")]
         [MaxLength(5)]
         public string? KodePoli { get; set; } // Relasi dengan Table MDiagnosa
 
-        [Column(TypeName = "varchar(1024)")]
-        [MaxLength(1024)]
-        public string? Keterangan { get; set; } // Keterangan
+        [Column(TypeName = "char(255)")]
+        [MaxLength(255)]
+        public string? Keterangan { get; set; } // Nomor Appointment
+
+        [Column(TypeName = "char(1)")]
+        [MaxLength(1)]
+        public string? StatusKonfirmasi { get; set; } // Nomor Appointment
 
         [Column(TypeName = "datetime")]
         public DateTime? UPDDT { get; set; } // Date time input
@@ -59,20 +60,5 @@ namespace ProfiraClinic.Models.Core
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
         public string? USRID { get; set; } // User Input
-
-        public int? IDDetail { get; set; } // IDDetail
-
-        [Column(TypeName = "char(255)")]
-        [MaxLength(255)]
-        public string? KodeGambar { get; set; } // Relasi dengan Table Customer
-
-        [Column(TypeName = "char(255)")]
-        [MaxLength(255)]
-        public string? IDGambar { get; set; } // Kode Dokter / Terapis
-
-        public string? KETLK { get; set; }
-        public string? NamaCustomer { get; set; }
-
-        public string? NamaKaryawan { get; set; }
     }
 }

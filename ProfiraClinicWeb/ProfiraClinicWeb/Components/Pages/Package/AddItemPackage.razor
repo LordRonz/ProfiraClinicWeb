@@ -13,11 +13,12 @@
 <MudCard Class="p-4 h-100">
     <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
 
+    <div class="form-container">
     <!-- Header Form -->
     <MudForm @ref="headerForm" Class="section-body table-form">
         <MudGrid>
             <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
@@ -37,7 +38,9 @@
                 <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Harga" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                <div class="d-flex align-items-center gap-2">
+                        <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" /><span>(Rp)</span>
+                    </div>
             </MudItem>
             <MudItem xs="12" sm="4">
                 <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
@@ -50,6 +53,8 @@
             </MudItem>
         </MudGrid>
     </MudForm>
+
+    </div>
 
     <Divider Class="my-4" />
 
@@ -112,6 +117,8 @@
 </MudCard>
 
 @code {
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
     private MudForm headerForm;
     private MudForm detailForm;
 
@@ -136,6 +143,7 @@
 
     protected override void OnInitialized()
     {
+        Layout.ChangeTitleAndRoute("Master / Paket Perawatan", "Add Paket Perawatan");
         header.Aktif = "1";
         isActive = true;
     }
@@ -321,6 +329,10 @@
 }
 
 <style>
+    .form-container {
+        max-width: 800px; /* adjust this value to control the width */
+    }
+
     .save-btn {
         background: rgba(47, 193, 71, 1);
         color: white;

@@ -30,17 +30,35 @@ namespace ProfiraClinicWebAPI.Services
         {
             System.Diagnostics.Debug.WriteLine(username);
             var user = _context.MUser.FirstOrDefault(x => x.USRID == username);
-            if (user == null)
-                return null;
-            var isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.Password);
-            if (!isPasswordValid)
-                return null;
-
-            return new LoginModel
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
-                Username = user.USRID,
-                KodeLokasi = user.KodeLokasi,
-            };
+                return new LoginModel
+                {
+                    Username = user.USRID,
+                    KodeLokasi = user.KodeLokasi,
+                    Role = "User" // DB user
+                };
+            }
+
+            // 2) Fall back to ClientUsers (from appsettings)
+            // NOTE: these are plain text in appsettings; consider hashing in the future.
+            var client = _clients.FirstOrDefault(c =>
+                string.Equals(c.ClientId, username, StringComparison.OrdinalIgnoreCase)
+                && c.ClientSecret == password);
+
+            System.Diagnostics.Debug.WriteLine(client?.ClientSecret);
+            System.Diagnostics.Debug.WriteLine(_clients?[0].ClientId);
+
+            if (client != null)
+            {
+                return new LoginModel
+                {
+                    Username = client.ClientId,
+                    KodeLokasi = null,          // none by default (can be supplied by request)
+                    Role = "Client"         // 3rd-party client
+                };
+            }
+            return null;
         }
 
         public string GenerateToken(LoginModel user, string? k)
@@ -51,7 +69,7 @@ namespace ProfiraClinicWebAPI.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Username),
-                new Claim(ClaimTypes.Role, "Client"),
+                new Claim(ClaimTypes.Role, string.IsNullOrWhiteSpace(user.Role) ? "User" : user.Role),
                 new Claim(JwtClaimTypes.KodeLokasi, k ?? user.KodeLokasi ?? string.Empty)
             };
 
