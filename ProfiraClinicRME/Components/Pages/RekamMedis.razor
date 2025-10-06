@@ -21,52 +21,55 @@
             ShowBack="true"
             />
 
-<MudCard Class="p-4 minh-100 rounded-3">
-    @if (_customer != null) {
-        <div class="">
-            <div class="d-flex w-100 gap-x-8 mb-12">
-                <div class="border-1 justify-content-center align-items-center d-flex item-shadow" style="width: 150px; height: 150px;">
+<MudCard Class="pa-4 minh-100 rounded-lg">
+    @if (_customer != null) 
+    {
+        <MudGrid Class="w-100">
+            <MudItem xs="3">
+
+                <div class="border-2 justify-center align-center d-flex item-shadow" style="width: 150px; height: 150px;">
                     <MudImage Src="/images/blank_profile1.png" Class="w-100" />
                 </div>
-                <div class="w-100  table-add-form">
-                    <MudGrid Class="flex-column" Style="max-width: 85%;">
-                        <MudItem xs="6" Class="p-1">
-                            <MudText Typo="Typo.h5" Color="MudBlazor.Color.Primary">@_customer.NamaCustomer</MudText>
+            </MudItem>
+            <MudItem xs="9">
+                <MudGrid Class="flex-column" Style="max-width: 85%;">
+                    <MudItem xs="6" Class="pa-1">
+                        <MudText Typo="Typo.h5" Color="MudBlazor.Color.Primary">@_customer.NamaCustomer</MudText>
+                    </MudItem>
+                    <MudItem xs="6" Class="pa-1">
+                        <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">
+                            @($"{_customer.KodeCustomer} // {_jnsKelamin} // {_age}")
+                        </MudText>
+                    </MudItem>
+                    <MudItem xs="6" Class="pa-1">
+                        <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">
+                            @(DateUtility.FormatDate(_customer.TanggalLahir))
+                        </MudText>
+                    </MudItem>
+                    <MudGrid Class="flex-row">
+                        <MudItem xs="12" md="6">
+                            <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Alamat Rumah</MudText>
+                            <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.AlamatDomisili</MudText>
                         </MudItem>
-                        <MudItem xs="6" Class="p-1">
-                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@($"{_customer.KodeCustomer} // {_jnsKelamin} // {_age}")
-                            </MudText>
+                        <MudItem xs="12" md="3">
+                            <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Nomor KTP</MudText>
+                            <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.NIK</MudText>
                         </MudItem>
-                        <MudItem xs="6" Class="p-1">
-                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">
-                                @(DateUtility.FormatDate(_customer.TanggalLahir)) 
-                            </MudText>
+                        <MudItem xs="12" md="3">
+                            <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Nomor HP</MudText>
+                            <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.NomorHP</MudText>
                         </MudItem>
-                        <MudGrid Class="flex-row">
-                            <MudItem xs="12" md="6" >
-                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Alamat Rumah</MudText>
-                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.AlamatDomisili</MudText>
-                            </MudItem>
-                            <MudItem xs="12" md="3">
-                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Nomor KTP</MudText>
-                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.NIK</MudText>
-                            </MudItem>
-                            <MudItem xs="12" md="3">
-                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">Nomor HP</MudText>
-                                <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@_customer.NomorHP</MudText>
-                            </MudItem>
-                        </MudGrid>
-                        <MudGrid Class="flex-row">
-                            <MudItem xs="12" md="6">
-                                <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">No Appointment</MudText>
-                                    <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@CurrentAppointment.NomorAppointment</MudText>
-                            </MudItem>
-                        </MudGrid>
                     </MudGrid>
-                </div>
-            </div>
-            <ProfiraClinicRME.Components.Menu.Menu />
-        </div>
+                    <MudGrid Class="flex-row">
+                        <MudItem xs="12" md="6">
+                            <MudText Typo="Typo.h6" Color="MudBlazor.Color.Primary">No Appointment</MudText>
+                            <MudText Typo="Typo.body1" Color="MudBlazor.Color.Default">@CurrentAppointment.NomorAppointment</MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+        <ProfiraClinicRME.Components.Menu.Menu />
     }
 </MudCard>
 
