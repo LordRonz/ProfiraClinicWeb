@@ -8,10 +8,7 @@
 @inject BarangHeaderApiService BarangHeaderApi
 @inject NavigationManager Navigation
 
-<MudCard Class="p-4 h-100 d-flex justify-center">
-    <div class="form-container">
-        <MudText Typo="Typo.h6" Class="mb-3">Edit Barang Header</MudText>
-
+<MudCard Class="p-3 h-100">
         <MudForm @ref="form" Class="table-form">
             <MudGrid GutterSize="0">
                 <!-- KodeBarang (read-only) -->
@@ -84,19 +81,24 @@
                 </MudItem>
             </MudGrid>
 
-            <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
-                <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
-                    Kembali
-                </MudButton>
-                <MudButton Variant="Variant.Filled"
-                           Color="MudBlazor.Color.Primary"
-                           Disabled="!form?.IsValid ?? false"
-                           OnClick="SubmitAsync">
-                    Simpan
-                </MudButton>
-            </MudStack>
+        <div class="button-bar mt-4">
+            <MudButton Variant="Variant.Outlined"
+                       Color="MudBlazor.Color.Secondary"
+                       OnClick="GoBack"
+                       Class="action-btn">
+                Kembali
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       OnClick="SubmitAsync"
+                       Class="action-btn">
+                Simpan
+            </MudButton>
+        </div>
+
+
         </MudForm>
-    </div>
 </MudCard>
 
 @code {
@@ -137,7 +139,7 @@
         StateHasChanged();
     }
 
-    private void GoBack() => Navigation.NavigateTo("/product-item-2");
+    private void GoBack() => Navigation.NavigateTo("/product-item");
 
     private async Task SubmitAsync()
     {
@@ -154,6 +156,13 @@
 
 <style>
     /* Make the inner form area narrower so inputs aren't full width */
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
     .form-container {
         width: 100%;
         max-width: 720px;       /* Tweak to taste (640–840px works well) */

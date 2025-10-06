@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
-    public class PPerawatanH
+    [Table("PPerawatanH")]
+    public class PerawatanHeader
     {
         [Column]
         public long IDPerawatanHeader { get; set; }
