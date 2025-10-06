@@ -17,7 +17,7 @@
             Title="Pemeriksaan"
             ShowBack="true"
             ShowSave="true"
-            Appointment="_apo"
+            Appointment="CurrentAppointment"
             OnSave="@DoSave" />
 
 
@@ -135,7 +135,6 @@
     private bool _loading;
     private List<TRMPemeriksaanUmum> _listRekamMedis = [];
     private string _saveMode = "add";
-    private TRMAppointment? _apo = null;
     private TRMPemeriksaanUmum _trmPemeriksaanUmumInForm = new();
 
 
@@ -157,7 +156,7 @@
         await base.OnInitializedAsync();
 
         //ambil rekam medis pemeriksaan umum
-        var resDiagnosa = await SvcPemeriksaanUmum.GetListAsync(_apo.KodeCustomer);
+        var resDiagnosa = await SvcPemeriksaanUmum.GetListAsync(CurrentAppointment.KodeCustomer);
         if (resDiagnosa.Status == ServiceResultEnum.FOUND)
         {
             _listRekamMedis = resDiagnosa.Data.Items;
@@ -168,7 +167,7 @@
         }
 
         //cek apakah sudah ada pemriksaan umum untuk appointment ini
-        var resCheck = await SvcPemeriksaanUmum.GetByNomorAppointment(_apo.NomorAppointment);
+        var resCheck = await SvcPemeriksaanUmum.GetByNomorAppointment(CurrentAppointment.NomorAppointment);
         if (resCheck.Status == ServiceResultEnum.FOUND)
         {
             _saveMode = "edit";
@@ -176,17 +175,17 @@
             addSnackbar("Memuat ulang data Pemeriksaan Umum.", Severity.Info);
 
         }
-        _trmPemeriksaanUmumInForm.NomorAppointment = _apo?.NomorAppointment ?? "";
-        _trmPemeriksaanUmumInForm.KodeKaryawan = _apo?.KodeKaryawan ?? "";
-        _trmPemeriksaanUmumInForm.KodeCustomer = _apo?.KodeCustomer ?? "";
-        _trmPemeriksaanUmumInForm.KodeLokasi = _apo?.KodeLokasi ?? "";
+        _trmPemeriksaanUmumInForm.NomorAppointment = CurrentAppointment.NomorAppointment ?? "";
+        _trmPemeriksaanUmumInForm.KodeKaryawan = CurrentAppointment.KodeKaryawan ?? "";
+        _trmPemeriksaanUmumInForm.KodeCustomer = CurrentAppointment.KodeCustomer ?? "";
+        _trmPemeriksaanUmumInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "";
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task DoSave()
     {
         LogTrace.Info("start", path: _classPath);
-        _trmPemeriksaanUmumInForm.KodeLokasi = _apo?.KodeLokasi ?? "-";
+        _trmPemeriksaanUmumInForm.KodeLokasi = CurrentAppointment.KodeLokasi ?? "-";
         _trmPemeriksaanUmumInForm.TanggalTransaksi = DateTime.Now;
         //keadaan umum binded
         //tk kesadaran binded
@@ -209,7 +208,7 @@
         {
             addSnackbar(msg, Severity.Info);
             await Task.Delay(1000);
-            Nav.NavigateTo("/perawatan/" + _apo?.IDAppointment);
+            Nav.NavigateTo("/perawatan/" + CurrentAppointment.IDAppointment);
         }
         else
         {
