@@ -20,7 +20,7 @@
             ShowSave="true"
             Title="Anamnesis" />
 
-<MudCard Class="p-4 minh-100 rounded-3 pemeriksaan-input">
+<MudCard Class="pa-4 minh-100 rounded-lg pemeriksaan-input">
     <MudTabs @bind-ActivePanelIndex=@_activePanelIndex Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6 tabcontainer" style="">
         <MudTabPanel Text="Anamnesis">
             <MudTextField @bind-Value="@_anamnesisInForm.KeteranganAnamnesis" ShrinkLabel T="string" Placeholder="Silakan ketik anamnesis pasien disini" Variant="Variant.Outlined" Lines="15" MaxLines="15" AutoGrow />
@@ -47,14 +47,14 @@
         </MudTabPanel>
         <MudTabPanel Text="Riwayat">
             <MudGrid Class="gap-y-2 riwayat" Style="max-width: 70%;">
-                <MudItem xs="12" Class="p-1">
+                <MudItem xs="12" Class="pa-1">
                     <MudTextField @bind-Value="@_riwayatInForm.PenyakitDahulu"
                                   ShrinkLabel T="string" Label="Riwayat Penyakit Dahulu (termasuk riwayat operasi)" Variant="Variant.Outlined" Lines="10" />
                 </MudItem>
-                <MudItem xs="4" Class="p-1">
+                <MudItem xs="4" Class="pa-1">
                     <p>Riwayat Penyakit Sekarang</p>
                 </MudItem>
-                <MudItem xs="8" Class="p-1 gap-2">
+                <MudItem xs="8" Class="pa-1 gap-2">
                     <div class="d-flex gap-2 flex-wrap">
                         <MudCheckBox @bind-Value="@_riwayatInForm.IsDM" T="bool" Label="DM" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
                         <MudCheckBox @bind-Value="@_riwayatInForm.IsHipertensi" T="bool" Label="Hipertensi" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
@@ -66,10 +66,10 @@
                     </div>
                     <MudTextField ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
                 </MudItem>
-                <MudItem xs="4" Class="p-1">
+                <MudItem xs="4" Class="pa-1">
                     <p>Riwayat Alergi Obat</p>
                 </MudItem>
-                <MudItem xs="8" Class="p-1 gap-2">
+                <MudItem xs="8" Class="pa-1 gap-2">
                     <div class="d-flex gap-2 flex-wrap">
                         <MudCheckBox Value="@(!_riwayatInForm.IsAlergiObat)" T="bool" Label="Tidak" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
                         <MudCheckBox Value="@(_riwayatInForm.IsAlergiObat)"
@@ -78,10 +78,10 @@
                     <MudTextField @bind-Value="@_riwayatInForm.KetAlergiObat"
                                   ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
                 </MudItem>
-                <MudItem xs="4" Class="p-1">
+                <MudItem xs="4" Class="pa-1">
                     <p>Riwayat Alergi Makanan</p>
                 </MudItem>
-                <MudItem xs="8" Class="p-1 gap-2">
+                <MudItem xs="8" Class="pa-1 gap-2">
                     <div class="d-flex gap-2 flex-wrap">
                         <MudCheckBox Value="@(!_riwayatInForm.IsAlergiMakanan)"
                                      T="bool" Label="Tidak" Dense Size="MudBlazor.Size.Small"></MudCheckBox>
@@ -91,10 +91,10 @@
                     <MudTextField @bind-Value="@_riwayatInForm.KetAlergiMakanan"
                                   ShrinkLabel T="string" Variant="Variant.Outlined" Lines="10" />
                 </MudItem>
-                <MudItem xs="4" Class="p-1">
+                <MudItem xs="4" Class="pa-1">
                     <p>Faktor Resiko</p>
                 </MudItem>
-                <MudItem xs="8" Class="p-1 gap-2">
+                <MudItem xs="8" Class="pa-1 gap-2">
                     <div class="d-flex gap-2 flex-wrap">
                         <MudCheckBox Value="@_riwayatInForm.IsMerokok"
                                      T="bool" Label="Merokok" Dense Size="MudBlazor.Size.Small"></MudCheckBox>

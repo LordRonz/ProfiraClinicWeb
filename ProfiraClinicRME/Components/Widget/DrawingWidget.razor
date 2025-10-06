@@ -11,7 +11,7 @@
         <CardHeaderContent>
             <MudText Typo="Typo.body1"> Editor </MudText>
             <MudText Typo="Typo.body2"> select tools and draw..</MudText>
-            <div class="d-flex justify-space-between gap-2 p-2 align-center" style="height:6em">
+            <div class="d-flex justify-space-between gap-2 pa-2 align-center" style="height:6em">
                 <ColorPicker Value="@_color" ValueChanged="DoUpdateColor" />
                 <MudToggleIconButton Toggled="@(_drawMode == "free" ? true : false)"
                                      Icon="@Icons.Material.Filled.Brush"

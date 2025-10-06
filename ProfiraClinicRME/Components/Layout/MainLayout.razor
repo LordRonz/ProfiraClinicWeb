@@ -35,7 +35,7 @@
 
     <MudAppBar Style="background: rgba(1, 73, 191, 1); z-index: 1000;" Elevation="0" Fixed="true">
         @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" /> *@
-        <MudLink Href="/" Class="d-flex justify-content-center gap-2 text-decoration-none">
+        <MudLink Href="/" Class="d-flex justify-center gap-2 text-decoration-none">
             <MudImage Src="images/logo-white.png" Alt="Profira" Class="" Height="85" Style="filter: brightness(0) invert(1);" />
         </MudLink>
         @* <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="MudBlazor.Color.Dark" Edge="Edge.Start" OnClick="@DrawerToggle" /> *@
@@ -44,8 +44,8 @@
             <SectionOutlet SectionId="TitleBlock" />
         </div>
         <MudSpacer></MudSpacer>
-        <div class="d-flex flex-column align-items-end">
-            <div class="d-flex justify-content-center align-items-center">
+        <div class="d-flex flex-column align-end">
+            <div class="d-flex justify-center align-center">
                 <MudBadge Content="3" Overlap="true" Class="mr-8" Color="MudBlazor.Color.Secondary">
                     <MudIcon Icon="@Icons.Material.Filled.Notifications" Style="color: #fff;" />
                 </MudBadge>
@@ -53,14 +53,14 @@
                     <MudIcon Icon="@Icons.Material.Filled.Search" Style="color: #fff;" />
                 </div>
 
-                <div class="d-flex align-items-center gap-2" onclick="@ToggleProfilePopover">
+                <div class="d-flex align-center gap-2" onclick="@ToggleProfilePopover">
                     <MudText Typo="Typo.body2">@_user?.UserName</MudText>
                     <MudAvatar>
-                        <MudImage Src="images/avatar1.jpeg" Alt="An image of the best dog ever!"></MudImage>
+                        <MudImage Src="images/avatar1.jpeg" Alt="avatar1"></MudImage>
                     </MudAvatar>
                     <MudPopover Open="@_isProfilePopoverOpen" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter">
                         <div class="d-flex flex-column pa-1">
-                            <MudList T="string" Clickable="true">
+                            <MudList T="string">
                                 <MudListItem Text="Profile" Icon="@Icons.Material.Filled.Person" />
                                 <MudListItem Text="Settings" Icon="@Icons.Material.Filled.Settings" />
                                 <MudListItem Text="Activity Log" Icon="@Icons.Material.Filled.FormatListBulleted" />
@@ -80,7 +80,7 @@
 
 
     <MudMainContent Class="h-100">
-        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="h-100 px-2 pb-4">
+        <MudContainer MaxWidth="MaxWidth.Large"  Class="h-100 px-2 pb-4">
 
             <CascadingValue Name="CurrentUser" Value="_user">
                 <CascadingValue Name="CurrentAppointment" Value="_appointment">
@@ -134,7 +134,7 @@
     {
         Typography = new Typography()
         {
-            Default = new Default()
+            Default = new DefaultTypography()
             {
                 FontFamily = new[] { "Poppins", "Helvetica", "Arial", "sans-serif" }
             }
@@ -232,9 +232,9 @@
 
     public void Dispose() => Nav.LocationChanged -= _onLocationChanged;
 
-    private void OpenDialog()
+    private async Task OpenDialog()
     {
-        DialogService.Show<ProfiraClinicRME.Components.Dialog.LogOutDialog>("Log Out");
+        await DialogService.ShowAsync<ProfiraClinicRME.Components.Dialog.LogOutDialog>("Log Out");
     }
 }
 
