@@ -35,7 +35,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<string> LoginAsync(LoginModel model)
         {
             var response = await _httpClient.PostAsJsonAsync("api/auth/login", model);
-            if (response.StatusCode != 0)
+            if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
                 throw new HttpRequestException($"Login failed");
@@ -45,6 +45,11 @@ namespace ProfiraClinicWeb.Services
             if (authResult == null || string.IsNullOrEmpty(authResult?.Data?.Token))
             {
                 throw new HttpRequestException("Authentication succeeded but token was not returned.");
+            }
+
+            if (authResult.StatusCode != 0)
+            {
+                throw new HttpRequestException("Login failed, check your credentials.");
             }
 
             return authResult.Data.Token;

@@ -23,7 +23,7 @@ namespace ProfiraClinicWebAPI.Controllers
             => q.OrderBy(d => d.KodeBarang);
 
         [NonAction]
-        public override Task<ActionResult> GetItems(string last = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        public override Task<ActionResult> GetItems(string last = null, [FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery(Name = "sort")] string[] sort = null)
             => base.GetItems(last);
 
         [HttpGet("GetList")]

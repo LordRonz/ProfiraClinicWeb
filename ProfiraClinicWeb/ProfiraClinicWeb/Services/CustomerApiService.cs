@@ -12,23 +12,49 @@ namespace ProfiraClinicWeb.Services
             _httpClient = httpClient;
         }
 
-        public async Task<ApiResponse<PagedResult<Customer>>> GetPatientsAsync(int page = 1, int pageSize = 20)
+        public async Task<ApiResponse<PagedResult<Customer>>> GetPatientsAsync(
+    int page = 1, int pageSize = 20, params string[]? sort)
         {
-            var url = $"api/Patient/GetList?Page={page}&PageSize={pageSize}";
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<Customer>>>(url)
-                           ?? throw new HttpRequestException("No response payload");
+            var qs = new List<string>
+    {
+        $"Page={page}",
+        $"PageSize={pageSize}"
+    };
+
+            if (sort is not null)
+            {
+                foreach (var s in sort.Where(x => !string.IsNullOrWhiteSpace(x)))
+                    qs.Add($"sort={Uri.EscapeDataString(s)}");   // e.g. "NamaCustomer:desc" or "-NamaCustomer"
+            }
+
+            var url = $"api/Patient/GetList?{string.Join("&", qs)}";
+            var response = await _httpClient
+                .GetFromJsonAsync<ApiResponse<PagedResult<Customer>>>(url)
+                ?? throw new HttpRequestException("No response payload");
             return response;
         }
 
         public async Task<ApiResponse<PagedResult<Customer>>> SearchPatientsAsync(
-            string searchTerm,
-            int page = 1,
-            int pageSize = 20)
+            string searchTerm, int page = 1, int pageSize = 20, params string[]? sort)
         {
-            var url = $"api/Patient/GetListByString?Page={page}&PageSize={pageSize}";
-            var payload = new { Param = searchTerm ?? string.Empty };
-            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
+            var qs = new List<string>
+    {
+        $"Page={page}",
+        $"PageSize={pageSize}"
+    };
 
+            if (sort is not null)
+            {
+                foreach (var s in sort.Where(x => !string.IsNullOrWhiteSpace(x)))
+                    qs.Add($"sort={Uri.EscapeDataString(s)}");
+            }
+
+            var url = $"api/Patient/GetListByString?{string.Join("&", qs)}";
+
+            // BaseCrudController.Search expects body.GetParam
+            var payload = new { Param = searchTerm ?? string.Empty };
+
+            var respMsg = await _httpClient.PostAsJsonAsync(url, payload);
             if (!respMsg.IsSuccessStatusCode)
             {
                 var err = await respMsg.Content.ReadAsStringAsync();
@@ -38,6 +64,8 @@ namespace ProfiraClinicWeb.Services
             var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<Customer>>>();
             return result!;
         }
+
+
 
         public async Task<ApiResponse<Customer>> GetPatientByCodeAsync(string code)
         {

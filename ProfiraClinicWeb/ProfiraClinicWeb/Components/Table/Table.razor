@@ -39,7 +39,14 @@
 </div>
 @if (!UseServerData || ServerDataFunc == null)
 {
-    <MudTable HeaderClass="@GetHeaderClass()" Striped Bordered Items="_data" Dense Hover Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="MudBlazor.Color.Info" Filter="_filterPredicate" @ref="table">
+    <MudTable HeaderClass="@GetHeaderClass()"
+              Striped Bordered
+              Items="_displayData"
+              Dense Hover Breakpoint="Breakpoint.Sm"
+              Loading="@_loading"
+              LoadingProgressColor="MudBlazor.Color.Info"
+              Filter="_filterPredicate"
+              @ref="table">
         <ColGroup>
             @foreach (TableColumn col in _columns)
             {
@@ -63,8 +70,25 @@
         <HeaderContent>
             @foreach (TableColumn col in _columns)
             {
-                // Pass the Dto properties to the component
-                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+                if (col.Type == ColumnType.Data)
+                {
+                    <MudTh Class="fw-bold border-header-table sort-header"
+                           @onclick="(() => ToggleSort(col.DataField))">
+                        <span>@col.Caption</span>
+                        @if (_sortColumn == col.DataField)
+                        {
+                            <MudIcon Size="MudBlazor.Size.Small"
+                                     Class="ms-1"
+                                     Icon="@(_sortDir == SortDir.Desc
+                                                                             ? Icons.Material.Filled.ArrowDownward
+                                                                             : Icons.Material.Filled.ArrowUpward)" />
+                        }
+                    </MudTh>
+                }
+                else
+                {
+                    <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+                }
             }
         </HeaderContent>
         <RowTemplate>
@@ -140,10 +164,28 @@ else
         <HeaderContent>
             @foreach (TableColumn col in _columns)
             {
-                // Pass the Dto properties to the component
-                <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+                if (col.Type == ColumnType.Data)
+                {
+                    <MudTh Class="fw-bold border-header-table sort-header"
+                           @onclick="(() => ToggleSortAndReload(col.DataField))">
+                        <span>@col.Caption</span>
+                        @if (_sortColumn == col.DataField && _sortDir != SortDir.None)
+                        {
+                            <MudIcon Size="MudBlazor.Size.Small"
+                                     Class="ms-1"
+                                     Icon="@(_sortDir == SortDir.Desc
+                                                                             ? Icons.Material.Filled.ArrowDownward
+                                                                             : Icons.Material.Filled.ArrowUpward)" />
+                        }
+                    </MudTh>
+                }
+                else
+                {
+                    <MudTh Class="fw-bold border-header-table">@col.Caption</MudTh>
+                }
             }
         </HeaderContent>
+
         <RowTemplate>
             @foreach (TableColumn col in _columns)
             {
@@ -224,7 +266,8 @@ else
     public TableConfig Config { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
     [Parameter]
     public string? ClassOverride { get; set; }
-    [Parameter] public Func<int, int, string, Task<ApiResponse<PagedResult<Dictionary<string, string>>>>>? ServerDataFunc { get; set; }
+    [Parameter]
+    public Func<int, int, string, string?, string?, Task<ApiResponse<PagedResult<Dictionary<string, string>>>>>? ServerDataFunc { get; set; }
 
     [Parameter]
     public bool? WithAdd { get; set; } = true;
@@ -235,6 +278,89 @@ else
     private bool FilterFunc1(Dictionary<string, string> element) => FilterFunc(element, searchString1.ToLower().Trim());
 
     private List<TableColumn> _columns = new();
+
+    private enum SortDir { None, Desc, Asc }
+
+    private string? _sortColumn;
+    private SortDir _sortDir = SortDir.None;
+
+    private List<Dictionary<string, string>> _displayData = [];
+
+    private void UpdateDisplayData()
+    {
+        if (_sortDir == SortDir.None || string.IsNullOrWhiteSpace(_sortColumn))
+        {
+            _displayData = _data.ToList();
+            return;
+        }
+
+        int CompareVals(Dictionary<string, string> a, Dictionary<string, string> b)
+        {
+            var av = a.GetValueOrDefault(_sortColumn!) ?? string.Empty;
+            var bv = b.GetValueOrDefault(_sortColumn!) ?? string.Empty;
+
+            if (decimal.TryParse(av, out var an) && decimal.TryParse(bv, out var bn))
+                return an.CompareTo(bn);
+
+            if (DateTime.TryParse(av, out var ad) && DateTime.TryParse(bv, out var bd))
+                return ad.CompareTo(bd);
+
+            return string.Compare(av, bv, StringComparison.OrdinalIgnoreCase);
+        }
+
+        var list = _data.ToList();
+        list.Sort((a, b) => _sortDir == SortDir.Desc ? -CompareVals(a, b) : CompareVals(a, b));
+        _displayData = list;
+    }
+
+    private void ToggleSort(string dataField)
+    {
+        if (!string.Equals(_sortColumn, dataField, StringComparison.Ordinal))
+        {
+            _sortColumn = dataField;
+            _sortDir = SortDir.Desc;           // first click = DESC
+        }
+        else
+        {
+            _sortDir = _sortDir switch          // cycle: DESC -> ASC -> None -> DESC ...
+            {
+                SortDir.Desc => SortDir.Asc,
+                SortDir.Asc => SortDir.None,
+                _ => SortDir.Desc
+            };
+            if (_sortDir == SortDir.None) _sortColumn = null;
+        }
+
+        UpdateDisplayData();
+        StateHasChanged();
+    }
+
+    private void ToggleSortAndReload(string dataField)
+    {
+        if (!string.Equals(_sortColumn, dataField, StringComparison.Ordinal))
+        {
+            _sortColumn = dataField;
+            _sortDir = SortDir.Desc;
+        }
+        else
+        {
+            _sortDir = _sortDir switch
+            {
+                SortDir.Desc => SortDir.Asc,
+                SortDir.Asc => SortDir.None,
+                _ => SortDir.Desc
+            };
+            if (_sortDir == SortDir.None) _sortColumn = null;
+        }
+
+        if (UseServerData && ServerDataFunc != null)
+        {
+            _ = table?.ReloadServerData();
+        }
+        StateHasChanged();
+    }
+
+
 
     protected override void OnParametersSet()
     {
@@ -252,6 +378,8 @@ else
                 .ToHashSet();
 
             _filterPredicate = FilterFunc1;
+
+            UpdateDisplayData();
         }
     }
 
@@ -324,7 +452,16 @@ else
 
     private async Task<TableData<Dictionary<string, string>>> LoadServerData(TableState state, CancellationToken token)
     {
-        var resp = await ServerDataFunc!(state.Page + 1, state.PageSize, searchString1);
+        var dir = _sortDir == SortDir.None ? null
+                 : _sortDir == SortDir.Desc ? "desc" : "asc";
+        System.Diagnostics.Debug.WriteLine(searchString1);
+        var resp = await ServerDataFunc!(
+            state.Page + 1,
+            state.PageSize,
+            searchString1,
+            _sortColumn,
+            dir
+        );
 
         return new TableData<Dictionary<string, string>>
         {
@@ -332,6 +469,7 @@ else
             Items = resp.Data?.Items ?? new List<Dictionary<string, string>>()
         };
     }
+
 
     private void OnSearchChanged(string value)
     {
@@ -358,6 +496,8 @@ else
         _data = _data.Where(r =>
             !string.Equals(r.GetValueOrDefault(keyField), keyVal, StringComparison.Ordinal)
         ).ToList();
+
+        UpdateDisplayData();
     }
 
     private async Task OnDeleteClicked(string keyField, string? keyVal, Func<string?, Task<bool>>? serverAction)
@@ -377,6 +517,17 @@ else
 
 
 <style>
+    .sort-header {
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+    }
+
+        .sort-header .mud-icon-root {
+            vertical-align: middle;
+        }
+
+
     .bg-blue {
         background-color: rgba(1, 73, 191, 1);
     }
