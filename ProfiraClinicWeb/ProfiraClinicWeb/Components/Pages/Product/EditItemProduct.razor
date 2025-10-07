@@ -1,5 +1,190 @@
-﻿<h3>EditItemProduct</h3>
+﻿@page "/product-item/{Id}/edit"
+
+@using ProfiraClinic.Models.Core
+@using ProfiraClinic.Models.Api
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+
+@inject BarangHeaderApiService BarangHeaderApi
+@inject NavigationManager Navigation
+
+<MudCard Class="p-3 h-100">
+        <MudForm @ref="form" Class="table-form">
+            <MudGrid GutterSize="0">
+                <!-- KodeBarang (read-only) -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Kode Barang"
+                                  @bind-Value="model.KodeBarang"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Disabled="true" />
+                </MudItem>
+
+                <MudItem xs="12" />
+
+                <!-- UnitJual -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Unit Jual"
+                                  @bind-Value="model.UnitJual"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Required="true" />
+                </MudItem>
+
+                <MudItem xs="12" />
+
+                <!-- HargaJual -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Harga Jual"
+                                  @bind-Value="model.HargaJual"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Placeholder="e.g. 125000.00"
+                                  Required="true" />
+                </MudItem>
+
+                <MudItem xs="12" />
+
+                <!-- DiscMember -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Diskon Member"
+                                  @bind-Value="model.DiscMember"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Placeholder="e.g. 5.000" />
+                </MudItem>
+
+                <MudItem xs="12" />
+
+                <!-- DiscNonMember -->
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string"
+                                  Label="Diskon Non Member"
+                                  @bind-Value="model.DiscNonMember"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  Placeholder="e.g. 2.500" />
+                </MudItem>
+
+                <MudItem xs="12" />
+
+                <!-- Aktif -->
+                <MudItem xs="12" sm="6" Class="d-flex align-center">
+                    <MudSwitch T="bool" @bind-Checked="aktifBool"
+                               Color="MudBlazor.Color.Primary"
+                               Class="me-2" />
+                    <MudText Typo="Typo.body2">Aktif</MudText>
+                </MudItem>
+            </MudGrid>
+
+        <div class="button-bar mt-4">
+            <MudButton Variant="Variant.Outlined"
+                       Color="MudBlazor.Color.Secondary"
+                       OnClick="GoBack"
+                       Class="action-btn">
+                Kembali
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       OnClick="SubmitAsync"
+                       Class="action-btn">
+                Simpan
+            </MudButton>
+        </div>
+
+
+        </MudForm>
+</MudCard>
 
 @code {
+    [Parameter] public string Id { get; set; } = string.Empty;
 
+    private MudForm? form;
+    private EditBarangHeaderDto model = new();
+    private bool aktifBool = true; // maps to model.Aktif "1"/"0"
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            GoBack();
+            return;
+        }
+
+        // Load current header by code
+        var resp = await BarangHeaderApi.GetBarangHeaderByCodeAsync(Id);
+        if (resp.StatusCode != 0 || resp.Data is null)
+        {
+            GoBack();
+            return;
+        }
+
+        var h = resp.Data;
+
+        // Map entity -> DTO (DTO uses string for numerics)
+        model.KodeBarang   = h.KodeBarang ?? string.Empty;
+        model.UnitJual     = h.UnitJual ?? string.Empty;
+        model.HargaJual    = h.HargaJual.ToString("0.##");
+        model.DiscMember   = h.DiscMember.ToString("0.###");
+        model.DiscNonMember= h.DiscNonMember.ToString("0.###");
+        model.Aktif        = string.IsNullOrWhiteSpace(h.Aktif) ? "1" : h.Aktif;
+        model.USRID        = string.IsNullOrWhiteSpace(h.USRID) ? "" : h.USRID;
+
+        aktifBool = model.Aktif == "1";
+        StateHasChanged();
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/product-item");
+
+    private async Task SubmitAsync()
+    {
+        // switch -> string flag
+        model.Aktif = aktifBool ? "1" : "0";
+
+        var result = await BarangHeaderApi.UpdateBarangHeaderAsync(model);
+        if (result.StatusCode < 300)
+            GoBack();
+        else
+            System.Diagnostics.Debug.WriteLine(result.Message);
+    }
 }
+
+<style>
+    /* Make the inner form area narrower so inputs aren't full width */
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
+    .form-container {
+        width: 100%;
+        max-width: 720px;       /* Tweak to taste (640–840px works well) */
+    }
+
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0 10px !important;
+        font-size: 12px !important;
+        margin-bottom: 0 !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+</style>

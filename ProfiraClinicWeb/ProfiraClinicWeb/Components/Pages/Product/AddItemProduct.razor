@@ -71,13 +71,13 @@
 
         </MudGrid>
 
-        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+        <div class="button-bar mt-4">
             <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">Kembali</MudButton>
             <MudButton Variant="Variant.Filled"
                        Color="MudBlazor.Color.Primary"
                        Disabled="!form.IsValid"
                        OnClick="SubmitAsync">Simpan</MudButton>
-        </MudStack>
+        </div>
     </MudForm>
 </MudCard>
 
@@ -157,6 +157,13 @@
 
 /* Optional: match your compact form style */
 <style>
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
     .table-form .mud-input-root {
         height: 30px !important;
         padding: 0px 10px !important;

@@ -270,5 +270,13 @@ VALUES
                 });
             }
         }
+
+
+        [HttpGet("GetByCode/{code}")]
+        public async Task<ActionResult<BarangHeader>> GetItemByCode(string code)
+        {
+            return await FindOne(c => c.KodeBarang == code);
+        }
     }
+
 }

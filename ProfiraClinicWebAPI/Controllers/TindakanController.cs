@@ -6,15 +6,15 @@ using ProfiraClinicWebAPI.Data;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    public class TindakanController : BaseCrudController<PPerawatanH>
+    public class TindakanController : BaseCrudController<PerawatanHeader>
     {
         public TindakanController(AppDbContext ctx) : base(ctx) { }
 
-        protected override DbSet<PPerawatanH> DbSet
+        protected override DbSet<PerawatanHeader> DbSet
             => _context.PPerawatanH;
 
-        protected override IQueryable<PPerawatanH> ApplySearch(
-            IQueryable<PPerawatanH> q,
+        protected override IQueryable<PerawatanHeader> ApplySearch(
+            IQueryable<PerawatanHeader> q,
             string likeParam)
             => q.Where(d
                 => EF.Functions.Like(d.KodeJenis, likeParam)
@@ -22,12 +22,12 @@ namespace ProfiraClinicWebAPI.Controllers
                 || EF.Functions.Like(d.KodePerawatan, likeParam)
                 || EF.Functions.Like(d.NamaPerawatan, likeParam));
 
-        protected override IOrderedQueryable<PPerawatanH> ApplyOrder(
-            IQueryable<PPerawatanH> q)
+        protected override IOrderedQueryable<PerawatanHeader> ApplyOrder(
+            IQueryable<PerawatanHeader> q)
             => q.OrderBy(d => d.KodePerawatan);
 
-        protected override IQueryable<PPerawatanH> ApplyLastFilter(
-            IQueryable<PPerawatanH> q,
+        protected override IQueryable<PerawatanHeader> ApplyLastFilter(
+            IQueryable<PerawatanHeader> q,
             DateTime lastDate)
         {
             return q.Where(p => p.UpdDt > lastDate);
@@ -35,7 +35,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
         // POST: api/Tindakan/add
         [HttpPost("add")]
-        public async Task<ActionResult<PPerawatanH>> AddTindakan([FromBody] PPerawatanH newTindakan)
+        public async Task<ActionResult<PerawatanHeader>> AddTindakan([FromBody] PerawatanHeader newTindakan)
         {
             if (newTindakan == null)
             {

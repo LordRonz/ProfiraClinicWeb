@@ -49,7 +49,7 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<MKlinik> MKlinik { get; set; }
         public DbSet<Appointment> Appointment { get; set; }
         public DbSet<TRMAppointment> AppointmentList { get; set; }
-        public DbSet<PPerawatanH> PPerawatanH { get; set; }
+        public DbSet<PerawatanHeader> PPerawatanH { get; set; }
         public DbSet<UserGroup> MUserGroup { get; set; }
         public DbSet<User> MUser { get; set; }
         public DbSet<Referensi> MRefferensi { get; set; }
@@ -92,5 +92,8 @@ namespace ProfiraClinicWebAPI.Data
 
         public DbSet<TRMPenandaanGambar> TRMPenandaanGambar { get; set; }
         public DbSet<PerawatanDetail> PerawatanDetail { get; set; }
+
+        public DbSet<TRMPerawatanHeader> TRMPerawatanHeader { get; set; }
+        public DbSet<TRMPerawatanDetail> TRMPerawatanDetail { get; set; }
     }
 }

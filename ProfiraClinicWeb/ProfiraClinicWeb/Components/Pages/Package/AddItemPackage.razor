@@ -63,7 +63,7 @@
         <MudGrid>
             <MudItem xs="12" sm="3">
                 <!-- Replaced text input with autocomplete for Perawatan -->
-                <MudAutocomplete T="PPerawatanH"
+                <MudAutocomplete T="PerawatanHeader"
                                  Label="Pilih Perawatan"
                                  @bind-Value="selectedPerawatan"
                                  SearchFunc="SearchPerawatan"
@@ -109,8 +109,7 @@
         </RowTemplate>
     </MudTable>
 
-    <!-- Save Header and Details -->
-    <div class="d-flex justify-end mt-4">
+    <div class="button-bar mt-4">
         <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Class="save-btn" OnClick="SubmitAll">Simpan Paket</MudButton>
         <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" Class="back-btn" OnClick="Back">Kembali</MudButton>
     </div>
@@ -127,10 +126,10 @@
     private List<PaketDetail> details = new List<PaketDetail>();
 
     private List<GroupPaket> groupPakets = new List<GroupPaket>();
-    private List<PPerawatanH> perawatans = new List<PPerawatanH>();
+    private List<PerawatanHeader> perawatans = new List<PerawatanHeader>();
 
     private GroupPaket selectedGroup;
-    private PPerawatanH selectedPerawatan; // NEW: holds current perawatan selection
+    private PerawatanHeader selectedPerawatan; // NEW: holds current perawatan selection
 
     private bool isActive;
     private bool isEditingDetail = false;
@@ -160,7 +159,7 @@
             // Load Perawatan (Tindakan)
             var perawatanApiResponse = await PerawatanApiService.GetTindakansAsync();
             if (perawatanApiResponse.StatusCode == 0 && perawatanApiResponse.Data != null)
-                perawatans = perawatanApiResponse.Data.Items ?? new List<PPerawatanH>();
+                perawatans = perawatanApiResponse.Data.Items ?? new List<PerawatanHeader>();
 
             StateHasChanged();
         }
@@ -195,7 +194,7 @@
 
     // --- Autocomplete: Perawatan ---
 
-    private Task<IEnumerable<PPerawatanH>> SearchPerawatan(string value, CancellationToken cancelToken)
+    private Task<IEnumerable<PerawatanHeader>> SearchPerawatan(string value, CancellationToken cancelToken)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Task.FromResult(perawatans.AsEnumerable());
@@ -207,7 +206,7 @@
         return Task.FromResult(result);
     }
 
-    private void OnPerawatanChanged(PPerawatanH p)
+    private void OnPerawatanChanged(PerawatanHeader p)
     {
         selectedPerawatan = p;
         detail.KodePerawatan = p?.KodePerawatan; // keep the saved code in sync with selection
@@ -329,6 +328,13 @@
 }
 
 <style>
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
     .form-container {
         max-width: 800px; /* adjust this value to control the width */
     }

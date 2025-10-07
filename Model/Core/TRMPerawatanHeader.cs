@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
 {
+    [Table("TRM_Perawatan_Header")]
     public class TRMPerawatanHeader
     {
         [Column(TypeName = "char(25)")]
