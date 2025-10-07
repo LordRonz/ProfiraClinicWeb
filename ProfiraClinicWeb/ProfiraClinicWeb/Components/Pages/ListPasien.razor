@@ -36,12 +36,12 @@
             {
                 new TableColumn { Caption="View",           DataField="view",      Type=ColumnType.View    },
                 new TableColumn { Caption="Edit",           DataField="edit",      Type=ColumnType.Edit    },
-                new TableColumn { Caption="Kode Customer",  DataField="memberId"                        },
-                new TableColumn { Caption="Nama Pasien",    DataField="namaPasien"                      },
-                new TableColumn { Caption="Alamat",         DataField="alamat"                         },
-                new TableColumn { Caption="No. HP",         DataField="noHp"                           },
-                new TableColumn { Caption="Tgl Lahir",      DataField="tglLahir"                       },
-                new TableColumn { Caption="Aktif?",         DataField="aktif"                          },
+                new TableColumn { Caption="Kode Customer",  DataField="KodeCustomer"                        },
+                new TableColumn { Caption="Nama Pasien",    DataField="NamaCustomer"                      },
+                new TableColumn { Caption="Alamat",         DataField="AlamatDomisili"                         },
+                new TableColumn { Caption="No. HP",         DataField="NomorHP"                           },
+                new TableColumn { Caption="Tgl Lahir",      DataField="TanggalLahir"                       },
+                new TableColumn { Caption="Aktif?",         DataField="Aktif"                          },
             },
             // no local data needed in server mode
             dataSource: new List<object>(),
@@ -50,44 +50,61 @@
     }
 
     private Task<ApiResponse<PagedResult<Dictionary<string, string>>>> LoadPatientsAsync(
-        int page,
-        int pageSize,
-        string searchTerm)
+    int page,
+    int pageSize,
+    string searchTerm,
+    string? sortField,   // e.g. "NamaCustomer" or null
+    string? sortDir      // "desc" | "asc" | null
+)
     {
+        // Build sort tokens expected by the API client, e.g. "NamaCustomer:desc"
+        string[] sorts = BuildSort(sortField, sortDir);
+
         if (string.IsNullOrWhiteSpace(searchTerm))
-            return ApiService.GetPatientsAsync(page, pageSize)
-                   .ContinueWith(t =>
-                       new ApiResponse<PagedResult<Dictionary<string, string>>>(
-                           t.Result.StatusCode,
-                           t.Result.Message,
-                           // map Customer -> Dictionary<string,string>
-                           new PagedResult<Dictionary<string, string>>
-                           {
-                               TotalCount = t.Result.Data.TotalCount,
-                               Page = t.Result.Data.Page,
-                               PageSize = t.Result.Data.PageSize,
-                               TotalPages = t.Result.Data.TotalPages,
-                               Items = t.Result.Data.Items.Select(el => ToDict(el)).ToList()
-                           }
-                       )
-                   );
+        {
+            return ApiService.GetPatientsAsync(page, pageSize, sorts)
+                .ContinueWith(t => new ApiResponse<PagedResult<Dictionary<string, string>>>(
+                    t.Result.StatusCode,
+                    t.Result.Message,
+                    new PagedResult<Dictionary<string, string>>
+                    {
+                        TotalCount = t.Result.Data.TotalCount,
+                        Page = t.Result.Data.Page,
+                        PageSize = t.Result.Data.PageSize,
+                        TotalPages = t.Result.Data.TotalPages,
+                        Items = t.Result.Data.Items.Select(ToDict).ToList()
+                    }
+                ));
+        }
         else
-            return ApiService.SearchPatientsAsync(searchTerm, page, pageSize)
-                   .ContinueWith(t =>
-                       new ApiResponse<PagedResult<Dictionary<string, string>>>(
-                           t.Result.StatusCode,
-                           t.Result.Message,
-                           new PagedResult<Dictionary<string, string>>
-                           {
-                               TotalCount = t.Result.Data.TotalCount,
-                               Page = t.Result.Data.Page,
-                               PageSize = t.Result.Data.PageSize,
-                               TotalPages = t.Result.Data.TotalPages,
-                               Items = t.Result.Data.Items.Select(el => ToDict(el)).ToList()
-                           }
-                       )
-                   );
+        {
+            return ApiService.SearchPatientsAsync(searchTerm, page, pageSize, sorts)
+                .ContinueWith(t => new ApiResponse<PagedResult<Dictionary<string, string>>>(
+                    t.Result.StatusCode,
+                    t.Result.Message,
+                    new PagedResult<Dictionary<string, string>>
+                    {
+                        TotalCount = t.Result.Data.TotalCount,
+                        Page = t.Result.Data.Page,
+                        PageSize = t.Result.Data.PageSize,
+                        TotalPages = t.Result.Data.TotalPages,
+                        Items = t.Result.Data.Items.Select(ToDict).ToList()
+                    }
+                ));
+        }
     }
+
+    private static string[] BuildSort(string? field, string? dir)
+    {
+        if (string.IsNullOrWhiteSpace(field) || string.IsNullOrWhiteSpace(dir))
+            return Array.Empty<string>(); // no sorting
+
+        // normalize direction
+        var d = dir.Equals("desc", StringComparison.OrdinalIgnoreCase) ? "desc" : "asc";
+        return new[] { $"{field}:{d}" };
+    }
+
+
 
     // helper to convert your Customer into the Dictionary<string,string> shape your table expects
     private Dictionary<string, string> ToDict(Customer el) =>
@@ -95,12 +112,12 @@
         {
             ["view"] = $"pasien/{el.KodeCustomer}",
             ["edit"] = $"pasien/{el.KodeCustomer}/edit",
-            ["memberId"] = el.KodeCustomer,
-            ["namaPasien"] = el.NamaCustomer,
-            ["alamat"] = el.AlamatDomisili,
-            ["noHp"] = el.NomorHP,
-            ["tglLahir"] = el.TanggalLahir?.ToString("dd/MM/yyyy") ?? "",
-            ["aktif"] = el.AKTIF == "1" ? "Ya" : "Tidak"
+            ["KodeCustomer"] = el.KodeCustomer,
+            ["NamaCustomer"] = el.NamaCustomer,
+            ["AlamatDomisili"] = el.AlamatDomisili,
+            ["NomorHP"] = el.NomorHP,
+            ["TanggalLahir"] = el.TanggalLahir?.ToString("dd/MM/yyyy") ?? "",
+            ["Aktif"] = el.AKTIF == "1" ? "Ya" : "Tidak"
         };
 
     private int ChartIndex = -1; // default value cannot be 0 -> first selected index is 0.
