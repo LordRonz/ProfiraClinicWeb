@@ -102,13 +102,6 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrEmpty(userName))
                 return Unauthorized();
 
-            // Look up the user
-            var user = await _context.MUser
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.USRID == userName);
-            if (user == null)
-                return NotFound();
-
             // Validate required fields
             if (string.IsNullOrEmpty(appDto.NomorAppointment))
                 return BadRequest("NomorAppointment is required");
@@ -157,7 +150,6 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrEmpty(userName)) return Unauthorized();
 
             var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.USRID == userName);
-            if (user == null) return NotFound("User not found.");
 
             var apptDate = dto.TanggalAppointment;              // full date/time from payload
             var year = apptDate.Year.ToString("0000");
@@ -212,7 +204,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 StatusAppointment = "1",
                 Estimasi = 0,
                 UpdDt = DateTime.UtcNow,
-                UsrId = user.KodeUser ?? user.USRID
+                UsrId = user?.KodeUser ?? user?.USRID
             };
 
             _context.Appointment.Add(entity);
