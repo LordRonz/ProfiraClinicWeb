@@ -53,7 +53,7 @@ namespace ProfiraClinicWebAPI.Controllers
             // Prepare SQL parameters. For nullable fields, pass DBNull.Value.
             var sqlParameters = new[]
             {
-        new SqlParameter("@UserID", newUser.KodeUser ?? (object)DBNull.Value),
+        new SqlParameter("@KodeUser", newUser.KodeUser ?? (object)DBNull.Value),
         // The stored procedure generates the customer code, so pass an empty string.
         new SqlParameter("@USRID", newUser.USRID ?? (object)DBNull.Value),
         new SqlParameter("@Password", hashedPassword ?? (object)DBNull.Value),
@@ -66,7 +66,7 @@ namespace ProfiraClinicWebAPI.Controllers
             {
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC dbo.usp_MUser_Add " +
-                    "@UserID, @UserName, @Password, @KodeUserGroup, @UserInput, @KodeLokasi",
+                    "@KodeUser, @USRID, @Password, @KodeUserGroup, @UserInput, @KodeLokasi",
                     sqlParameters);
 
                 return CreatedAtAction(nameof(GetItem), new { id = newUser.KodeUser }, newUser);

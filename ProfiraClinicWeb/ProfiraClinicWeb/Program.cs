@@ -126,7 +126,7 @@ builder.Services.AddHttpClient<ImagesApiService>(client =>
 builder.Services.AddHttpClient<AuthApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseAddress);
-});
+}).AddHttpMessageHandler<BearerTokenHandler>();
 
 
 var app = builder.Build();

@@ -161,7 +161,7 @@
                             <MudCollapse Expanded="@systemMenuExpanded">
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/group-login"))">Setup Group Login</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/login-user"))">Setup Login User</MudNavLink>
-                                <MudNavLink OnClick="@(() => OnClickMasterNav("/password"))">Perubahan Password</MudNavLink>
+                                <MudNavLink OnClick="@(() => OnClickMasterNav($"/auth/change-password/{user?.UserName}"))">Perubahan Password</MudNavLink>
                                 <MudNavLink OnClick="@(() => OnClickMasterNav("/group-auth"))">Setup Otorisasi Group</MudNavLink>
                             </MudCollapse>
                         </MudNavMenu>
