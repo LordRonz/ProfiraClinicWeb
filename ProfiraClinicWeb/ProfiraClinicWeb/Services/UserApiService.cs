@@ -57,7 +57,7 @@ namespace ProfiraClinicWeb.Services
             {
                 // Retrieve the error message from the response.
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<User>((int)responseMessage.StatusCode, $"Error creating patient: {errorMsg}");
+                return new ApiResponse<User>((int)responseMessage.StatusCode, $"Error creating user: {errorMsg}");
             }
 
             // Deserialize the created patient.

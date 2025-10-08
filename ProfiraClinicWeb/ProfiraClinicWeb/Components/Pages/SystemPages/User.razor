@@ -53,7 +53,7 @@
                 (object)new
                 {
                     view = $"login-user/{el.KodeUser}",
-                    edit = $"login-user/edit/{el.KodeUser}",
+                    edit = $"login-user/{el.KodeUser}/edit",
                     memberId = el.KodeUser,
                     namaPasien = el.USRID,
                     groupLogin = el.KodeUserGroup,
@@ -62,9 +62,8 @@
 
             UserTableConfig = new TableConfig(
                 new List<TableColumn> {
-                    new TableColumn { Caption = "View", DataField = "view", Type = ColumnType.View },
                     new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
-                    new TableColumn { Caption = "User ID", DataField = "memberId" },
+                    new TableColumn { Caption = "Kode User", DataField = "memberId" },
                     new TableColumn { Caption = "Nama User", DataField = "namaPasien" },
                     new TableColumn { Caption = "Group Login", DataField = "groupLogin" },
 
