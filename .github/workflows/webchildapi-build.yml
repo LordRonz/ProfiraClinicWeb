@@ -1,4 +1,4 @@
-name: .NET
+name: Web Child API Build
 
 on:
   push:
