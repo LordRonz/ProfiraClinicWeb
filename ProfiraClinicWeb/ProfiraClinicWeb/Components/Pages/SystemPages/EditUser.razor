@@ -61,7 +61,7 @@
             </MudItem>
         </MudGrid>
 
-        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+        <div class="button-bar mt-4">
             <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
                 Kembali
             </MudButton>
@@ -72,7 +72,7 @@
                        OnClick="SubmitAsync">
                 Simpan
             </MudButton>
-        </MudStack>
+        </div>
     </MudForm>
 </MudCard>
 
@@ -129,6 +129,13 @@
 }
 
 <style>
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
     .save-btn {
         background: rgba(47, 193, 71, 1);
         color: white;

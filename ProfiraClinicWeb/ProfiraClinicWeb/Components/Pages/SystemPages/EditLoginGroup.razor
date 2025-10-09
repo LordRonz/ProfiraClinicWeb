@@ -1,92 +1,100 @@
 ﻿@page "/group-login/{Id}/edit"
 
-@using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
-@using ProfiraClinicWeb.Helpers
-@using System.ComponentModel.DataAnnotations
 @using ProfiraClinicWeb.Services
 @using MudBlazor
-@inject HttpClient httpClient
-@inject CustomerApiService CustomerApiService
 @inject GroupUserApiService GroupUserApiService
 @inject NavigationManager NavigationManager
 
 <MudCard Class="p-4 h-100">
-    <MudTextField T="string"
-                  Label="Nama Group"
-                  @bind-Value="userGroup.NamaUserGroup"
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense" Class="mb-3" />
-    <MudTextField T="string"
-                  Label="Kode Group"
-                  @bind-Value="userGroup.KodeUserGroup"
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense" Class="mb-4" />
+    <MudForm @ref="form" Class="table-form">
+        <MudGrid GutterSize="3">
+            <!-- Row 1: Nama Group (max half width) -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Nama Group"
+                              @bind-Value="userGroup.NamaUserGroup"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Required="true"
+                              Class="mb-0" />
+            </MudItem>
 
-    <MudButton Variant="Variant.Filled"
-               Color="MudBlazor.Color.Primary"
-               Class="ml-auto rounded-3"
-               OnClick="SubmitAsync">
-        Simpan
-    </MudButton>
+            <!-- Row break -->
+            <MudItem xs="12" Style="height: 0 !important;" Class="p-0" />
+
+            <!-- Row 2: Kode Group (max half width, read-only for edit) -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Kode Group"
+                              @bind-Value="userGroup.KodeUserGroup"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Disabled="true"
+                              Class="mb-0" />
+            </MudItem>
+        </MudGrid>
+
+        <div class="button-bar mt-4">
+            <MudButton Variant="Variant.Outlined"
+                       Color="MudBlazor.Color.Secondary"
+                       OnClick="GoBack">
+                Kembali
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="MudBlazor.Color.Primary"
+                       Disabled="!form?.IsValid ?? true"
+                       OnClick="SubmitAsync">
+                Simpan
+            </MudButton>
+        </div>
+    </MudForm>
 </MudCard>
 
-
 @code {
-    [Parameter]
-    public string Id { get; set; }
+    [Parameter] public string Id { get; set; } = string.Empty;
 
-    // The patient model used for data binding.
-    private UserGroup userGroup = new UserGroup();
+    private MudForm? form;
+    private UserGroup userGroup = new();
+
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
-
-    // Local UI-bound properties.
-    private DateTime? date = DateTime.Today;
-
-    private bool sameAsAlamat = false; // Checkbox for "Sama dengan Alamat Sekarang".
-
-    MudForm form;
-
-    // File upload handling.
-    IList<IBrowserFile> files = new List<IBrowserFile>();
-    private void UploadFiles(IBrowserFile file)
-    {
-        files.Add(file);
-        // TODO: Implement file upload logic as needed.
-    }
 
     protected override async Task OnInitializedAsync()
     {
         Layout.ChangeTitleAndRoute("Login Group", "Edit Login Group");
+
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            GoBack();
+            return;
+        }
+
         var response = await GroupUserApiService.GetUserGroupByCodeAsync(Id);
-        if (response.StatusCode == 0 && response.Data != null)
+        if (response.StatusCode == 0 && response.Data is not null)
         {
             userGroup = response.Data;
         }
         else
         {
-            // Handle API error case appropriately (e.g., display an error message)
-            // For example: show a notification, log the error etc.
             System.Diagnostics.Debug.WriteLine("Error loading user group data");
+            GoBack();
         }
     }
 
-    // Called when the "Simpan" button is clicked.
+    private void GoBack() => NavigationManager.NavigateTo("/group-login");
+
     private async Task SubmitAsync()
     {
-        // Call the API service update method.
-        userGroup.USRID = "";
+        await form!.Validate();
+        if (!form.IsValid) return;
+
+        // set system fields if needed
+        userGroup.USRID = userGroup.USRID ?? string.Empty;
+
         var result = await GroupUserApiService.UpdateUserGroupAsync(Id, userGroup);
-        if (result.StatusCode < 300)
-        {
-            NavigationManager.NavigateTo("/group-login");
-        }
-        else
-        {
-            // Here you can display a snackbar or alert message with result.Message.
-            System.Diagnostics.Debug.WriteLine(result.Message);
-        }
+        if (result.StatusCode < 300) GoBack();
+        else System.Diagnostics.Debug.WriteLine(result.Message);
     }
 }
 
@@ -98,31 +106,12 @@
         gap: 12px; /* space between buttons */
         flex-wrap: nowrap; /* never wrap to next line */
     }
-    .save-btn {
-        background: rgba(47, 193, 71, 1);
-        color: white;
-        text-transform: none;
-    }
-
-        .save-btn:hover {
-            background: rgba(27, 153, 41, 1);
-        }
-
-    .back-btn {
-        background: rgba(156, 99, 5, 1);
-        color: white;
-        margin-left: 20px;
-        text-transform: none;
-    }
-
-        .back-btn:hover {
-            background: rgba(126, 69, 2, 1);
-        }
 
     .table-form .mud-input-root {
         height: 30px !important;
-        padding: 0px 10px !important;
+        padding: 0 10px !important;
         font-size: 12px !important;
+        margin-bottom: 0 !important;
     }
 
     .table-form .mud-input-label {
@@ -136,47 +125,5 @@
 
     .table-form .mud-input-label-inputcontrol {
         top: -3px;
-    }
-
-    .active-tab {
-        background-color: rgba(162, 238, 240, 1);
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .tab-panel {
-        border: 1px solid rgba(202, 199, 199, 1);
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .tab-header {
-        border: 1px solid rgba(202, 199, 199, 1);
-        border-top: none;
-        border-top-right-radius: 20px;
-        border-top-left-radius: 20px;
-    }
-
-    .section {
-        width: 100%;
-        overflow: hidden; /* clip rounded corners */
-        border-radius: 8px;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        background-color: #a2eef0; /* your blue */
-        padding: 0.75rem 1rem;
-        font-weight: 500;
-    }
-
-        .section-header .mud-icon-root {
-            margin-right: 0.5rem;
-            font-size: 1.25rem;
-        }
-
-    .section-body {
-        padding: 1rem;
     }
 </style>
