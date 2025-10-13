@@ -11,29 +11,36 @@
         <CardHeaderContent>
             <MudText Typo="Typo.body1"> Editor </MudText>
             <MudText Typo="Typo.body2"> select tools and draw..</MudText>
-            <div class="d-flex justify-space-between gap-2 pa-2 align-center" style="height:6em">
+            <div class="d-flex justify-space-between gap-1 pa-2 align-center" style="height:6em">
                 <ColorPicker Value="@_color" ValueChanged="DoUpdateColor" />
-                <MudToggleIconButton Toggled="@(_drawMode == "free" ? true : false)"
+                <MudToggleIconButton 
+                    Class="pa-1"
+                    Toggled="@(_drawMode == "free" ? true : false)"
                                      Icon="@Icons.Material.Filled.Brush"
                                      Color="@Color.Dark"
                                      ToggledIcon="@Icons.Material.Filled.Brush"
                                      ToggledColor="@Color.Success"
                                      title="Free" ToggledChanged="@(() => SetMode("free"))" />
-                <MudToggleIconButton Toggled="@(_drawMode == "rectangle" ? true : false)"
-                                     Icon="@Icons.Material.Filled.Square"
+                <MudToggleIconButton 
+                    Class="pa-1"
+                    Toggled="@(_drawMode == "rectangle" ? true : false)"
+                                     Icon="far fa-square"
                                      Color="@Color.Dark"
-                                     ToggledIcon="@Icons.Material.Filled.Square"
+                                     ToggledIcon="fas fa-square"
                                      ToggledColor="@Color.Success"
                                      title="Rectangle" ToggledChanged="@(() => SetMode("rectangle"))" />
-                <MudToggleIconButton Toggled="@(_drawMode == "ellipse" ? true : false)"
-                                     Icon="@Icons.Material.Filled.Circle"
+                <MudToggleIconButton Class="pa-1"
+                    Toggled="@(_drawMode == "ellipse" ? true : false)"
+                                     Icon="far fa-circle"
                                      Color="@Color.Dark"
-                                     ToggledIcon="@Icons.Material.Filled.Circle"
+                                     ToggledIcon="fas fa-circle"
                                      ToggledColor="@Color.Success"
                                      title="Ellipse"
                                      ToggledChanged="@(() => SetMode("ellipse"))" />
-                <MudIconButton OnClick="DoReset" Icon="@Icons.Material.Filled.Restore" Color="Color.Warning" />
-                <MudIconButton OnClick="OnSave" Icon="@Icons.Material.Filled.Save" Color="Color.Primary" />
+                <MudIconButton Class="pa-1"
+                    OnClick="DoReset" Icon="@Icons.Material.Filled.Restore" Color="Color.Warning" />
+                <MudIconButton Class="pa-1"
+                    OnClick="OnSave" Icon="@Icons.Material.Filled.Save" Color="Color.Primary" />
 
             </div>
 
