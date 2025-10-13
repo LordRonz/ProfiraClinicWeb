@@ -5,15 +5,15 @@
 @inject ISnackbar SB;
 @inject IJSRuntime JS
 
-<div class="color-picker-container">
-    <div class="color-picker-wrapper" @onclick="OpenColorPicker">
-        <input @ref="colorInput"
+<div class="pa-1 color-picker-container">
+    <div @ref="IconPallete" class="color-picker-wrapper" @onclick="OpenColorPicker">
+        <i  class="fas fa-palette"></i>
+        <input 
                id="colorInput"
                type="color"
                value="@Value"
                @onchange="OnColorChanged"
                class="color-input" />
-        <MudIcon Icon="@Icons.Material.Filled.ArrowDropDown" Class="dropdown-icon" />
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {
@@ -22,7 +22,7 @@
 </div>
 
 @code {
-    private ElementReference colorInput;
+    private ElementReference IconPallete;
 
     [Parameter] 
     public string Value { get; set; } = "#000000";
@@ -74,6 +74,9 @@
     {
         var newValue = e.Value?.ToString() ?? "#000000";
         // Value = newValue;
+        // await JS.InvokeVoidAsync("changeForeground", "colorInput");
+        await JS.InvokeVoidAsync("setElementColor", IconPallete, newValue);
+
         await ValueChanged.InvokeAsync(newValue);
     }
 }
@@ -94,8 +97,8 @@
         cursor: pointer;
         cursor: pointer;
         display: flex;
-        min-width: 120px;
-        padding: 8px 12px;
+        min-width: 25px;
+        padding: 2px;
         transition: border-color 0.3s ease;
     }
 
@@ -120,12 +123,8 @@
     .color-input {
         /* opacity: 0; */
         position: absolute;
-        width:30%;
-    }
-
-    .dropdown-icon {
-        margin-left: auto;
-        color: var(--mud-palette-text-secondary);
+        width:15%;
+        visibility: hidden;
     }
 
     .color-label {

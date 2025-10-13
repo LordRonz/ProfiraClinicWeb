@@ -11,6 +11,12 @@ var showPicker = function(inputId) {
         console.warn(e);
     }
 }
+var setElementColor = function (elementRef, newColor) {
+    if (elementRef) {
+        // The ElementReference is mapped to the actual DOM element
+        elementRef.style.color = newColor;
+    }
+}
 
 var ImageService = {
 
