@@ -30,6 +30,12 @@ namespace ProfiraClinicRME.Model
             set => Entity.KodeLokasi = value;
         }
 
+        public string KetLokasi
+        {
+            get => "n/a";
+            set => _ = value;
+        }
+
         public string TahunTransaksi
         {
             get => Entity.TahunTransaksi;
