@@ -35,15 +35,33 @@
 
         <MudPaper Class="pa-4 mb-8 d-flex flex-column justify-center align-center w-100 bg-white bg-opacity-75 rounded-lg" Elevation="3">
             <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-column gap-2 w-100">
-                <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense"  Variant="Variant.Filled" T="string" Label="Username" @ref="userNameField" @bind-Value="userName" />
-                <MudTextField Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense"  Variant="Variant.Filled" T="string" Label="Password" Class="mt-3" InputType="@PasswordInput" @ref="pwField" @bind-Value="userPass" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonVisibilityClick" AdornmentAriaLabel="Show Password" />
+                <MudTextField @bind-Value="userName"
+                              @ref="userNameField"
+                              Label="Username"
+                              Placeholder="enter user name here ..."
+                              Style="border-radius: 20px; background-color: #F1F5F9;" Margin="Margin.Dense"
+                              T="string"
+                              Variant="Variant.Filled" />
+                <MudTextField @bind-Value="userPass"
+                              @ref="pwField"
+                              Adornment="Adornment.End"
+                              AdornmentAriaLabel="Show Password"
+                              AdornmentIcon="@PasswordInputIcon"
+                              Class="mt-3"
+                              InputType="@PasswordInput"
+                              Label="Password"
+                              Margin="Margin.Dense"
+                              OnAdornmentClick="ButtonVisibilityClick"
+                              Placeholder="enter pasword here ..."
+                              Style="border-radius: 20px; background-color: #F1F5F9;"
+                              T="string"
+                              Variant="Variant.Filled" />
 
                 <MudSelect T="string"
                            @bind-Value="_selectedKetLok"
                            OuterClass="bg-transparent rounded-pill"
                            InputClass="bg-transparent"
                            Style="border-radius: 20px; background-color: #F1F5F9;"
-                           
                            Variant="Variant.Filled"
                            Label="Pilih klinik ..."
                            AnchorOrigin="Origin.BottomCenter">
