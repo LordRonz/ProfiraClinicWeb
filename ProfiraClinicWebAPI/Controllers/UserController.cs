@@ -150,6 +150,8 @@ namespace ProfiraClinicWebAPI.Controllers
 
             var kodeLokasi = kdLok ?? user.KodeLokasi;
 
+            var jabatan = karyawan != null ? await _context.Dokter.FirstOrDefaultAsync(k => k.KodeKaryawan == karyawan.KodeKaryawan) : null;
+
             MKlinik? clinic = null;
             if (!string.IsNullOrEmpty(kodeLokasi))
             {
@@ -166,6 +168,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 KodeLokasi = user.KodeLokasi,
                 Klinik = clinic,
                 Karyawan = karyawan,
+                KodeJabatan = jabatan?.KodeJabatan ?? null,
             };
 
             return Ok(dto);

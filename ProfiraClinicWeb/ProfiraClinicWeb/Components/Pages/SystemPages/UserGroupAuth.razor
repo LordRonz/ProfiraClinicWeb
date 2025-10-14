@@ -1,0 +1,85 @@
+﻿@page "/group-auth"
+@using System.Net.Http.Json
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Utils
+@using ProfiraClinicWeb.Services
+@inject UserGroupOtorisasiApiService ApiService
+
+<MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
+    <ProfiraClinicWeb.Components.Table.Table Config="UserGroupTableConfig" WithAdd="false" />
+</MudCard>
+
+@code {
+    private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
+
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    // Configuration for the table. It will be set once the data is loaded.
+    public TableConfig UserGroupTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+
+    // Holds the list of patients
+    private List<UserGroupOtorisasi> UserGroups = new List<UserGroupOtorisasi>();
+
+    // This method sets up the page title.
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("System", "Setup Otorisasi Group");
+    }
+
+    // When the component is initialized, call the API service to retrieve patients.
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("Loading patients...");
+            // Get the API response
+            var apiResponse = await ApiService.GetUserGroupsOtorisasiAsync();
+            // Check if status code indicates success
+            System.Diagnostics.Debug.WriteLine("Done");
+            if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
+            {
+                UserGroups = apiResponse.Data.Items;
+            }
+            else
+            {
+                // Handle API error case appropriately (e.g., display an error message)
+                // For example: show a notification, log the error etc.
+            }
+
+            System.Diagnostics.Debug.WriteLine("Parsing to table data");
+
+            var dataSource = UserGroups.Select(el =>
+                (object)new
+                {
+                    view = $"group-login/{el.KodeUserGroup}",
+                    edit = $"group-login/{el.KodeUserGroup}/edit",
+                    kodeGroup = el.KodeUserGroup,
+                    kodeModul = el.KodeModul,
+                }
+            ).ToList();
+
+            UserGroupTableConfig = new TableConfig(
+                new List<TableColumn> {
+                    new TableColumn { Caption = "Kode Group", DataField = "kodeGroup" },
+                    new TableColumn { Caption = "Kode Modul", DataField = "kodeModul" },
+                            },
+                dataSource,
+                "/group-login/add"
+            );
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions (e.g., network errors, deserialization issues, etc.)
+            System.Diagnostics.Debug.WriteLine($"Error loading patients: {ex.Message}");
+        }
+    }
+
+    private int ChartIndex = -1; // default value cannot be 0 -> first selected index is 0.
+
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Sales", Data = new double[] { 4500, 5300, 6250, 7800, 9800, 15000 } },
+    };
+    public string[] XAxisLabels = { "January", "February", "March", "April", "May", "June" };
+}

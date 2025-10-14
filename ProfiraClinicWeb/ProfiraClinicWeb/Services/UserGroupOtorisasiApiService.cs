@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using ProfiraClinic.Models.Core;
+﻿using ProfiraClinic.Models.Core;
 using ProfiraClinicWeb.Helpers;
 
 namespace ProfiraClinicWeb.Services
@@ -28,7 +23,7 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
-        public async Task<ApiResponse<PagedResult<UserGroup>>> SearchUserGroupsOtorisasiAsync(
+        public async Task<ApiResponse<PagedResult<UserGroupOtorisasi>>> SearchUserGroupsOtorisasiAsync(
             string searchTerm,
             int page = 1,
             int pageSize = 20)
@@ -39,7 +34,7 @@ namespace ProfiraClinicWeb.Services
             if (!respMsg.IsSuccessStatusCode)
             {
                 var err = await respMsg.Content.ReadAsStringAsync();
-                return new ApiResponse<PagedResult<UserGroup>>((int)respMsg.StatusCode, $"Error: {err}");
+                return new ApiResponse<PagedResult<UserGroupOtorisasi>>((int)respMsg.StatusCode, $"Error: {err}");
             }
             var result = await respMsg.Content.ReadFromJsonAsync<ApiResponse<PagedResult<UserGroupOtorisasi>>>();
             return result!;
@@ -48,7 +43,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<UserGroupOtorisasi>> GetUserGroupOtorisasiByCodeAsync(string id)
         {
             var response = await _httpClient
-                .GetFromJsonAsync<ApiResponse<UserGroup>>($"api/UserGroupOtorisasi/GetByCode/{id}")
+                .GetFromJsonAsync<ApiResponse<UserGroupOtorisasi>>($"api/UserGroupOtorisasi/GetByCode/{id}")
                 ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
