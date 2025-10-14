@@ -128,6 +128,12 @@ builder.Services.AddHttpClient<AuthApiService>(client =>
     client.BaseAddress = new Uri(apiBaseAddress);
 }).AddHttpMessageHandler<BearerTokenHandler>();
 
+builder.Services.AddHttpClient<UserGroupOtorisasiApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+}).AddHttpMessageHandler<BearerTokenHandler>()
+    .AddHttpMessageHandler<AuthRedirectHandler>();
+
 
 var app = builder.Build();
 
