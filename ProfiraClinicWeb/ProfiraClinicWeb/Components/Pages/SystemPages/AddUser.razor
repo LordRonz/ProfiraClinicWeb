@@ -17,7 +17,7 @@
             <!-- Row 1: User ID & Nama User -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
-                              Label="User ID"
+                              Label="Kode User"
                               @bind-Value="userData.KodeUser"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense"
@@ -76,18 +76,20 @@
             </MudItem>
         </MudGrid>
 
-        <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
-            <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
-                Kembali
-            </MudButton>
-            <MudButton Variant="Variant.Filled"
-                       Color="MudBlazor.Color.Primary"
-                       Type="Submit"
-                       Disabled="!form.IsValid"
-                       OnClick="SubmitAsync">
-                Simpan
-            </MudButton>
-        </MudStack>
+        <div class="button-bar mt-4">
+            <MudStack Direction="Row" Justify="Justify.FlexEnd" Spacing="2" Class="mt-4">
+                <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" OnClick="GoBack">
+                    Kembali
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="MudBlazor.Color.Primary"
+                           Type="Submit"
+                           Disabled="!form.IsValid"
+                           OnClick="SubmitAsync">
+                    Simpan
+                </MudButton>
+            </MudStack>
+        </div>
     </MudForm>
 </MudCard>
 
@@ -144,6 +146,13 @@
 }
 
 <style>
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
     .save-btn {
         background: rgba(47, 193, 71, 1);
         color: white;

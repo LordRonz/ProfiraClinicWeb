@@ -6,6 +6,7 @@ namespace ProfiraClinicWeb.Helpers
         public int StatusCode { get; }
         public string Message { get; }
         public T Data { get; }
+        public string? Title { get; }
 
         public ApiResponse(int statusCode, string message, T data = default)
         {

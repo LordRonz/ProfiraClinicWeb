@@ -1,0 +1,22 @@
+name: Web Child API Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore ./ProfiraClinicWebChildAPI/ProfiraClinicWebChildAPI.csproj
+
+      - name: Build
+        run: dotnet build ./ProfiraClinicWebChildAPI/ProfiraClinicWebChildAPI.csproj --configuration Debug --no-restore

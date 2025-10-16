@@ -29,6 +29,23 @@ namespace ProfiraClinicWebAPI.Controllers
             public string Status { get; set; }
         }
 
+        public class EditStatusAppointmentDto
+        {
+            public string? KodeLokasi { get; set; }          // optional: will fallback to token/user
+            public string NomorAppointment { get; set; } = default!;
+            public DateTime? TanggalAppointment { get; set; } // date part is used
+            public string KodeCustomer { get; set; } = default!;
+        }
+
+        public class EditStatusPerawatanDto
+        {
+            public string? KodeLokasi { get; set; }          // optional: falls back to token
+            public string NomorAppointment { get; set; } = default!;
+            public DateTime? TanggalAppointment { get; set; } // date part used
+            public string KodeCustomer { get; set; } = default!;
+        }
+
+
         public AppointmentController(AppDbContext ctx) : base(ctx) { }
 
         protected override DbSet<Appointment> DbSet
@@ -102,13 +119,6 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrEmpty(userName))
                 return Unauthorized();
 
-            // Look up the user
-            var user = await _context.MUser
-                            .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.USRID == userName);
-            if (user == null)
-                return NotFound();
-
             // Validate required fields
             if (string.IsNullOrEmpty(appDto.NomorAppointment))
                 return BadRequest("NomorAppointment is required");
@@ -146,6 +156,100 @@ namespace ProfiraClinicWebAPI.Controllers
             }
         }
 
+        [HttpPost("EditStatusAppointment")]
+        public async Task<IActionResult> EditStatusAppointment([FromBody] EditStatusAppointmentDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            // Validate required inputs from SP contract
+            if (string.IsNullOrWhiteSpace(dto.NomorAppointment))
+                return BadRequest("NomorAppointment is required.");
+            if (string.IsNullOrWhiteSpace(dto.KodeCustomer))
+                return BadRequest("KodeCustomer is required.");
+            if (!dto.TanggalAppointment.HasValue)
+                return BadRequest("TanggalAppointment (date) is required.");
+
+            // Prefer code from token, then user, then dto
+            var kodeLokasiFromToken = User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+            var kodeLokasi = dto.KodeLokasi ?? kodeLokasiFromToken;
+            if (string.IsNullOrWhiteSpace(kodeLokasi))
+                return BadRequest("KodeLokasi is required (token/user/dto).");
+
+            var parameters = new[]
+            {
+        new SqlParameter("@KodeLokasi", SqlDbType.Char, 10) { Value = kodeLokasi },
+        new SqlParameter("@NomorAppointment", SqlDbType.Char, 25) { Value = dto.NomorAppointment },
+        // SP expects DATE only
+        new SqlParameter("@TanggalAppointment", SqlDbType.Date) { Value = dto.TanggalAppointment.Value.Date },
+        new SqlParameter("@KodeCustomer", SqlDbType.Char, 10) { Value = dto.KodeCustomer }
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_Appointment_EditStatusAppointment " +
+                    "@KodeLokasi, @NomorAppointment, @TanggalAppointment, @KodeCustomer",
+                    parameters
+                );
+
+                return Ok(new { message = "Status appointment updated to 'Arrival' (3)." });
+            }
+            catch (SqlException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SQL Error: {ex.Message}");
+                return StatusCode(500, "An error occurred while updating the appointment status.");
+            }
+        }
+
+        [HttpPost("EditStatusPerawatan")]
+        public async Task<IActionResult> EditStatusPerawatan([FromBody] EditStatusPerawatanDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            // Validate inputs expected by SP
+            if (string.IsNullOrWhiteSpace(dto.NomorAppointment))
+                return BadRequest("NomorAppointment is required.");
+            if (string.IsNullOrWhiteSpace(dto.KodeCustomer))
+                return BadRequest("KodeCustomer is required.");
+            if (!dto.TanggalAppointment.HasValue)
+                return BadRequest("TanggalAppointment (date) is required.");
+
+            // Prefer kode lokasi from token; allow dto override
+            var kodeLokasi = dto.KodeLokasi ?? User.FindFirstValue(JwtClaimTypes.KodeLokasi);
+            if (string.IsNullOrWhiteSpace(kodeLokasi))
+                return BadRequest("KodeLokasi is required (token or dto).");
+
+            var parameters = new[]
+            {
+        new SqlParameter("@KodeLokasi", SqlDbType.Char, 10) { Value = kodeLokasi },
+        new SqlParameter("@NomorAppointment", SqlDbType.Char, 25) { Value = dto.NomorAppointment },
+        // SP expects DATE only
+        new SqlParameter("@TanggalAppointment", SqlDbType.Date) { Value = dto.TanggalAppointment.Value.Date },
+        new SqlParameter("@KodeCustomer", SqlDbType.Char, 10) { Value = dto.KodeCustomer }
+    };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_TRM_Appointment_EditStatusPerawatan " +
+                    "@KodeLokasi, @NomorAppointment, @TanggalAppointment, @KodeCustomer",
+                    parameters);
+
+                return Ok(new { message = "Status perawatan updated (PERAWATAN timestamp set)." });
+            }
+            catch (SqlException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"SQL Error: {ex.Message}");
+                return StatusCode(500, "An error occurred while updating status perawatan.");
+            }
+        }
+
+
+
         [HttpPost("CreateAppointment")]
         public async Task<IActionResult> CreateAppointment([FromBody] AddAppointmentThirdPartyDto dto)
         {
@@ -157,7 +261,6 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrEmpty(userName)) return Unauthorized();
 
             var user = await _context.MUser.AsNoTracking().FirstOrDefaultAsync(u => u.USRID == userName);
-            if (user == null) return NotFound("User not found.");
 
             var apptDate = dto.TanggalAppointment;              // full date/time from payload
             var year = apptDate.Year.ToString("0000");
@@ -212,7 +315,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 StatusAppointment = "1",
                 Estimasi = 0,
                 UpdDt = DateTime.UtcNow,
-                UsrId = user.KodeUser ?? user.USRID
+                UsrId = user?.KodeUser ?? user?.USRID
             };
 
             _context.Appointment.Add(entity);

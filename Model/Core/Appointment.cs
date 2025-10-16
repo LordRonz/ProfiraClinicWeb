@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProfiraClinic.Models.Core
-{   
+{
     public class Appointment
     {
         [Column(TypeName = "bigint")]
@@ -37,10 +37,7 @@ namespace ProfiraClinic.Models.Core
         public string? NamaCustomer { get; set; }
 
         [Column(TypeName = "char(50)")]
-        public string? NomorHPCustomer { get; set; }
-
-        [Column(TypeName = "date")]
-        public DateOnly tanggalLahir { get; set; }
+        public string? NomorHP { get; set; }
 
         [Column(TypeName = "varchar(50)")]
         public string? KodeRuangan { get; set; }

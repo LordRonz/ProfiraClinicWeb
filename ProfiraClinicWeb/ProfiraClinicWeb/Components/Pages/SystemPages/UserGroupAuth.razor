@@ -1,12 +1,12 @@
-﻿@page "/login-user"
+﻿@page "/group-auth"
 @using System.Net.Http.Json
 @using ProfiraClinic.Models.Core
 @using ProfiraClinicWeb.Utils
 @using ProfiraClinicWeb.Services
-@inject UserApiService ApiService
+@inject UserGroupOtorisasiApiService ApiService
 
 <MudCard Class="p-4 h-100 rounded-3 overflow-scroll">
-    <ProfiraClinicWeb.Components.Table.Table Config="UserTableConfig" />
+    <ProfiraClinicWeb.Components.Table.Table Config="UserGroupTableConfig" WithAdd="false" />
 </MudCard>
 
 @code {
@@ -16,15 +16,15 @@
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
 
     // Configuration for the table. It will be set once the data is loaded.
-    public TableConfig UserTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+    public TableConfig UserGroupTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
     // Holds the list of patients
-    private List<ProfiraClinic.Models.Core.User> Users = new List<ProfiraClinic.Models.Core.User>();
+    private List<UserGroupOtorisasi> UserGroups = new List<UserGroupOtorisasi>();
 
     // This method sets up the page title.
     protected override void OnInitialized()
     {
-        Layout.ChangeTitleAndRoute("System", "Setup Login User");
+        Layout.ChangeTitleAndRoute("System", "Setup Otorisasi Group");
     }
 
     // When the component is initialized, call the API service to retrieve patients.
@@ -34,12 +34,12 @@
         {
             System.Diagnostics.Debug.WriteLine("Loading patients...");
             // Get the API response
-            var apiResponse = await ApiService.GetUsersAsync();
+            var apiResponse = await ApiService.GetUserGroupsOtorisasiAsync();
             // Check if status code indicates success
             System.Diagnostics.Debug.WriteLine("Done");
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
             {
-                Users = apiResponse.Data.Items;
+                UserGroups = apiResponse.Data.Items;
             }
             else
             {
@@ -49,28 +49,23 @@
 
             System.Diagnostics.Debug.WriteLine("Parsing to table data");
 
-            var dataSource = Users.Select(el =>
+            var dataSource = UserGroups.Select(el =>
                 (object)new
                 {
-                    view = $"login-user/{el.KodeUser}",
-                    edit = $"login-user/{el.KodeUser}/edit",
-                    memberId = el.KodeUser,
-                    namaPasien = el.USRID,
-                    groupLogin = el.KodeUserGroup,
+                    view = $"group-login/{el.KodeUserGroup}",
+                    edit = $"group-login/{el.KodeUserGroup}/edit",
+                    kodeGroup = el.KodeUserGroup,
+                    kodeModul = el.KodeModul,
                 }
             ).ToList();
 
-            UserTableConfig = new TableConfig(
+            UserGroupTableConfig = new TableConfig(
                 new List<TableColumn> {
-                    new TableColumn { Caption = "Edit", DataField = "edit", Type = ColumnType.Edit },
-                    new TableColumn { Caption = "Kode User", DataField = "memberId" },
-                    new TableColumn { Caption = "Nama User", DataField = "namaPasien" },
-                    new TableColumn { Caption = "Group Login", DataField = "groupLogin" },
-
-                    new TableColumn { Caption = "Delete", DataField = "delete", Type = ColumnType.Delete },
-                                },
+                    new TableColumn { Caption = "Kode Group", DataField = "kodeGroup" },
+                    new TableColumn { Caption = "Kode Modul", DataField = "kodeModul" },
+                            },
                 dataSource,
-                "/login-user/add"
+                "/group-login/add"
             );
         }
         catch (Exception ex)
@@ -79,4 +74,12 @@
             System.Diagnostics.Debug.WriteLine($"Error loading patients: {ex.Message}");
         }
     }
+
+    private int ChartIndex = -1; // default value cannot be 0 -> first selected index is 0.
+
+    public List<ChartSeries> Series = new List<ChartSeries>()
+    {
+        new ChartSeries() { Name = "Sales", Data = new double[] { 4500, 5300, 6250, 7800, 9800, 15000 } },
+    };
+    public string[] XAxisLabels = { "January", "February", "March", "April", "May", "June" };
 }

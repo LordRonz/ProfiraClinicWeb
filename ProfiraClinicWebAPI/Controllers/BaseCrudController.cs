@@ -72,7 +72,8 @@ namespace ProfiraClinicWebAPI.Controllers
         public virtual async Task<ActionResult> GetItems(
             [FromQuery] string last = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20,
+            [FromQuery(Name = "sort")] string[] sort = null)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 1;
@@ -95,6 +96,8 @@ namespace ProfiraClinicWebAPI.Controllers
                 query = ApplyLastFilter(query, lastDate);
             }
 
+            query = ApplySort(query, sort);
+
             var totalCount = await query.CountAsync();
             var items = await query
                 .Skip((page - 1) * pageSize)
@@ -106,11 +109,99 @@ namespace ProfiraClinicWebAPI.Controllers
                 TotalCount = totalCount,
                 Page = page,
                 PageSize = pageSize,
-                Items = items // List<MyDto>
+                Items = items
             };
 
             return Ok(result);
         }
+
+        private static IQueryable<TEntity> ApplySort(IQueryable<TEntity> source, string[] sortParams)
+        {
+            if (sortParams == null || sortParams.Length == 0) return source;
+
+            // Allow either multiple ?sort=... or a single comma-separated ?sort=a:asc,-b
+            var tokens = sortParams
+                .SelectMany(s => (s ?? string.Empty)
+                    .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                .ToList();
+
+            if (tokens.Count == 0) return source;
+
+            bool ordered = false; // track if we used OrderBy already
+
+            foreach (var token in tokens)
+            {
+                // accepted forms: "Name", "Name:asc", "Name:desc", "+Name", "-Name"
+                string raw = token.Trim();
+                if (string.IsNullOrEmpty(raw)) continue;
+
+                bool desc = false;
+                string propName = raw;
+
+                // +Name / -Name
+                if (raw.StartsWith("+") || raw.StartsWith("-"))
+                {
+                    desc = raw.StartsWith("-");
+                    propName = raw.Substring(1);
+                }
+                else
+                {
+                    // Name:desc / Name:asc
+                    var parts = raw.Split(':', StringSplitOptions.TrimEntries);
+                    propName = parts[0];
+                    if (parts.Length > 1)
+                        desc = parts[1].Equals("desc", StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (string.IsNullOrWhiteSpace(propName)) continue;
+
+                // Find property (case-insensitive)
+                var prop = typeof(TEntity).GetProperty(
+                    propName,
+                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+
+                if (prop == null)
+                {
+                    // Unknown column – choose behavior:
+                    // (A) ignore silently:
+                    continue;
+
+                    // (B) OR reject the request:
+                    // throw new ArgumentException($"Unknown sort column '{propName}'.");
+                }
+
+                var param = Expression.Parameter(typeof(TEntity), "x");
+                var body = Expression.Property(param, prop);
+                var lambda = Expression.Lambda(body, param);
+
+                string methodName;
+                if (!ordered)
+                {
+                    methodName = desc ? "OrderByDescending" : "OrderBy";
+                    ordered = true;
+                }
+                else
+                {
+                    methodName = desc ? "ThenByDescending" : "ThenBy";
+                }
+
+                source = (IQueryable<TEntity>)typeof(Queryable)
+                    .GetMethods()
+                    .First(m =>
+                    {
+                        if (m.Name != methodName) return false;
+                        var args = m.GetGenericArguments();
+                        var prms = m.GetParameters();
+                        return args.Length == 2 && prms.Length == 2;
+                    })
+                    .MakeGenericMethod(typeof(TEntity), prop.PropertyType)
+                    .Invoke(null, new object[] { source, lambda });
+            }
+
+            return source;
+        }
+
+
 
         [HttpGet("GetById/{id}")]
         public virtual async Task<ActionResult<TEntity>> GetItem(long id)
@@ -123,15 +214,25 @@ namespace ProfiraClinicWebAPI.Controllers
         public virtual async Task<ActionResult> Search(
             [FromBody] BaseBodyListOr body,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20,
+            [FromQuery(Name = "sort")] string[] sort = null)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 1;
             if (pageSize > 100) pageSize = 100;
 
             var query = ApplySearch(DbSet.AsNoTracking(), body.GetParam);
-            System.Diagnostics.Debug.WriteLine(body.GetParam);
-            query = ApplyOrder(query);
+
+            // If client supplies sort => apply dynamic sorting.
+            // If not supplied => default to NO ordering (leave as-is).
+            if (sort != null && sort.Length > 0)
+            {
+                query = ApplySort(query, sort);
+            }
+            // else: no ordering here (intentionally)
+            // If you still want a controller-specific default, do it in the derived controller,
+            // or uncomment the following line:
+            // else { query = ApplyOrder(query); }
 
             var totalCount = await query.CountAsync();
             var items = await query
@@ -148,6 +249,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 items
             });
         }
+
 
         /// <summary>
         /// Core “find one by arbitrary predicate” helper.

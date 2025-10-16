@@ -35,7 +35,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<string> LoginAsync(LoginModel model)
         {
             var response = await _httpClient.PostAsJsonAsync("api/auth/login", model);
-            if (response.StatusCode != 0)
+            if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
                 throw new HttpRequestException($"Login failed");
@@ -45,6 +45,11 @@ namespace ProfiraClinicWeb.Services
             if (authResult == null || string.IsNullOrEmpty(authResult?.Data?.Token))
             {
                 throw new HttpRequestException("Authentication succeeded but token was not returned.");
+            }
+
+            if (authResult.StatusCode != 0)
+            {
+                throw new HttpRequestException("Login failed, check your credentials.");
             }
 
             return authResult.Data.Token;
@@ -75,7 +80,10 @@ namespace ProfiraClinicWeb.Services
 
         public async Task<string> ChangePasswordAsync(ChangeOwnPasswordDto model)
         {
+
+            System.Diagnostics.Debug.WriteLine("CHANGING PASSWORD");
             var response = await _httpClient.PostAsJsonAsync("api/auth/change-password", model);
+            System.Diagnostics.Debug.WriteLine(response.StatusCode);
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
@@ -83,11 +91,12 @@ namespace ProfiraClinicWeb.Services
             }
 
             var authResult = await response.Content.ReadFromJsonAsync<ApiResponse<AuthResponse>>();
-            if (authResult == null || string.IsNullOrEmpty(authResult.Data.Token))
+            if (authResult == null)
             {
                 throw new HttpRequestException("Registration succeeded but token was not returned.");
             }
-
+            System.Diagnostics.Debug.WriteLine("SUCCESS");
+            System.Diagnostics.Debug.WriteLine(authResult);
             return "Success";
         }
     }
