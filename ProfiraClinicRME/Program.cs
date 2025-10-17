@@ -55,6 +55,7 @@ builder.Services.AddScoped<ApiService>(provider =>
 );
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IClinicService, ClinicService>();
+builder.Services.AddScoped<IDokterService, DokterService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IMasterDiagnosaService, MasterDiagnosaService>();

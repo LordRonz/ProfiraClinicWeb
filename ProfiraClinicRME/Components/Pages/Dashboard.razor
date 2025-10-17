@@ -17,11 +17,36 @@
 @inject IUserService SvcUser
 @inject NavigationManager Nav
 @inject IAppointmentService SvcAppointment
+@inject IDokterService SvcDokter
 
 <TopbarUser Route="Dasboard"
             Title="@_title" />
 
 <MudCard Class="pa-4 h-100 rounded-lg overflow-scroll">
+
+    @if (_kodeJabatan != "DR")
+    {
+        <MudCardHeader>
+            <MudGrid>
+                <MudItem xs="6" md="3" Class="pa-1">
+
+                    <MudSelect T="DokterListDto"
+                               Value="@_selectedDokter"
+                               ValueChanged="@HandleDokterChanged"
+
+                               Variant="Variant.Outlined"
+                               Label="Pilih dokter ..."
+                               AnchorOrigin="Origin.BottomCenter">
+                        @foreach (var dokter in _listDokter)
+                        {
+                            <MudSelectItem T="DokterListDto" Value="@dokter">@dokter.NamaDokter</MudSelectItem>
+                        }
+
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudCardHeader>
+    }
     <Table WithAdd="false" WithFilter="false" WithPaging="false" Config="_appointmentTblConf" />
 </MudCard>
 
@@ -31,6 +56,13 @@
 
     public TableConfig _appointmentTblConf { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
 
+    private string _kodeJabatan = "";
+
+    private string _selectedKodeKaryawan = "";
+
+    private DokterListDto? _selectedDokter = null;
+
+    private List<DokterListDto> _listDokter = [];
 
     private List<TRMAppointment> _listAppointment;
     private string _title = "Appointment list on ";
@@ -58,12 +90,48 @@
         LogTrace.Info("current user", CurrentUser, _classPath);
 
         _title += CurrentUser.Klinik.KETLK;
+        _kodeJabatan = CurrentUser.KodeJabatan ?? "DR";
+        // _kodeJabatan = "TR";
 
 
-        var resApo = await SvcAppointment.GetListOnWaitAsync(CurrentUser.KodeLokasi ?? "", DateTime.Today, CurrentUser.Karyawan?.KodeKaryawan);
 
-        var test = DateUtility.FormatDate(DateTime.Today, DateUtility.FormatMode.Date);
-        // Check if status code indicates success
+        //load table for dokter, or list dokter for other
+        var kodeKaryawan = CurrentUser.Karyawan?.KodeKaryawan
+                        ?? throw new AppException("Data pengguna tidak valid.");
+        if (_kodeJabatan == "DR")
+        {
+            await LoadTable(kodeKaryawan);
+        }
+        else
+        {
+            var resDokter = await SvcDokter.GetListAsync();
+            if (resDokter.Status == ServiceResultEnum.FOUND)
+            {
+                _listDokter = resDokter!.Data!.Items;
+                // _selectedDokter = _listDokter.First();
+
+            }
+            else
+            {
+                addSnackbar("Gagal memuat data dokter.", Severity.Error);
+                LogTrace.Error("Gagal memuat data dokter", resDokter, _classPath);
+            }
+
+        }
+    }
+
+    private async Task HandleDokterChanged(DokterListDto dokter)
+    {
+        LogTrace.Info("dokter changed", dokter, _classPath);
+        _selectedDokter = dokter;
+        await LoadTable(dokter.KodeKaryawan);
+    }
+
+    private async Task LoadTable(string kodeKaryawan)
+    {
+
+        //load appointment table
+        var resApo = await SvcAppointment.GetListOnWaitAsync(CurrentUser.KodeLokasi ?? "", DateTime.Today, kodeKaryawan);
 
         if (resApo.Status == ServiceResultEnum.FOUND)
         {
@@ -118,8 +186,6 @@
 
         }
     }
-
-
 
     private async Task SetCurrentAppointment(Dictionary<string, string> dct)
     {
