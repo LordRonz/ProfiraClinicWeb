@@ -9,6 +9,7 @@
 @inject GroupPerawatanApiService ApiService
 @inject PerawatanHeaderApiService PerawatanApiService
 @inject PerawatanDetailApiService PerawatanDetailApiService
+@inject BarangHeaderApiService BarangApiService
 
 <MudCard Class="p-4 h-100">
     <MudText Typo="Typo.h6" Class="mb-4">Tambah Perawatan</MudText>
@@ -64,7 +65,15 @@
     <MudForm @ref="detailForm" Class="table-form section-body">
         <MudGrid>
             <MudItem xs="12" sm="3">
-                <MudTextField T="string" Label="Kode Barang" @bind-Value="detail.KodeBarang" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                <MudAutocomplete T="BarangListDto"
+                                 Label="Pilih Barang"
+                                 @bind-Value="selectedBarang"
+                                 SearchFunc="SearchBarang"
+                                 Clearable="true"
+                                 ToStringFunc="@(p => p == null ? null : $"{p.KodeBarang} ({p.NamaBarang})")"
+                                 Dense="true"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
             </MudItem>
             <MudItem xs="12" sm="3">
                 <MudTextField T="string" Label="Unit Pakai" @bind-Value="detail.UnitPakai" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
@@ -107,8 +116,8 @@
             <MudTd DataLabel="Jumlah Pakai">@context.JumlahPakai</MudTd>
             <MudTd DataLabel="Indikator">@context.IndikatorPakai</MudTd>
             <MudTd DataLabel="Aksi">
-                <MudIconButton Icon="Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
-                <MudIconButton Icon="Icons.Material.Filled.Delete" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.RemoveRedEye" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -129,6 +138,9 @@
 
     private List<GroupPerawatan> groupPerawatans = new();
     private List<PerawatanHeader> perawatans = new(); // kept if you want to search existing for reference
+    private List<BarangListDto> barangs = new List<BarangListDto>();
+
+    private BarangListDto? selectedBarang;
 
     private GroupPerawatan selectedGroup;
     private bool isActive = true;
@@ -146,6 +158,7 @@
     {
         if (firstRender)
         {
+
             var apiResponse = await ApiService.GetGroupPerawatansAsync();
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
                 groupPerawatans = apiResponse.Data.Items ?? new();
@@ -154,6 +167,10 @@
             var perawatanApiResponse = await PerawatanApiService.GetTindakansAsync();
             if (perawatanApiResponse.StatusCode == 0 && perawatanApiResponse.Data != null)
                 perawatans = perawatanApiResponse.Data.Items ?? new();
+
+            var barangApiResponse = await BarangApiService.GetBarangItemsAsync();
+            if (barangApiResponse.StatusCode == 0 && barangApiResponse.Data != null)
+                barangs = barangApiResponse.Data ?? new();
 
             StateHasChanged();
         }
@@ -170,6 +187,18 @@
         return Task.FromResult(result);
     }
 
+    private Task<IEnumerable<BarangListDto>> SearchBarang(string value, CancellationToken cancelToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(barangs.AsEnumerable());
+
+        var result = barangs.Where(p =>
+            (p.KodeBarang?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.NamaBarang?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return Task.FromResult(result);
+    }
+
     private void OnGroupChanged(GroupPerawatan gp)
     {
         selectedGroup = gp;
@@ -182,6 +211,8 @@
     {
         await detailForm.Validate();
         if (!detailForm.IsValid) return;
+
+        detail.KodeBarang = selectedBarang?.KodeBarang;
 
         if (string.IsNullOrWhiteSpace(detail.KodeBarang)
             || string.IsNullOrWhiteSpace(detail.UnitPakai))
@@ -216,13 +247,15 @@
             JumlahPakai = item.JumlahPakai,
             IndikatorPakai = item.IndikatorPakai
         };
+
+        selectedBarang = barangs?.FirstOrDefault(p => p.KodeBarang == item.KodeBarang);
     }
 
     private void UpdateDetail()
     {
         if (isEditingDetail && editingIndex >= 0)
         {
-            details[editingIndex].KodeBarang = detail.KodeBarang;
+            details[editingIndex].KodeBarang = selectedBarang?.KodeBarang ?? detail.KodeBarang;
             details[editingIndex].UnitPakai = detail.UnitPakai;
             details[editingIndex].JumlahPakai = detail.JumlahPakai;
             details[editingIndex].IndikatorPakai = detail.IndikatorPakai;
@@ -243,6 +276,7 @@
         isEditingDetail = false;
         editingIndex = -1;
         detail = new PerawatanDetail();
+        selectedBarang = null;
     }
 
     private async Task SubmitAll()
@@ -278,6 +312,7 @@
             {
                 foreach (var d in details)
                 {
+                    d.KodeBarang = selectedBarang?.KodeBarang ?? "";
                     await PerawatanDetailApiService.CreatePerawatanDetailAsync(d);
                 }
             }

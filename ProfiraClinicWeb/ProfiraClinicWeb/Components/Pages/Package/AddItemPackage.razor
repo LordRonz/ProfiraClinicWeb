@@ -103,8 +103,8 @@
             <MudTd DataLabel="Kode Perawatan">@context.KodePerawatan</MudTd>
             <MudTd DataLabel="Jumlah">@context.JumlahPerawatan</MudTd>
             <MudTd DataLabel="Aksi">
-                <MudIconButton Icon="Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
-                <MudIconButton Icon="Icons.Material.Filled.Delete" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -129,7 +129,7 @@
     private List<PerawatanHeader> perawatans = new List<PerawatanHeader>();
 
     private GroupPaket selectedGroup;
-    private PerawatanHeader selectedPerawatan; // NEW: holds current perawatan selection
+    private PerawatanHeader? selectedPerawatan; // NEW: holds current perawatan selection
 
     private bool isActive;
     private bool isEditingDetail = false;
@@ -218,6 +218,8 @@
     {
         await detailForm.Validate();
         if (!detailForm.IsValid) return;
+
+        detail.KodePerawatan = selectedPerawatan?.KodePerawatan;
 
         // ensure a perawatan is selected
         if (string.IsNullOrWhiteSpace(detail.KodePerawatan))
