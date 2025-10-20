@@ -1,0 +1,454 @@
+﻿@page "/package-item/{Id}/edit"
+
+@using ProfiraClinic.Models
+@using ProfiraClinic.Models.Core
+@using ProfiraClinicWeb.Services
+@using MudBlazor
+@inject PaketDetailApiService PaketApiService
+@inject PaketHeaderApiService PaketHeaderApiService
+@inject NavigationManager NavigationManager
+@inject GroupPaketApiService ApiService
+@inject PerawatanHeaderApiService PerawatanApiService
+
+<MudCard Class="p-4 h-100">
+    <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
+
+    <div class="form-container">
+        <!-- Header Form -->
+        <MudForm @ref="headerForm" Class="section-body table-form">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="GroupPaket"
+                                     Label="Pilih Group Paket"
+                                     @bind-Value="selectedGroup"
+                                     SearchFunc="SearchGroup"
+                                     Clearable="true"
+                                     ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
+                                     Dense="true"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <div class="d-flex align-items-center gap-2">
+                        <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" /><span>(Rp)</span>
+                    </div>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+
+    </div>
+
+    <Divider Class="my-4" />
+
+    <!-- Detail Form -->
+    <MudForm @ref="detailForm" Class="table-form section-body">
+        <MudGrid>
+            <MudItem xs="12" sm="3">
+                <!-- Replaced text input with autocomplete for Perawatan -->
+                <MudAutocomplete T="PerawatanHeader"
+                                 Label="Pilih Perawatan"
+                                 @bind-Value="selectedPerawatan"
+                                 SearchFunc="SearchPerawatan"
+                                 Clearable="true"
+                                 ToStringFunc="@(p => p == null ? null : $"{p.KodePerawatan} ({p.NamaPerawatan})")"
+                                 Dense="true"
+                                 Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="3">
+                <MudNumericField T="int" Label="Jumlah Perawatan" @bind-Value="detail.JumlahPerawatan" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudItem>
+            <MudItem xs="12" sm="6" Class="d-flex align-end">
+                @if (isEditingDetail)
+                {
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Warning" OnClick="UpdateDetail">Update</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" Class="ml-2" OnClick="CancelEdit">Cancel</MudButton>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" OnClick="AddDetail">Tambah Detail</MudButton>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+
+    <!-- Details Table -->
+    <MudTable Items="details" Hover="true" Class="mt-4">
+        <HeaderContent>
+            <MudTh>No Urut</MudTh>
+            <MudTh>Kode Perawatan</MudTh>
+            <MudTh>Jumlah</MudTh>
+            <MudTh>Aksi</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="No Urut">@context.NoUrut</MudTd>
+            <MudTd DataLabel="Kode Perawatan">@context.KodePerawatan</MudTd>
+            <MudTd DataLabel="Jumlah">@context.JumlahPerawatan</MudTd>
+            <MudTd DataLabel="Aksi">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="MudBlazor.Color.Primary" OnClick="() => EditDetail(context)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Error" OnClick="() => RemoveDetail(context)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <div class="button-bar mt-4">
+        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" Class="save-btn" OnClick="SubmitAll">Simpan Paket</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Secondary" Class="back-btn" OnClick="Back">Kembali</MudButton>
+    </div>
+</MudCard>
+
+@code {
+    [CascadingParameter]
+    public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+    private MudForm headerForm;
+    private MudForm detailForm;
+
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+    private PaketHeader header = new PaketHeader();
+    private PaketDetail detail = new PaketDetail();
+    private List<PaketDetail> details = new List<PaketDetail>();
+
+    private List<GroupPaket> groupPakets = new List<GroupPaket>();
+    private List<PerawatanHeader> perawatans = new List<PerawatanHeader>();
+
+    private PaketHeader? paketDetailInitial;
+
+    private GroupPaket selectedGroup;
+    private PerawatanHeader? selectedPerawatan; // NEW: holds current perawatan selection
+
+    private bool isActive;
+    private bool isEditingDetail = false;
+    private int editingIndex = -1;
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/package-item");
+    }
+
+    protected override void OnInitialized()
+    {
+        Layout.ChangeTitleAndRoute("Master / Paket Perawatan", "Add Paket Perawatan");
+        header.Aktif = "1";
+        isActive = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var resp = await PaketHeaderApiService.GetPaketHeaderByCodeAsync(Id);
+            if (resp.StatusCode == 0 && resp.Data is not null)
+            {
+                paketDetailInitial = resp.Data;
+                System.Diagnostics.Debug.WriteLine(resp.Data.NamaPaket);
+                StateHasChanged();
+            }
+
+            // Load Group Paket
+            var apiResponse = await ApiService.GetGroupPaketsAsync();
+            if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
+                groupPakets = apiResponse.Data.Items ?? new List<GroupPaket>();
+
+            // Load Perawatan (Tindakan)
+            var perawatanApiResponse = await PerawatanApiService.GetTindakansAsync();
+            if (perawatanApiResponse.StatusCode == 0 && perawatanApiResponse.Data != null)
+                perawatans = perawatanApiResponse.Data.Items ?? new List<PerawatanHeader>();
+
+            header.NamaPaket = paketDetailInitial?.NamaPaket ?? "";
+            header.KodePaket = paketDetailInitial?.KodePaket ?? "";
+            header.MasaLaku = paketDetailInitial?.MasaLaku ?? 0;
+
+            selectedGroup = groupPakets.FirstOrDefault(p => p.KodeGroupPaket == header.KodeGroupPaket);
+            header.KodeGroupPaket = paketDetailInitial.KodeGroupPaket;
+            header.IDPaketHeader = paketDetailInitial.IDPaketHeader;
+            header.DiscMember = paketDetailInitial.DiscMember;
+            header.DiscNonMember = paketDetailInitial.DiscNonMember;
+            header.KodeJenis = paketDetailInitial.KodeJenis;
+
+            StateHasChanged();
+        }
+    }
+
+    // --- Autocomplete: Group Paket ---
+
+    private Task<IEnumerable<GroupPaket>> SearchGroup(string value, CancellationToken cancelToken)
+    {
+        if (string.IsNullOrEmpty(value))
+            return Task.FromResult(groupPakets.AsEnumerable());
+
+        var result = groupPakets.Where(g =>
+            (g.KodeGroupPaket?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (g.NamaGroupPaket?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return Task.FromResult(result);
+    }
+
+    private void OnGroupChanged(GroupPaket gp)
+    {
+        selectedGroup = gp;
+        if (gp != null)
+        {
+            header.KodeGroupPaket = gp.KodeGroupPaket;
+            // If you want NamaPaket to default from group name:
+            // Only set when user hasn't typed a custom name
+            if (string.IsNullOrWhiteSpace(header.NamaPaket))
+                header.NamaPaket = gp.NamaGroupPaket;
+        }
+    }
+
+    // --- Autocomplete: Perawatan ---
+
+    private Task<IEnumerable<PerawatanHeader>> SearchPerawatan(string value, CancellationToken cancelToken)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(perawatans.AsEnumerable());
+
+        var result = perawatans.Where(p =>
+            (p.KodePerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (p.NamaPerawatan?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        return Task.FromResult(result);
+    }
+
+    private void OnPerawatanChanged(PerawatanHeader p)
+    {
+        selectedPerawatan = p;
+        detail.KodePerawatan = p?.KodePerawatan; // keep the saved code in sync with selection
+    }
+
+    // --- Detail CRUD ---
+
+    private async Task AddDetail()
+    {
+        await detailForm.Validate();
+        if (!detailForm.IsValid) return;
+
+        detail.KodePerawatan = selectedPerawatan?.KodePerawatan;
+
+        // ensure a perawatan is selected
+        if (string.IsNullOrWhiteSpace(detail.KodePerawatan))
+        {
+            // optionally show a snackbar/toast here
+            return;
+        }
+
+        detail.NoUrut = details.Count + 1;
+
+        details.Add(new PaketDetail
+        {
+            NoUrut = detail.NoUrut,
+            KodePerawatan = detail.KodePerawatan,
+            JumlahPerawatan = detail.JumlahPerawatan
+        });
+
+        ResetDetailForm();
+    }
+
+    private void EditDetail(PaketDetail item)
+    {
+        isEditingDetail = true;
+        editingIndex = details.IndexOf(item);
+
+        detail = new PaketDetail
+        {
+            NoUrut = item.NoUrut,
+            KodePerawatan = item.KodePerawatan,
+            JumlahPerawatan = item.JumlahPerawatan
+        };
+
+        // sync the autocomplete selection to reflect current row
+        selectedPerawatan = perawatans.FirstOrDefault(p => p.KodePerawatan == item.KodePerawatan);
+    }
+
+    private void UpdateDetail()
+    {
+        if (isEditingDetail && editingIndex >= 0)
+        {
+            details[editingIndex].KodePerawatan = detail.KodePerawatan;
+            details[editingIndex].JumlahPerawatan = detail.JumlahPerawatan;
+            ResetDetailForm();
+        }
+    }
+
+    private void CancelEdit()
+    {
+        ResetDetailForm();
+    }
+
+    private void RemoveDetail(PaketDetail item)
+    {
+        details.Remove(item);
+        // Re-number NoUrut
+        for (int i = 0; i < details.Count; i++)
+            details[i].NoUrut = i + 1;
+    }
+
+    private void ResetDetailForm()
+    {
+        isEditingDetail = false;
+        editingIndex = -1;
+        detail = new PaketDetail();
+        selectedPerawatan = null; // clear perawatan picker
+    }
+
+    private async Task SubmitAll()
+    {
+        await headerForm.Validate();
+        if (headerForm.IsValid)
+        {
+            header.Aktif = isActive ? "1" : "0";
+
+            var paket = new PaketHeader
+            {
+                KodePaket = header.KodePaket,
+                KodeJenis = header.KodeJenis,
+                KodeGroupPaket = header.KodeGroupPaket,
+                NamaPaket = header.NamaPaket,
+                HARGA = header.HARGA,
+                DiscMember = header.DiscMember,
+                DiscNonMember = header.DiscNonMember,
+                MasaLaku = header.MasaLaku,
+                Aktif = header.Aktif,
+                USRID = ""
+            };
+
+            // Save header
+            var resultHeader = await PaketHeaderApiService.CreatePaketHeaderAsync(paket);
+            if (resultHeader.StatusCode < 300)
+            {
+                // Save details
+                foreach (var d in details)
+                {
+                    d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
+                    await PaketApiService.CreatePaketDetailAsync(d);
+                }
+
+                NavigationManager.NavigateTo("/package-item");
+            }
+            else
+            {
+                // TODO: handle error (snackbar/log)
+            }
+        }
+    }
+}
+
+<style>
+    .button-bar {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px; /* space between buttons */
+        flex-wrap: nowrap; /* never wrap to next line */
+    }
+
+    .form-container {
+        max-width: 800px; /* adjust this value to control the width */
+    }
+
+    .save-btn {
+        background: rgba(47, 193, 71, 1);
+        color: white;
+        text-transform: none;
+    }
+
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
+
+    .back-btn {
+        background: rgba(156, 99, 5, 1);
+        color: white;
+        margin-left: 20px;
+        text-transform: none;
+    }
+
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
+
+    .table-form .mud-input-root {
+        height: 30px !important;
+        padding: 0px 10px !important;
+        font-size: 12px !important;
+    }
+
+    .table-form .mud-input-label {
+        font-size: 14px !important;
+        line-height: 14px !important;
+    }
+
+    .table-form .mud-input-label-outlined.mud-input-label-margin-dense {
+        transform: translate(12px, 10px) scale(1);
+    }
+
+    .table-form .mud-input-label-inputcontrol {
+        top: -3px;
+    }
+
+    .table-form .mud-select-input.mud-input-slot {
+        transform: translate(5px, 7px);
+        top: -8px;
+    }
+
+    .active-tab {
+        background-color: rgba(162, 238, 240, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-panel {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .tab-header {
+        border: 1px solid rgba(202, 199, 199, 1);
+        border-top: none;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+    }
+
+    .section {
+        width: 100%;
+        overflow: hidden; /* clip rounded corners */
+        border-radius: 8px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        background-color: #a2eef0; /* your blue */
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+    }
+
+        .section-header .mud-icon-root {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+    .section-body {
+        padding: 1rem;
+    }
+</style>
