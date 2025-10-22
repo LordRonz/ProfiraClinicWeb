@@ -100,27 +100,40 @@
             <NoteContent>
                 @{
 
-                    string[][] displayData = [[]];
+                    string[][] displayDataLeft = [[]];
+                    string[][] displayDataRight = [[]];
+
                     if (context is not null)
                     {
-                        displayData = [
-                        ["Kunjungan", context.NomorAppointment],
-                                ["Keadaan Umum", context.KeadaanUmum],
-                                ["Tingkat Kesadaran", context.TingkatKesadaran],
-                                ["Kesadaran", context.Kesadaran ?? ""],
-                                ["Sistolik", context.Sistolik?.ToString() ?? ""],
-                                ["Diastolik", context.Distolik?.ToString() ?? ""],
-                                ["Suhu", $"{context.Suhu} C"],
-                                ["Saturasi O2", context.Saturasi?.ToString() ?? ""],
-                                ["Frekuensi Nafas", $"{context.FrekuensiNapas}x/menit"],
-                                ["Frekuensi Nadi", $"{context.FrekuensiNadi}x/menit"],
-                                ["Dokter", context.NamaKaryawan ?? ""],
-                                [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
+                        displayDataLeft = [
+                            ["Kunjungan", context.NomorAppointment],
+                            ["Keadaan Umum", context.KeadaanUmum],
+                            ["Tingkat Kesadaran", context.TingkatKesadaran],
+                            ["Kesadaran", context.Kesadaran ?? ""],
+                            ["Sistolik", context.Sistolik?.ToString() ?? ""],
+                            ["Diastolik", context.Distolik?.ToString() ?? ""],
+                            ["Suhu", $"{context.Suhu} C"],
+                            ["Saturasi O2", context.Saturasi?.ToString() ?? ""],
+                            ["Frekuensi Nafas", $"{context.FrekuensiNapas}x/menit"],
+                            ["Frekuensi Nadi", $"{context.FrekuensiNadi}x/menit"],
+                            ["Lokasi", context.KETLK ?? ""],
+                            ["Dokter", context.NamaKaryawan ?? ""],
+                            [DateUtility.FormatDate(context.UPDDT, DateUtility.FormatMode.DateTime), ""]
                         ];
 
+                        displayDataRight = [
+                            ["Berat Badan", context.BeratBadan.ToString() ?? ""],
+                            ["Tinggi Badan", context.TinggiBadan.ToString() ?? ""],
+                            ["Index Masa Tubuh", context.IndexTubuh.ToString() ?? ""],
+                            ["Lingkar Kepala (cm)", context.LingkarKepala.ToString() ?? ""]
+                        ];
+
+                        <div class="d-flex gap-2">
+                            <TableGen Data="@displayDataLeft" Style="display:block" />
+                            <TableGen Data="@displayDataRight" Style="display:block" />
+                        </div>
                     }
                 }
-                <TableGen Data="@displayData" />
 
             </NoteContent>
         </Note>
@@ -138,9 +151,9 @@
     private TRMPemeriksaanUmum _trmPemeriksaanUmumInForm = new();
 
 
-    public PemeriksaanUmum()
+    public Pemeriksaan()
     {
-        _classPath = "App::Page::PemeriksaanUmum";
+        _classPath = "App::Page::Pemeriksaan";
         LogTrace.Info("init", path: _classPath);
     }
 
