@@ -1,6 +1,6 @@
 ﻿@inherits BaseWidget
 
-<table class="tablegen">
+<table class="tablegen" style="@Style">
     @foreach(var row in Data){
         <tr>
             <td>
@@ -21,5 +21,7 @@
     [Parameter]
     public string[][] Data { get; set; } = [[]];
 
+    [Parameter]
+    public string Style { get; set; } = "";
 
 }
