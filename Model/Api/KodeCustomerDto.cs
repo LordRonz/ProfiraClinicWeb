@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProfiraClinic.Models.Api
 {
-    public class KodeCustomerDTO
+    public class KodeCustomerDto
     {
         public string KodeCustomer { get; set; } = "";
     }

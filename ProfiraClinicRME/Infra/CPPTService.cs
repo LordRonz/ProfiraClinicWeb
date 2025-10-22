@@ -31,12 +31,12 @@ namespace ProfiraClinicRME.Infra
         public async Task<ServiceResult<Pagination<TRMCPPT>>> GetListAsync(string kodeCustomer)
         {
 
-            var request = new KodeCustomerDTO
+            var request = new KodeCustomerDto
             {
                 KodeCustomer = kodeCustomer
             };
 
-            Response<Pagination<TRMCPPT>?> apiResponse = await _svcApi.Send<KodeCustomerDTO, Pagination<TRMCPPT>>("post", $"api/CPPT/GetListTrm", request);
+            Response<Pagination<TRMCPPT>?> apiResponse = await _svcApi.Send<KodeCustomerDto, Pagination<TRMCPPT>>("post", $"api/CPPT/GetListTrm", request);
 
             ServiceResult<Pagination<TRMCPPT>> svcResult = _repo.ProcessResult(apiResponse, RepoProcessEnum.GET);
 

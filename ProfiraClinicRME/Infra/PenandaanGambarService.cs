@@ -100,12 +100,12 @@ namespace ProfiraClinicRME.Infra
         public async Task<ServiceResult<Pagination<PenandaanGambarFull>>> GetListAsync(string kodeCustomer)
         {
 
-            var request = new KodeCustomerDTO
+            var request = new KodeCustomerDto
             {
                 KodeCustomer = kodeCustomer
             };
 
-            Response<Pagination<PenandaanGambarFull>?> apiResponse = await _svcApi.Send<KodeCustomerDTO, Pagination<PenandaanGambarFull>>("post", $"api/PemeriksaanUmum/GetListTrm", request);
+            Response<Pagination<PenandaanGambarFull>?> apiResponse = await _svcApi.Send<KodeCustomerDto, Pagination<PenandaanGambarFull>>("post", $"api/PemeriksaanUmum/GetListTrm", request);
 
             ServiceResult<Pagination<PenandaanGambarFull>> svcResult = _repo.ProcessResult<Pagination<PenandaanGambarFull>>(apiResponse, RepoProcessEnum.GET);
 
