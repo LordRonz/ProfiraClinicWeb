@@ -102,13 +102,125 @@ namespace ProfiraClinicWebAPI.Controllers
         [HttpDelete("del/{code}")]
         public async override Task<IActionResult> Delete(string code)
         {
-            var affected = await _context.PaketHeader
-        .Where(p => p.KodePaket == code)
-        .ExecuteUpdateAsync(setters => setters
-            .SetProperty(p => p.Aktif, "0")
-            .SetProperty(p => p.UPDDT, DateTime.Now));
-            if (affected == 0) return NotFound();
-            return NoContent();
+            if (string.IsNullOrWhiteSpace(code))
+                return BadRequest("KodePaket is required.");
+
+            var pKode = new SqlParameter("@KodePaket", System.Data.SqlDbType.Char, 10)
+            {
+                Value = code
+            };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPaket_Del @KodePaket",
+                    pKode
+                );
+
+                return NoContent();
+            }
+            catch (SqlException ex)
+            {
+                // SP raises an error like: "Paket tersebut tidak ada ..."
+                if (ex.Message.Contains("tidak ada", StringComparison.OrdinalIgnoreCase))
+                    return NotFound(new { message = ex.Message });
+
+                return BadRequest(new
+                {
+                    message = "Failed to delete paket.",
+                    error = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Unexpected server error while deleting paket.",
+                    error = ex.Message
+                });
+            }
         }
+
+        [HttpPost("Edit")]
+        public async Task<IActionResult> Edit([FromBody] PaketHeader updatedPaketHeader)
+        {
+            if (updatedPaketHeader == null)
+                return BadRequest("PaketHeader data is required.");
+
+            if (string.IsNullOrWhiteSpace(updatedPaketHeader.KodePaket))
+                return BadRequest("KodePaket is required.");
+
+            // Define parameters for DELETE
+            var deleteParam = new SqlParameter("@KodePaket", System.Data.SqlDbType.Char, 10)
+            {
+                Value = updatedPaketHeader.KodePaket
+            };
+
+            // Define parameters for ADD
+            var addParams = new[]
+            {
+        new SqlParameter("@KodeJenis", updatedPaketHeader.KodeJenis ?? (object)DBNull.Value),
+        new SqlParameter("@KodeGroupPaket", updatedPaketHeader.KodeGroupPaket ?? (object)DBNull.Value),
+        new SqlParameter("@KodePaket", updatedPaketHeader.KodePaket ?? (object)DBNull.Value),
+        new SqlParameter("@NamaPaket", updatedPaketHeader.NamaPaket ?? (object)DBNull.Value),
+        new SqlParameter("@HARGA", updatedPaketHeader.HARGA),
+        new SqlParameter("@DiscMember", updatedPaketHeader.DiscMember),
+        new SqlParameter("@DiscNonMember", updatedPaketHeader.DiscNonMember),
+        new SqlParameter("@MasaLaku", updatedPaketHeader.MasaLaku),
+        new SqlParameter("@AKTIF", updatedPaketHeader.Aktif ?? (object)DBNull.Value),
+        new SqlParameter("@USRID", updatedPaketHeader.USRID ?? (object)DBNull.Value)
+    };
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Step 1: Delete the old record
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPaket_Del @KodePaket",
+                    deleteParam
+                );
+
+                // Step 2: Add the new record
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPaketH_Add " +
+                    "@KodeJenis, @KodeGroupPaket, @KodePaket, @NamaPaket, @HARGA, " +
+                    "@DiscMember, @DiscNonMember, @MasaLaku, @AKTIF, @USRID",
+                    addParams
+                );
+
+                await transaction.CommitAsync();
+
+                return Ok(new
+                {
+                    message = "Paket successfully updated.",
+                    kodePaket = updatedPaketHeader.KodePaket
+                });
+            }
+            catch (SqlException ex)
+            {
+                await transaction.RollbackAsync();
+
+                // Handle not found / RAISERROR from SP
+                if (ex.Message.Contains("tidak ada", StringComparison.OrdinalIgnoreCase))
+                    return NotFound(new { message = ex.Message });
+
+                return BadRequest(new
+                {
+                    message = "Failed to update paket.",
+                    error = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, new
+                {
+                    message = "Unexpected error while editing paket.",
+                    error = ex.Message
+                });
+            }
+        }
+
+
     }
 }

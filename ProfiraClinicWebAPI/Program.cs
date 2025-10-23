@@ -174,4 +174,16 @@ app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 app.MapControllers();
 
-app.Run();
+try
+{
+    Log.Information("Starting up...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application start-up failed");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

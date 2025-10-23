@@ -1,185 +1,216 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
-using ProfiraClinicWebAPI.Services;
-using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
 {
-    [Authorize]
-    public class PerawatanHeaderController
-    : BaseCrudController<TRMPerawatanHeader>
+    public class PerawatanHeaderController : BaseCrudController<PerawatanHeader>
     {
-        public class TRMPerawatanHeaderListDto()
-        {
-            public string? KodeCustomer { get; set; }
-        }
-        private readonly string _kodePoli;
+        public PerawatanHeaderController(AppDbContext ctx) : base(ctx) { }
 
-        public PerawatanHeaderController(AppDbContext ctx, IConfiguration configuration) : base(ctx)
-        {
-            _kodePoli = configuration["KodePoli"] ?? "";
-        }
+        protected override DbSet<PerawatanHeader> DbSet
+            => _context.PPerawatanH;
 
-        protected override DbSet<TRMPerawatanHeader> DbSet
-            => _context.TRMPerawatanHeader;
-
-        protected override IQueryable<TRMPerawatanHeader> ApplySearch(
-            IQueryable<TRMPerawatanHeader> q,
+        protected override IQueryable<PerawatanHeader> ApplySearch(
+            IQueryable<PerawatanHeader> q,
             string likeParam)
             => q.Where(d
-                => EF.Functions.Like(d.KodePoli, likeParam)
-                || EF.Functions.Like(d.KodeCustomer, likeParam)
-            || EF.Functions.Like(d.KodeLokasi, likeParam)
-            );
+                => EF.Functions.Like(d.KodeJenis, likeParam)
+                || EF.Functions.Like(d.KodeGroupPerawatan, likeParam)
+                || EF.Functions.Like(d.KodePerawatan, likeParam)
+                || EF.Functions.Like(d.NamaPerawatan, likeParam));
 
-        protected override IOrderedQueryable<TRMPerawatanHeader> ApplyOrder(
-            IQueryable<TRMPerawatanHeader> q)
-            => q.OrderBy(d => d.TanggalTransaksi);
+        protected override IOrderedQueryable<PerawatanHeader> ApplyOrder(
+            IQueryable<PerawatanHeader> q)
+            => q.OrderBy(d => d.KodePerawatan);
 
-        [HttpPost("AddTRMPerawatanHeader")]
-        public async Task<IActionResult> AddTRMPerawatanHeader([FromBody] AddTRMPerawatanHeaderDto appDto)
+        protected override IQueryable<PerawatanHeader> ApplyLastFilter(
+            IQueryable<PerawatanHeader> q,
+            DateTime lastDate)
         {
-            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userName))
-                return Unauthorized();
+            return q.Where(p => p.UpdDt > lastDate);
+        }
 
-            var user = await _context.MUser.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.USRID == userName);
-            if (user == null)
-                return NotFound();
 
-            // prefer kode lokasi from token, fallback to user, then dto
-            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi)
-                       ?? user.KodeLokasi
-                       ?? appDto.KodeLokasi;
+        [HttpGet("GetByCode/{code}")]
+        public async Task<ActionResult<PerawatanHeader>> GetItemByCode(string code)
+        {
+            return await FindOne(c => c.KodePerawatan == code);
+        }
 
-            // @NomorTransaksi is returned by the SP via assignment; caller must pass InputOutput
-            var nomorParam = new SqlParameter("@NomorTransaksi", System.Data.SqlDbType.Char, 21)
+        // POST: api/Tindakan/add
+        [HttpPost("add")]
+        public async Task<ActionResult<PerawatanHeader>> AddTindakan([FromBody] PerawatanHeader newTindakan)
+        {
+            if (newTindakan == null)
             {
-                Direction = System.Data.ParameterDirection.InputOutput,
-                // seed with empty char(21)
-                Value = (object)string.Empty.PadRight(21, ' ')
-            };
+                return BadRequest("Tindakan data is null.");
+            }
 
             var sqlParameters = new[]
             {
-        new SqlParameter("@KodeLokasi",    kdLok ?? (object)DBNull.Value),
-        new SqlParameter("@TanggalTransaksi", appDto.TanggalTransaksi ?? DateTime.Today),
-        new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
-        new SqlParameter("@KodeCustomer",  appDto.KodeCustomer ?? (object)DBNull.Value),
-        new SqlParameter("@KodePoli",      _kodePoli ?? (object)DBNull.Value),
-        new SqlParameter("@Keterangan",    appDto.KeteranganTRMPerawatanHeader ?? (object)DBNull.Value),
-        new SqlParameter("@USRID",         user.KodeUser ?? user.USRID ?? (object)DBNull.Value),
-        nomorParam
-    };
+                new SqlParameter("@KodeJenis", newTindakan.KodeJenis ?? (object)DBNull.Value),
+                new SqlParameter("@KategoriPerawatan", newTindakan.KategoriPerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@KodeGroupPerawatan", newTindakan.KodeGroupPerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@KodePerawatan", newTindakan.KodePerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@NamaPerawatan", newTindakan.NamaPerawatan ?? (object)DBNull.Value),
+                new SqlParameter("@HARGA", newTindakan.Harga),
+                new SqlParameter("@DiscMember", newTindakan.DiscMember),
+                new SqlParameter("@DiscNonMember", newTindakan.DiscNonMember),
+                new SqlParameter("@POINT", newTindakan.Point),
+                new SqlParameter("@AKTIF", newTindakan.Aktif ?? (object)DBNull.Value),
+                new SqlParameter("@USRID", newTindakan.UsrId ?? (object)DBNull.Value)
+            };
 
             try
             {
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_TRM_Perawatan_Header_Add " +
-                    "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                    "@KodeCustomer, @KodePoli, @Keterangan, @USRID, @NomorTransaksi",
+                    "EXEC dbo.usp_PPerawatanH_Add " +
+                    "@KodeJenis, @KategoriPerawatan, @KodeGroupPerawatan, @KodePerawatan, @NamaPerawatan, " +
+                    "@HARGA, @DiscMember, @DiscNonMember, @POINT, @AKTIF, @USRID",
                     sqlParameters);
 
-                var nomorTransaksi = (nomorParam.Value as string)?.Trim();
-                return Ok(new { nomorTransaksi });
+                // Return the newly created tindakan object
+                return CreatedAtAction(nameof(GetItem), new { id = newTindakan.KodePerawatan }, newTindakan);
             }
             catch (SqlException ex)
             {
-                return BadRequest(new { message = "Failed to add TRM Perawatan Header.", error = ex.Message });
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
         }
 
-
-        [HttpPost("EditTRMPerawatanHeader")]
-        public async Task<IActionResult> EditTRMPerawatanHeader([FromBody] EditTRMPerawatanHeaderDto appDto)
+        [HttpDelete("del/{code}")]
+        public async override Task<IActionResult> Delete(string code)
         {
-            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userName))
-                return Unauthorized();
+            if (string.IsNullOrWhiteSpace(code))
+                return BadRequest("KodePerawatan is required.");
 
-            var user = await _context.MUser.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.USRID == userName);
-            if (user == null)
-                return NotFound();
-
-            if (string.IsNullOrWhiteSpace(appDto.NomorTransaksi))
-                return BadRequest(new { message = "NomorTransaksi is required for editing." });
-
-            var kdLok = User.FindFirstValue(JwtClaimTypes.KodeLokasi)
-                       ?? user.KodeLokasi
-                       ?? appDto.KodeLokasi;
+            var pKode = new SqlParameter("@KodePerawatan", System.Data.SqlDbType.Char, 10)
+            {
+                Value = code
+            };
 
             try
             {
-                // 1) Delete existing header (Edit SP assumes nomor already removed)
-                var delParams = new[] { new SqlParameter("@NomorTransaksi", appDto.NomorTransaksi) };
-
-                // If your delete SP name is different, change it here.
+                // Call your SP that hard-deletes from PPerawatanH + PPerawatanD
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_TRM_Perawatan_Header_Del @NomorTransaksi", delParams);
+                    "EXEC dbo.usp_PPerawatan_Del @KodePerawatan",
+                    pKode
+                );
 
-                // 2) Re-insert via Edit SP
-                var editParams = new[]
-                {
-            new SqlParameter("@KodeLokasi",    kdLok ?? (object)DBNull.Value),
-            new SqlParameter("@TanggalTransaksi", appDto.TanggalTransaksi ?? DateTime.Today),
-            new SqlParameter("@NomorAppointment", appDto.NomorAppointment ?? (object)DBNull.Value),
-            new SqlParameter("@KodeCustomer",  appDto.KodeCustomer ?? (object)DBNull.Value),
-            new SqlParameter("@KodePoli",      _kodePoli ?? (object)DBNull.Value),
-            new SqlParameter("@Keterangan",    appDto.KeteranganTRMPerawatanHeader ?? (object)DBNull.Value),
-            new SqlParameter("@USRID",         user.KodeUser ?? user.USRID ?? (object)DBNull.Value),
-            new SqlParameter("@NomorTransaksi", appDto.NomorTransaksi)
-        };
-
-                await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_TRM_Perawatan_Header_Edit " +
-                    "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                    "@KodeCustomer, @KodePoli, @Keterangan, @USRID, @NomorTransaksi",
-                    editParams);
-
-                return Ok(new { nomorTransaksi = appDto.NomorTransaksi });
+                // SP completed successfully
+                return NoContent();
             }
             catch (SqlException ex)
             {
-                return BadRequest(new { message = "Failed to edit TRM Perawatan Header.", error = ex.Message });
+                // SP uses RAISERROR when the code is not found — convert to 404 for API consumers
+                if (ex.Message.Contains("tidak ada", StringComparison.OrdinalIgnoreCase))
+                    return NotFound(new { message = ex.Message });
+
+                // Other SQL errors -> 400 with details
+                return BadRequest(new
+                {
+                    message = "Failed to delete perawatan.",
+                    error = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                // Non-SQL exceptions
+                return StatusCode(500, new
+                {
+                    message = "Unexpected server error while deleting perawatan.",
+                    error = ex.Message
+                });
             }
         }
 
-        [HttpPost("GetByNomorTransaksi")]
-        public async Task<IActionResult> GetByNomorTransaksi([FromBody] GetByNomorTransaksiDto dto)
+        [HttpPost("edit")]
+        public async Task<IActionResult> Edit([FromBody] PerawatanHeader updated)
         {
-            var nomorTransaksi = dto.NomorTransaksi;
-            if (string.IsNullOrWhiteSpace(nomorTransaksi))
-                return BadRequest(new { message = "NomorTransaksi is required." });
+            if (updated == null)
+                return BadRequest("Payload is required.");
+            if (string.IsNullOrWhiteSpace(updated.KodePerawatan))
+                return BadRequest("KodePerawatan is required.");
 
-            var diagnosa = await _context.TRMPerawatanHeader
-                .AsNoTracking()
-                .FirstOrDefaultAsync(d => d.NomorTransaksi == nomorTransaksi);
+            // Params for DELETE
+            var delParam = new SqlParameter("@KodePerawatan", System.Data.SqlDbType.Char, 10)
+            {
+                Value = updated.KodePerawatan
+            };
 
-            if (diagnosa == null)
-                return Ok(new { message = "TRMPerawatanHeader not found." });
+            // Params for ADD (same mapping as your add endpoint)
+            var addParams = new[]
+            {
+        new SqlParameter("@KodeJenis",            updated.KodeJenis             ?? (object)DBNull.Value),
+        new SqlParameter("@KategoriPerawatan",    updated.KategoriPerawatan     ?? (object)DBNull.Value),
+        new SqlParameter("@KodeGroupPerawatan",   updated.KodeGroupPerawatan    ?? (object)DBNull.Value),
+        new SqlParameter("@KodePerawatan",        updated.KodePerawatan         ?? (object)DBNull.Value),
+        new SqlParameter("@NamaPerawatan",        updated.NamaPerawatan         ?? (object)DBNull.Value),
+        new SqlParameter("@HARGA",                updated.Harga),
+        new SqlParameter("@DiscMember",           updated.DiscMember),
+        new SqlParameter("@DiscNonMember",        updated.DiscNonMember),
+        new SqlParameter("@POINT",                updated.Point),
+        new SqlParameter("@AKTIF",                updated.Aktif                 ?? (object)DBNull.Value),
+        new SqlParameter("@USRID",                updated.UsrId                 ?? (object)DBNull.Value),
+    };
 
-            return Ok(diagnosa);
+            using var tx = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1) Delete existing
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPerawatan_Del @KodePerawatan",
+                    delParam
+                );
+
+                // 2) Re-insert updated
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.usp_PPerawatanH_Add " +
+                    "@KodeJenis, @KategoriPerawatan, @KodeGroupPerawatan, @KodePerawatan, @NamaPerawatan, " +
+                    "@HARGA, @DiscMember, @DiscNonMember, @POINT, @AKTIF, @USRID",
+                    addParams
+                );
+
+                await tx.CommitAsync();
+
+                return Ok(new
+                {
+                    message = "Perawatan successfully updated.",
+                    kodePerawatan = updated.KodePerawatan
+                });
+            }
+            catch (SqlException ex)
+            {
+                await tx.RollbackAsync();
+
+                // SP RAISERROR: not found on delete, surface 404
+                if (ex.Message.Contains("tidak ada", StringComparison.OrdinalIgnoreCase))
+                    return NotFound(new { message = ex.Message });
+
+                return BadRequest(new
+                {
+                    message = "Failed to update perawatan.",
+                    error = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                await tx.RollbackAsync();
+                return StatusCode(500, new
+                {
+                    message = "Unexpected server error while editing perawatan.",
+                    error = ex.Message
+                });
+            }
         }
 
-        [HttpPost("GetByNomorAppointment")]
-        public async Task<IActionResult> GetByNomorAppointment([FromBody] GetByNomorAppointmentDto dto)
-        {
-            var nomorAppointment = dto.NomorAppointment;
-            if (string.IsNullOrWhiteSpace(nomorAppointment))
-                return BadRequest(new { message = "NomorAppointment is required." });
 
-            var diagnosa = await _context.TRMPerawatanHeader
-                .AsNoTracking()
-                .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
-
-            return Ok(diagnosa);
-        }
     }
 }

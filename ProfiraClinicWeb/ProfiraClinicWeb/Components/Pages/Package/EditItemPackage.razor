@@ -1,4 +1,4 @@
-﻿@page "/package-item/add"
+﻿@page "/package-item/{Id}/edit"
 
 @using ProfiraClinic.Models
 @using ProfiraClinic.Models.Core
@@ -14,45 +14,45 @@
     <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
 
     <div class="form-container">
-    <!-- Header Form -->
-    <MudForm @ref="headerForm" Class="section-body table-form">
-        <MudGrid>
-            <MudItem xs="12" sm="6">
-                <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudAutocomplete T="GroupPaket"
-                                 Label="Pilih Group Paket"
-                                 @bind-Value="selectedGroup"
-                                 SearchFunc="SearchGroup"
-                                 Clearable="true"
-                                 ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
-                                 Dense="true"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="4">
-                <div class="d-flex align-items-center gap-2">
+        <!-- Header Form -->
+        <MudForm @ref="headerForm" Class="section-body table-form">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="GroupPaket"
+                                     Label="Pilih Group Paket"
+                                     @bind-Value="selectedGroup"
+                                     SearchFunc="SearchGroup"
+                                     Clearable="true"
+                                     ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
+                                     Dense="true"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <div class="d-flex align-items-center gap-2">
                         <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" /><span>(Rp)</span>
                     </div>
-            </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="4">
-                <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" Margin="Margin.Dense" />
-            </MudItem>
-        </MudGrid>
-    </MudForm>
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal" Label="Disc Member" @bind-Value="header.DiscMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal" Label="Disc Non Member" @bind-Value="header.DiscNonMember" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="4">
+                    <MudNumericField T="decimal" Label="Masa Laku" @bind-Value="header.MasaLaku" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </MudItem>
+            </MudGrid>
+        </MudForm>
 
     </div>
 
@@ -121,12 +121,16 @@
     private MudForm headerForm;
     private MudForm detailForm;
 
+    [Parameter] public string Id { get; set; } = string.Empty;
+
     private PaketHeader header = new PaketHeader();
     private PaketDetail detail = new PaketDetail();
     private List<PaketDetail> details = new List<PaketDetail>();
 
     private List<GroupPaket> groupPakets = new List<GroupPaket>();
     private List<PerawatanHeader> perawatans = new List<PerawatanHeader>();
+
+    private PaketHeader? paketDetailInitial;
 
     private GroupPaket selectedGroup;
     private PerawatanHeader? selectedPerawatan; // NEW: holds current perawatan selection
@@ -151,6 +155,14 @@
     {
         if (firstRender)
         {
+            var resp = await PaketHeaderApiService.GetPaketHeaderByCodeAsync(Id);
+            if (resp.StatusCode == 0 && resp.Data is not null)
+            {
+                paketDetailInitial = resp.Data;
+                System.Diagnostics.Debug.WriteLine(resp.Data.NamaPaket);
+                StateHasChanged();
+            }
+
             // Load Group Paket
             var apiResponse = await ApiService.GetGroupPaketsAsync();
             if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
@@ -160,6 +172,17 @@
             var perawatanApiResponse = await PerawatanApiService.GetTindakansAsync();
             if (perawatanApiResponse.StatusCode == 0 && perawatanApiResponse.Data != null)
                 perawatans = perawatanApiResponse.Data.Items ?? new List<PerawatanHeader>();
+
+            header.NamaPaket = paketDetailInitial?.NamaPaket ?? "";
+            header.KodePaket = paketDetailInitial?.KodePaket ?? "";
+            header.MasaLaku = paketDetailInitial?.MasaLaku ?? 0;
+
+            selectedGroup = groupPakets.FirstOrDefault(p => p.KodeGroupPaket == header.KodeGroupPaket);
+            header.KodeGroupPaket = paketDetailInitial.KodeGroupPaket;
+            header.IDPaketHeader = paketDetailInitial.IDPaketHeader;
+            header.DiscMember = paketDetailInitial.DiscMember;
+            header.DiscNonMember = paketDetailInitial.DiscNonMember;
+            header.KodeJenis = paketDetailInitial.KodeJenis;
 
             StateHasChanged();
         }
@@ -337,6 +360,7 @@
         gap: 12px; /* space between buttons */
         flex-wrap: nowrap; /* never wrap to next line */
     }
+
     .form-container {
         max-width: 800px; /* adjust this value to control the width */
     }
@@ -347,9 +371,9 @@
         text-transform: none;
     }
 
-    .save-btn:hover {
-        background: rgba(27, 153, 41, 1);
-    }
+        .save-btn:hover {
+            background: rgba(27, 153, 41, 1);
+        }
 
     .back-btn {
         background: rgba(156, 99, 5, 1);
@@ -358,9 +382,9 @@
         text-transform: none;
     }
 
-    .back-btn:hover {
-        background: rgba(126, 69, 2, 1);
-    }
+        .back-btn:hover {
+            background: rgba(126, 69, 2, 1);
+        }
 
     .table-form .mud-input-root {
         height: 30px !important;
@@ -419,10 +443,10 @@
         font-weight: 500;
     }
 
-    .section-header .mud-icon-root {
-        margin-right: 0.5rem;
-        font-size: 1.25rem;
-    }
+        .section-header .mud-icon-root {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
 
     .section-body {
         padding: 1rem;

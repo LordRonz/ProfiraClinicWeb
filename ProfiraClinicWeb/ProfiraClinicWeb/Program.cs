@@ -134,6 +134,12 @@ builder.Services.AddHttpClient<UserGroupOtorisasiApiService>(client =>
 }).AddHttpMessageHandler<BearerTokenHandler>()
     .AddHttpMessageHandler<AuthRedirectHandler>();
 
+builder.Services.AddHttpClient<RiwayatTransaksiApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseAddress);
+}).AddHttpMessageHandler<BearerTokenHandler>()
+    .AddHttpMessageHandler<AuthRedirectHandler>();
+
 
 var app = builder.Build();
 

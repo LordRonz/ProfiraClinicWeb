@@ -8,6 +8,7 @@
 @using Microsoft.EntityFrameworkCore;
 @inject HttpClient httpClient
 @inject CustomerApiService ApiService
+@inject RiwayatTransaksiApiService RiwayatTransaksiService
 @using Color = MudBlazor.Color
 
 @if (customer != null)
@@ -91,183 +92,235 @@ else
     </MudContainer>
 }
 
-@inject AppDbContext dbContext
 @code {
-    private bool _hidePosition;
     private bool _loading;
-    private IEnumerable<Element> Elements = new List<Element>();
     private string infoFormat = "Showing {first_item} to {last_item} of {all_items}";
 
     [CascadingParameter]
     public ProfiraClinicWeb.Components.Layout.MainLayout Layout { get; set; }
+
+    [Parameter] public string Kdcus { get; set; }
+
+    Customer? customer;
+
+    // Table configs for each tab
+    public TableConfig ProdukTableConfig { get; set; } = new(new(), new());
+    public TableConfig PerawatanTableConfig { get; set; } = new(new(), new());
+    public TableConfig PaketTableConfig { get; set; } = new(new(), new());
+    public TableConfig SisaPaketTableConfig { get; set; } = new(new(), new());
+    public TableConfig UangMukaTableConfig { get; set; } = new(new(), new());
+    public TableConfig PiutangTableConfig { get; set; } = new(new(), new());
 
     protected override void OnInitialized()
     {
         Layout.ChangeTitleAndRoute("Pasien", "Detail Pasien");
     }
 
-    [Parameter]
-    public string Kdcus { get; set; }
-
-    Customer customer = null;
-
-    public TableConfig ProdukTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    public TableConfig PerawatanTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    public TableConfig PaketTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    public TableConfig SisaPaketTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    public TableConfig UangMukaTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    public TableConfig PiutangTableConfig { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
-
-    string getGender() {
-        return customer.JenisKelamin == "0" ? "Perempuan" : "Laki-laki";
-    }
-
-    bool isActive()
-    {
-        return customer.AKTIF == "1";
-    }
-
     protected override async Task OnInitializedAsync()
     {
         var apiResponse = await ApiService.GetPatientByCodeAsync(Kdcus);
-        // Check if status code indicates success
-        System.Diagnostics.Debug.WriteLine("Done");
         if (apiResponse.StatusCode == 0 && apiResponse.Data != null)
-        {
             customer = apiResponse.Data;
-        }
-        else
-        {
-            // Handle API error case appropriately (e.g., display an error message)
-            // For example: show a notification, log the error etc.
-        }
-
-
-        Elements = new List<Element>()
-        {
-            new Element("Tess", 69, "waduh", 102),
-            new Element("Tesss", 691, "waduhos", 101),
-            new Element("Tessss", 694, "waduh", 103),
-        };
-
-        // var products1 = new List<object>()
-        // {
-        //     (object) new { klinik = "Profira Manyar", tgl = DateTime.Now, nomorFaktur="FT0001", namaProduk = "BC cream", qty = 1 },
-        //     (object) new { klinik = "Profira Central", tgl = DateTime.Now, nomorFaktur="FT0001", namaProduk = "Cream malam", qty = 1 }
-        // };
-
-        var products = await dbContext.SpVPenjualanProduk.FromSqlInterpolated($"EXECUTE usp_VPenjualanProduk @KDCUS={customer.KodeCustomer}").ToArrayAsync();
-
-        var productsDataSource = products.Select(el =>
-        {
-            return (object)new { klinik = el.KETLK, nomorFaktur = el.NOFAK, tgl = el.TGFAK, namaProduk = el.KDCUS, qty = el.NILPR };
-        }
-        ).ToList();
-
-        ProdukTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Klinik", DataField="klinik" },
-                new TableColumn { Caption="Tgl", DataField="tgl" },
-                new TableColumn { Caption="No. Faktur", DataField="nomorFaktur" },
-                new TableColumn { Caption="Nama Produk", DataField="namaProduk" },
-                new TableColumn { Caption="Qty", DataField="qty" },
-        }, productsDataSource);
-
-        var perawatan = await dbContext.SpVPenjualanPerawatan.FromSqlInterpolated($"EXECUTE usp_VPenjualanPerawatan @KDCUS={customer.KodeCustomer}").ToArrayAsync();
-
-        var perawatanDataSource = perawatan.Select(el =>
-        {
-            return (object)new { klinik = el.KETLK, nomorFaktur = el.NOKON, tgl = el.TGKON, namaTreatment = el.NMPER, qty = el.JUMLA, dokter = el.NMKAR };
-        }
-        ).ToList();
-
-        PerawatanTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Klinik", DataField="klinik" },
-                new TableColumn { Caption="Tgl", DataField="tgl" },
-                new TableColumn { Caption="No. Faktur", DataField="nomorFaktur" },
-                new TableColumn { Caption="Nama Treatment", DataField="namaTreatment" },
-                new TableColumn { Caption="Qty", DataField="qty" },
-                new TableColumn { Caption="Dokter", DataField="dokter" },
-        }, perawatanDataSource);
-
-
-        var paket = await dbContext.SpVPenjualanPaket.FromSqlInterpolated($"EXECUTE usp_VPenjualanPaket @KDCUS={customer.KodeCustomer}").ToArrayAsync();
-
-        var paketDataSource = paket.Select(el =>
-        {
-            return (object)new { klinik = el.KETLK, tgl = el.TGFAK, nomorFaktur = el.NOFAK, namaPaket = el.NMPKT, qty = el.JUMLA, expDate = DateTime.Now };
-        }
-        ).ToList();
-
-        PaketTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Klinik", DataField="klinik" },
-                new TableColumn { Caption="Tgl", DataField="tgl" },
-                new TableColumn { Caption="No. Faktur", DataField="nomorFaktur" },
-                new TableColumn { Caption="Nama Paket", DataField="namaPaket" },
-                new TableColumn { Caption="Qty", DataField="qty" },
-                new TableColumn { Caption="Exp Date", DataField="expDate" },
-        }, paketDataSource);
-
-        var sisaPaket = new List<object>()
-        {
-            (object) new { klinik = "Profira Manyar", nomorFaktur="PK001", namaPaket = "Pico Laser", namaPerawatan = "Pico Laser", freq = 3, pemakaian = 2, sisa = 1, expDate = DateTime.Now },
-            (object) new { klinik = "Profira Central", nomorFaktur="PK002", namaPaket = "Peeling", namaPerawatan = "Peeling", freq = 5, pemakaian = 2, sisa = 3, expDate = DateTime.Now }
-        };
-
-        SisaPaketTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Klinik", DataField="klinik" },
-                new TableColumn { Caption="No. Faktur", DataField="nomorFaktur" },
-                new TableColumn { Caption="Nama Paket", DataField="namaPaket" },
-                new TableColumn { Caption="Nama Perawatan", DataField="namaPerawatan" },
-                new TableColumn { Caption="Frekuensi", DataField="freq" },
-                new TableColumn { Caption="Pemakaian", DataField="pemakaian" },
-                new TableColumn { Caption="Sisa", DataField="sisa" },
-                new TableColumn { Caption="Exp Date", DataField="expDate" },
-        }, sisaPaket);
-
-        var uangMuka = new List<object>()
-        {
-            (object) new { klinik = "Profira Manyar", tglFaktur = DateTime.Now, nomorFaktur="PK001", uangMuka = "IDR 10.000.000", pakai = "IDR 5.000.000", sisa = "IDR 5.000.000" },
-            (object) new { klinik = "Profira Central", tglFaktur = DateTime.Now, nomorFaktur="PK002", uangMuka = "IDR 9.500.000", pakai = "IDR 3.000.000", sisa = "IDR 6.500.000" }
-        };
-
-        UangMukaTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Klinik", DataField="klinik" },
-                new TableColumn { Caption="Tgl. Faktur", DataField="tglFaktur" },
-                new TableColumn { Caption="No. Faktur", DataField="nomorFaktur" },
-                new TableColumn { Caption="Nilai Uang Muka", DataField="uangMuka" },
-                new TableColumn { Caption="Nilai Pakai", DataField="pakai" },
-                new TableColumn { Caption="Sisa", DataField="sisa" },
-        }, uangMuka);
-
-        var piutang = await dbContext.SpVSaldoPiutang.FromSqlInterpolated($"EXECUTE usp_VSaldoPiutang @KDCUS={customer.KodeCustomer}").ToArrayAsync();
-
-        var piutangDataSource = piutang.Select(el =>
-        {
-            return (object)new { klinik = el.KETLK, tglFaktur = el.TGFAK, nomorFaktur = el.NOFAK, piutang = el.NILAI, bayar = el.NILBY, sisa = el.SISA };
-        }
-        ).ToList();
-
-        PiutangTableConfig = new TableConfig(new List<TableColumn> {
-                new TableColumn { Caption="Klinik", DataField="klinik" },
-                new TableColumn { Caption="Tgl. Faktur", DataField="tglFaktur" },
-                new TableColumn { Caption="No. Faktur", DataField="nomorFaktur" },
-                new TableColumn { Caption="Nilai Piutang", DataField="piutang" },
-                new TableColumn { Caption="Nilai Bayar", DataField="bayar" },
-                new TableColumn { Caption="Sisa", DataField="sisa" },
-        }, piutangDataSource);
     }
 
-    private int ChartIndex = -1; //default value cannot be 0 -> first selectedindex is 0.
-
-    public List<ChartSeries> Series = new List<ChartSeries>()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        new ChartSeries() { Name = "Sales", Data = new double[] { 4500, 5300, 6250, 7800, 9800, 15000 } },
+        if (!firstRender || string.IsNullOrWhiteSpace(Kdcus)) return;
+
+        try
+        {
+            _loading = true;
+
+            // --- Sisa Paket (Saldo Paket) ---
+            var saldoPaketResp = await RiwayatTransaksiService.GetSaldoPaket(Kdcus);
+            var saldoPaketItems = saldoPaketResp.StatusCode == 0 && saldoPaketResp.Data != null
+                ? saldoPaketResp.Data
+                : new List<SaldoPaket>();
+
+            var sisaPaketDataSrc = saldoPaketItems.Select(x => (object)new
+            {
+                lokasi = x.KETLK,
+                noFaktur = x.NOFAK,
+                kodeCust = x.KDCUS,
+                namaCust = x.NMCUS,
+                kodePaket = x.KDPKT,
+                namaPaket = x.NMPKT,
+                kodePerawat = x.KDPER,
+                namaPerawat = x.NMPER,
+                frekwensi = x.FREKW?.ToString() ?? "",
+                jumlahPr = x.JMLPR?.ToString() ?? "",
+                sisa = x.SISA?.ToString() ?? "",
+                tglAkhir = x.TGAKH?.ToString("dd/MM/yyyy") ?? ""
+            }).ToList();
+
+            SisaPaketTableConfig = new TableConfig(
+                new List<TableColumn>
+                {
+                    new TableColumn { Caption="Lokasi",        DataField="lokasi" },
+                    new TableColumn { Caption="No Faktur",     DataField="noFaktur" },
+                    new TableColumn { Caption="Kode Cust",     DataField="kodeCust" },
+                    new TableColumn { Caption="Nama Cust",     DataField="namaCust" },
+                    new TableColumn { Caption="Kode Paket",    DataField="kodePaket" },
+                    new TableColumn { Caption="Nama Paket",    DataField="namaPaket" },
+                    new TableColumn { Caption="Kode Perawatan",DataField="kodePerawat" },
+                    new TableColumn { Caption="Nama Perawatan",DataField="namaPerawat" },
+                    new TableColumn { Caption="Frekwensi",     DataField="frekwensi" },
+                    new TableColumn { Caption="Jumlah PR",     DataField="jumlahPr" },
+                    new TableColumn { Caption="Sisa",          DataField="sisa" },
+                    new TableColumn { Caption="Tgl Akhir",     DataField="tglAkhir" },
+                },
+                sisaPaketDataSrc,
+                addRoute: ""
+            );
+
+            // --- Piutang ---
+            var piutangResp = await RiwayatTransaksiService.GetSaldoPiutang(Kdcus);
+            var piutang = piutangResp.StatusCode == 0 && piutangResp.Data != null
+                ? piutangResp.Data
+                : new List<SaldoPiutang>();
+
+            // Adjust columns to your SaldoPiutang model’s properties if names differ
+            var piutangDataSrc = piutang.Select(x => (object)new
+            {
+                nomor = x.NOFAK ?? "", // guess/fallback
+                tanggal = x.TGFAK?.ToString("dd/MM/yyyy") ?? "",
+                total = x.NILAI?.ToString("N2") ?? "",
+                sisa = x.SISA?.ToString("N2") ?? ""
+            }).ToList();
+
+            PiutangTableConfig = new TableConfig(
+                new List<TableColumn>
+                {
+                    new TableColumn { Caption="Nomor",   DataField="nomor" },
+                    new TableColumn { Caption="Tanggal", DataField="tanggal" },
+                    new TableColumn { Caption="Total",   DataField="total", Align = ColumnAlign.Right },
+                    new TableColumn { Caption="Sisa",    DataField="sisa",  Align = ColumnAlign.Right },
+                },
+                piutangDataSrc,
+                addRoute: ""
+            );
+
+            // --- Penjualan Paket ---
+            var jualPaketResp = await RiwayatTransaksiService.GetPenjualanPaket(Kdcus);
+            var jualPaket = jualPaketResp.StatusCode == 0 && jualPaketResp.Data != null
+                ? jualPaketResp.Data
+                : new List<PenjualanPaket>();
+
+            var paketDataSrc = jualPaket.Select(x => (object)new
+            {
+                noFaktur = x.NOFAK ?? "",
+                tanggal = x.TGFAK?.ToString("dd/MM/yyyy") ?? "",
+                kodePaket = x.KDPKT ?? "",
+                namaPaket = x.NMPKT ?? "",
+                qty = x.JUMLA?.ToString() ?? "0",
+                total = x.JUMLA?.ToString("N2") ?? ""
+            }).ToList();
+
+            PaketTableConfig = new TableConfig(
+                new List<TableColumn>
+                {
+                    new TableColumn { Caption="No Faktur",  DataField="noFaktur" },
+                    new TableColumn { Caption="Tanggal",    DataField="tanggal" },
+                    new TableColumn { Caption="Kode Paket", DataField="kodePaket" },
+                    new TableColumn { Caption="Nama Paket", DataField="namaPaket" },
+                    new TableColumn { Caption="Qty",        DataField="qty",   Align = ColumnAlign.Right },
+                    new TableColumn { Caption="Total",      DataField="total", Align = ColumnAlign.Right },
+                },
+                paketDataSrc,
+                addRoute: ""
+            );
+
+            // --- Penjualan Perawatan ---
+            var jualRawatResp = await RiwayatTransaksiService.GetPenjualanPerawatan(Kdcus);
+            var jualRawat = jualRawatResp.StatusCode == 0 && jualRawatResp.Data != null
+                ? jualRawatResp.Data
+                : new List<PenjualanPerawatan>();
+
+            var perawatanDataSrc = jualRawat.Select(x => (object)new
+            {
+                noFaktur = x.NOKON ?? "",
+                tanggal = x.TGKON?.ToString("dd/MM/yyyy") ?? "",
+                kodePerawatan = x.KDPER ?? "",
+                namaPerawatan = x.NMPER ?? "",
+                qty = x.JUMLA?.ToString() ?? "0",
+                total = x.JUMLA?.ToString("N2") ?? ""
+            }).ToList();
+
+            PerawatanTableConfig = new TableConfig(
+                new List<TableColumn>
+                {
+                    new TableColumn { Caption="No Faktur",      DataField="noFaktur" },
+                    new TableColumn { Caption="Tanggal",        DataField="tanggal" },
+                    new TableColumn { Caption="Kode Perawatan", DataField="kodePerawatan" },
+                    new TableColumn { Caption="Nama Perawatan", DataField="namaPerawatan" },
+                    new TableColumn { Caption="Qty",            DataField="qty",   Align = ColumnAlign.Right },
+                    new TableColumn { Caption="Total",          DataField="total", Align = ColumnAlign.Right },
+                },
+                perawatanDataSrc,
+                addRoute: ""
+            );
+
+            // --- Penjualan Produk ---
+            var jualProdResp = await RiwayatTransaksiService.GetSaldoPakets(Kdcus); // your method name returns PenjualanProduk
+            var jualProd = jualProdResp.StatusCode == 0 && jualProdResp.Data != null
+                ? jualProdResp.Data
+                : new List<PenjualanProduk>();
+
+            var produkDataSrc = jualProd.Select(x => (object)new
+            {
+                noFaktur = x.NOFAK ?? "",
+                tanggal = x.TGFAK?.ToString("dd/MM/yyyy") ?? "",
+                kodeBarang = x.KDBHN ?? "",
+                namaBarang = x.KDBHN ?? "",
+                qty = x.JMLJL?.ToString() ?? "0",
+                total = x.JMLJL?.ToString("N2") ?? ""
+            }).ToList();
+
+            ProdukTableConfig = new TableConfig(
+                new List<TableColumn>
+                {
+                    new TableColumn { Caption="No Faktur",   DataField="noFaktur" },
+                    new TableColumn { Caption="Tanggal",     DataField="tanggal" },
+                    new TableColumn { Caption="Kode Barang", DataField="kodeBarang" },
+                    new TableColumn { Caption="Nama Barang", DataField="namaBarang" },
+                    new TableColumn { Caption="Qty",         DataField="qty",   Align = ColumnAlign.Right },
+                    new TableColumn { Caption="Total",       DataField="total", Align = ColumnAlign.Right },
+                },
+                produkDataSrc,
+                addRoute: ""
+            );
+
+            // --- Uang Muka (if/when you have an endpoint, populate similarly) ---
+            UangMukaTableConfig = new TableConfig(
+                new List<TableColumn>
+                {
+                    new TableColumn { Caption="(TODO) Tanggal", DataField="tanggal" },
+                    new TableColumn { Caption="(TODO) Nomor",   DataField="nomor" },
+                    new TableColumn { Caption="(TODO) Nilai",   DataField="nilai", Align = ColumnAlign.Right },
+                },
+                new List<object>(),
+                addRoute: ""
+            );
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading riwayat transaksi for {Kdcus}: {ex.Message}");
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    string getGender() => customer?.JenisKelamin == "0" ? "Perempuan" : "Laki-laki";
+    bool isActive() => customer?.AKTIF == "1";
+
+    private int ChartIndex = -1;
+    public List<ChartSeries> Series = new()
+    {
+        new ChartSeries { Name = "Sales", Data = new double[] { 4500, 5300, 6250, 7800, 9800, 15000 } },
     };
     public string[] XAxisLabels = { "January", "February", "March", "April", "May", "June" };
-
 }
+

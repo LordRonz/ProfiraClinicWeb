@@ -14,7 +14,7 @@ namespace ProfiraClinicWeb.Services
 
         public async Task<ApiResponse<PagedResult<PerawatanHeader>>> GetTindakansAsync()
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<PerawatanHeader>>>("api/Tindakan/GetList");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PagedResult<PerawatanHeader>>>("api/PerawatanHeader/GetList");
 
             if (response == null)
             {
@@ -26,7 +26,7 @@ namespace ProfiraClinicWeb.Services
 
         public async Task<ApiResponse<PerawatanHeader>> GetTindakanByCodeAsync(String id)
         {
-            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PerawatanHeader>>($"api/Tindakan/GetByCode/{id}");
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<PerawatanHeader>>($"api/PerawatanHeader/GetByCode/{id}");
 
             if (response == null)
             {
@@ -39,7 +39,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<PerawatanHeader>> CreateTindakanAsync(PerawatanHeader perawatan)
         {
             // POST the paket object as JSON to the API.
-            var responseMessage = await _httpClient.PostAsJsonAsync("api/Tindakan/add", perawatan);
+            var responseMessage = await _httpClient.PostAsJsonAsync("api/PerawatanHeader/add", perawatan);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -56,7 +56,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<object>> UpdateTindakanAsync(string kodePaket, PerawatanHeader perawatan)
         {
             // The endpoint expects a PUT request with the paket identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/Tindakan/edit/{kodePaket}", perawatan);
+            var responseMessage = await _httpClient.PutAsJsonAsync($"api/PerawatanHeader/edit/{kodePaket}", perawatan);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -71,7 +71,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<PerawatanHeader>> DeletePerawatanHeaderByIdAsync(string id)
         {
             var response = await _httpClient
-                .DeleteFromJsonAsync<ApiResponse<PerawatanHeader>>($"api/Tindakan/Del/{id}")
+                .DeleteFromJsonAsync<ApiResponse<PerawatanHeader>>($"api/PerawatanHeader/Del/{id}")
                 ?? throw new HttpRequestException("Failed to retrieve response from API.");
             return response;
         }
