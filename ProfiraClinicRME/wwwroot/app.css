@@ -61,6 +61,12 @@ html, body {
     background-color: rgb(234,228,228); /* your bg-dark bg-opacity-25 */
 }
 
+fieldset{
+    margin-inline: 2px;
+    border: 2px solid teal;
+    padding: 4px;
+}
+
 .back-btn {
     background: rgba(156, 99, 5, 1);
     color: white;
@@ -84,6 +90,12 @@ html, body {
 
 .bg-wave-fixed.patient {
     background-image: url("images/wave.png");
+}
+
+.flex-break {
+    flex-basis: 100%;
+    height: 0;
+    width: 100%;
 }
 
 .fw-bold {

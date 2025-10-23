@@ -7,9 +7,11 @@ namespace ProfiraClinic.Models.Core
     [Table("TRM_Perawatan_Detail")]
     public class TRMPerawatanDetail
     {
+        [Key]
+        public int IdDetail { get; set; }
+
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]
-        [Key]
         public string NomorTransaksi { get; set; } // DIAG/Tahun/Bulan/Nourut
 
         [Column(TypeName = "int")]
@@ -31,12 +33,14 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string? KodePerawatan { get; set; }
 
+        [Column(TypeName = "varchar(50)")]
+        public string NamaPerawatan { get; set; } = "";
+
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
         public string? KodePerawatanPengganti { get; set; }
 
-        [Precision(12, 2)]
-        public decimal Qty { get; set; }
+        public int Qty { get; set; }
 
         [Column(TypeName = "varchar(255)")]
         [MaxLength(255)]

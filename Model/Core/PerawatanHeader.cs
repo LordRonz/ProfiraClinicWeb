@@ -23,7 +23,7 @@ namespace ProfiraClinic.Models.Core
         public string KodePerawatan { get; set; }
 
         [Column(TypeName = "varchar(50)")]
-        public string? NamaPerawatan { get; set; }
+        public string NamaPerawatan { get; set; } = "";
 
         [Column(TypeName = "numeric(12,2)")]
         [Required]

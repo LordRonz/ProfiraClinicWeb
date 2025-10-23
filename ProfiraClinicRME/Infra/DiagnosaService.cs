@@ -17,7 +17,7 @@ namespace ProfiraClinicRME.Infra
         private string _classPath = "Infra::DiagnosaService";
 
         private BaseRepo<TRMDiagnosa> _repo;
-        // Inject the HttpClient (assuming it is configured in Program.cs or Startup.cs)
+
         public DiagnosaService(ApiService svcApi)
         {
             _svcApi = svcApi;
@@ -25,7 +25,6 @@ namespace ProfiraClinicRME.Infra
         }
 
 
-        // Retrieves all clinics.
         public async Task<ServiceResult<Pagination<TRMDiagnosa>>> GetListAsync(string kodeCustomer)
         {
 

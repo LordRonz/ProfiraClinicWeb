@@ -66,7 +66,7 @@ builder.Services.AddScoped<IAnamnesisService, AnamnesisService>();
 builder.Services.AddScoped<IRiwayatService, RiwayatService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPenandaanGambarService, PenandaanGambarService>();
-
+builder.Services.AddScoped<ITRMPerawatanService, TRMPerawatanService>();
 
 builder.Services.AddHttpClient<AuthService>(client =>
 {

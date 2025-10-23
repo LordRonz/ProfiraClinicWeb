@@ -1,0 +1,434 @@
+@page "/tindakan-perawatan"
+@inherits BasePage
+
+@using System.Net.Http.Json
+@using ProfiraClinicRME.Utils;
+@using ProfiraClinicRME.Components.Section
+@using ProfiraClinicRME.Components.Table
+
+@inject IAppointmentService SvcAppointment
+@inject IDokterService SvcDokter
+@inject ITRMPerawatanService SvcTRMPerawatan
+
+<TopbarUser Route="Dashboard >> Rekam Medis"
+            Title="Tindakan Perawatan"
+            ShowBack="true"
+            ShowSave="true"
+            Appointment="CurrentAppointment" />
+
+
+<MudCard Class="pa-4 minh-100 rounded-lg pemeriksaan-input">
+    <div class="d-flex flex-column gap-2">
+
+        <fieldset class="pa-2">
+            <legend>Header</legend>
+            <MudTextField ShrinkLabel T="string" Label="Keterangan" Variant="Variant.Outlined" />
+        </fieldset>
+        <fieldset class="py-2 px-2">
+            <legend>Detail</legend>
+            <MudGrid Class="gap-2" Spacing="2">
+                <MudItem xs="4" md="2">
+                    <MudSelect AnchorOrigin="Origin.BottomCenter"
+                               Label="Sumber"
+                               ShrinkLabel
+                               Style="width:80%;"
+                               T="string"
+                               Value="@_source"
+                               ValueChanged="DoSourceChange"
+                               Variant="Variant.Outlined">
+                        <MudSelectItem Value="@_listSource[0]" />
+                        <MudSelectItem Value="@_listSource[1]" />
+                        <MudSelectItem Value="@_listSource[2]" />
+                    </MudSelect>
+                </MudItem>
+
+                <div class="flex-break"></div>
+                @if (_source == "lepas")
+                {
+                    <MudItem xs="12" md="4">
+                        <MudSelect AnchorOrigin="Origin.BottomCenter"
+                                   Label="Perawatan"
+                                   ShrinkLabel
+                                   Style="width:50%;"
+                                   T="PerawatanHeader"
+                                   Value="@_perawatanHeaderInForm"
+                                   ValueChanged="DoPerawatanChange"
+                                   Variant="Variant.Outlined">
+                            @foreach (var perawatanHeader in _listPerawatanHeader)
+                            {
+                                <MudSelectItem Value="@perawatanHeader">@perawatanHeader.NamaPerawatan</MudSelectItem>
+                            }
+
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
+                        <MudTextField ShrinkLabel T="decimal" ReadOnly="true" Label="Harga" Value="@_perawatanHeaderInForm.Harga" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudNumericField @bind-Value="@_trmPerawatanDetailInForm.Qty" Label="Qty" Variant="Variant.Outlined" Max="10" />
+
+                    </MudItem>
+                }
+                else if (_source == "paket")
+                {
+                    <MudItem xs="12" md="4">
+                        <MudSelect AnchorOrigin="Origin.BottomCenter"
+                                   Label="Paket Terjual"
+                                   ShrinkLabel
+                                   Style="width:50%;"
+                                   T="PaketTerjual"
+                                   Value="@_paketTerjualInForm"
+                                   ValueChanged="DoPackageSoldSelected"
+                                   Variant="Variant.Outlined">
+                            @foreach (var paketTerjual in _listPaketTerjual)
+                            {
+                                <MudSelectItem Value="@paketTerjual">
+                                    @(paketTerjual.NomorFaktur + " - " + paketTerjual.NamaPaket + " - " + paketTerjual.NamaPerawatan)
+                                </MudSelectItem>
+                            }
+
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudTextField ShrinkLabel T="int" ReadOnly="true" Label="Max Qty" Value="@_paketTerjualInForm.Saldo" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudNumericField @bind-Value="@_trmPerawatanDetailInForm.Qty" Label="Qty" Variant="Variant.Outlined" Max="@_paketTerjualInForm.Saldo" />
+                    </MudItem>
+                }
+                else
+                {
+                    <MudItem xs="12" md="2">
+                        <MudTextField ShrinkLabel T="string"  Label="Token" @bind-Value="@_tokenPerawatan" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="2">
+                        <MudButton Size="MudBlazor.Size.Small" StartIcon="far fa-square-plus" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2" OnClick="DoCheckToken">Cek</MudButton>
+
+                    </MudItem>
+                    <div class="flex-break"></div>
+                    <MudItem xs="12" md="4">
+                        <MudTextField ShrinkLabel T="string" ReadOnly="true" Label="Perawatan" Value="@_perawatanHeaderInForm.NamaPerawatan" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudTextField ShrinkLabel T="int" ReadOnly="true" Label="Max Qty" Value="@_paketTerjualInForm.Saldo" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudNumericField @bind-Value="@_trmPerawatanDetailInForm.Qty" Label="Qty" Variant="Variant.Outlined" Max="@_paketTerjualInForm.Saldo" />
+                    </MudItem>
+                }
+                <div class="flex-break"></div>
+                <MudItem xs="12" md="6">
+                    <MudTextField ShrinkLabel T="string" Label="Keterangan Detail" @bind-Value="@_trmPerawatanDetailInForm.KeteranganDetail" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="6" md="2">
+                    <MudButton Size="MudBlazor.Size.Small" StartIcon="far fa-square-plus" IconSize="@MudBlazor.Size.Small" Class="save-btn mt-2" OnClick="DoSaveDetail">Simpan Detail</MudButton>
+
+                </MudItem>
+            </MudGrid>
+        </fieldset>
+        <Table WithAdd="false" WithFilter="false" WithPaging="false" Config="_tableCfg" />
+    </div>
+
+</MudCard>
+
+@code {
+    [CascadingParameter(Name = "CurrentAppointment")]
+    public TRMAppointment CurrentAppointment { get; set; }
+
+    private bool _hidePosition;
+    private bool _loading;
+    private List<DokterListDto> _listDokter = [];
+    private List<DokterListDto> _listSuster = [];
+    private List<PerawatanHeader> _listPerawatanHeader = new List<PerawatanHeader>();
+    private List<PaketTerjual> _listPaketTerjual = new List<PaketTerjual>();
+    private List<string> _listSource = ["lepas", "paket", "token"];
+    private List<TableColumn> _listTableColumn = new List<TableColumn>();
+    private List<TRMPerawatan> _listTRMPerawatanCustomer = new List<TRMPerawatan>();
+    private List<TRMPerawatanDetail> _listTRMPerawatanDetailCustomer = new List<TRMPerawatanDetail>();
+    private List<TRMPerawatanDetail> _listTRMPerawatanDetailInTable = new List<TRMPerawatanDetail>();
+    private List<TRMPerawatanHeader> _listTRMPerawatanHeaderCustomer = new List<TRMPerawatanHeader>();
+    private PerawatanHeader _perawatanHeaderInForm = new();
+    private string _source = "lepas";
+    private TableConfig _tableCfg { get; set; } = new TableConfig(new List<TableColumn>(), new List<object>());
+    private TRMPerawatanDetail _trmPerawatanDetailInForm = new();
+    private TRMPerawatanHeader _trmPerawatanHeaderInForm = new();
+    private PaketTerjual _paketTerjualInForm = new();
+    private string _tokenPerawatan = "";
+
+    // private class SaldoPerawatan
+    // {
+    //     public string KodePerawatan { get; set; }
+    //     public string NamaPerawatan { get; set; }
+    //     public int Saldo { get; set; }
+    // }
+
+    private class PaketTerjual
+    {
+        public string KodePaket { get; set; }
+        public string NamaPaket { get; set; }
+        public string NomorFaktur { get; set; }
+        public string KodePerawatan { get; set; }
+        public string NamaPerawatan { get; set; }
+        public int Saldo { get; set; }
+    }
+
+    private class TRMPerawatan
+    {
+        public TRMPerawatanHeader Header { get; set; }
+        public List<TRMPerawatanDetail> ListDetail { get; set; }
+    }
+
+    public TindakanPerawatan()
+    {
+        _classPath = "App::Page::TindakanPerawatan";
+        LogTrace.Info("init", path: _classPath);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _listTableColumn = [
+            new TableColumn {
+                Caption = "Edit",
+                DataField = "view",
+                Type = ColumnType.View,
+                CustomIcon = "fas fa-pencil",
+                Action = DoEditDetail
+            },
+            new TableColumn { Caption = "Kode Perawatan", DataField = "KodePerawatan" },
+            new TableColumn { Caption = "Kode Perawatan Pengganti", DataField = "KodePerawatanPengganti" },
+            new TableColumn { Caption = "Qtt", DataField = "Qty" }
+        ];
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //req daftar suster
+        _listSuster = new List<DokterListDto> {
+            new DokterListDto { KodeKaryawan = "S001", NamaDokter = "John Doe" },
+            new DokterListDto { KodeKaryawan = "S002", NamaDokter = "Adam Smith" },
+            new DokterListDto { KodeKaryawan = "S003", NamaDokter = "Betty Johnson" },
+            new DokterListDto { KodeKaryawan = "S004", NamaDokter = "Douglas Brown" },
+        };
+
+        //req daftar dokter
+        _listDokter = new List<DokterListDto> {
+            new DokterListDto { KodeKaryawan = "D001", NamaDokter = "dr. Jeanny Doe" },
+            new DokterListDto { KodeKaryawan = "D002", NamaDokter = "dr. John Smith" },
+            new DokterListDto { KodeKaryawan = "D003", NamaDokter = "dr. Alice Johnson" },
+            new DokterListDto { KodeKaryawan = "D004", NamaDokter = "dr. Michael Brown" },
+        };
+
+        //req daftar perawatan
+        _listPerawatanHeader = new List<PerawatanHeader> {
+            new PerawatanHeader { KodePerawatan = "P001", NamaPerawatan = "Pemeriksaan Fisik", Harga = 150000 },
+            new PerawatanHeader { KodePerawatan = "P002", NamaPerawatan = "Terapi Oksigen", Harga = 200000 },
+            new PerawatanHeader { KodePerawatan = "P003", NamaPerawatan = "Infus Cairan", Harga = 250000 },
+            new PerawatanHeader { KodePerawatan = "P004", NamaPerawatan = "Pengukuran Tekanan Darah", Harga = 100000 },
+        };
+
+
+
+        //req daftar saldo
+        _listPaketTerjual = new List<PaketTerjual> {
+            new PaketTerjual {
+                KodePaket = "PKT001",
+                NamaPaket = "Paket Kesehatan Dasar",
+                NomorFaktur = "A1/2025/10/0001",
+                KodePerawatan = "P001",
+                NamaPerawatan = "Pemeriksaan Fisik",
+                Saldo = 5
+
+            },
+            new PaketTerjual {
+                KodePaket = "PKT001",
+                NamaPaket = "Paket Kesehatan Dasar",
+                NomorFaktur = "A1/2025/10/0001",
+                KodePerawatan = "P002",
+                NamaPerawatan = "Terapi Oksigen",
+                Saldo = 3
+            },
+            new PaketTerjual {
+                KodePaket = "PKT002",
+                NamaPaket = "Paket Kesehatan Lanjutan",
+                NomorFaktur = "A1/2025/10/0001",
+                KodePerawatan = "P003",
+                NamaPerawatan = "Infus Cairan",
+                Saldo = 4
+            },
+            new PaketTerjual {
+                KodePaket = "PKT002",
+                NamaPaket = "Paket Kesehatan Lanjutan",
+                NomorFaktur = "A1/2025/10/0001",
+                KodePerawatan = "P004",
+                NamaPerawatan = "Pengukuran Tekanan Darah",
+                Saldo = 6
+            }
+        };
+
+        //req list TRMPerawatanHeader and TRMPerawatanDetail
+        _listTRMPerawatanHeaderCustomer = new List<TRMPerawatanHeader> {
+            new TRMPerawatanHeader { NomorTransaksi = "TRM001", TanggalTransaksi = DateTime.Now.AddDays(-3)},
+            new TRMPerawatanHeader { NomorTransaksi = "TRM002", TanggalTransaksi = DateTime.Now.AddDays(-2)},
+            new TRMPerawatanHeader { NomorTransaksi = "TRM003", TanggalTransaksi = DateTime.Now.AddDays(-1)},
+        };
+
+        _listTRMPerawatanDetailCustomer = new List<TRMPerawatanDetail> {
+            new TRMPerawatanDetail {IdDetail=1, NomorTransaksi = "TRM001",KodePerawatan = "P001", KodePerawatanPengganti = "", Qty = 1, KeteranganDetail = "Sukses", KodeDokter="DFM"},
+            new TRMPerawatanDetail {IdDetail=2, NomorTransaksi = "TRM001",KodePerawatan = "P002", KodePerawatanPengganti = "", Qty = 2, KeteranganDetail = "Sukses", KodeDokter="DFM"},
+            new TRMPerawatanDetail {IdDetail=3, NomorTransaksi = "TRM002",KodePerawatan = "P001", KodePerawatanPengganti = "", Qty = 1, KeteranganDetail = "Sukses", KodeDokter="DAG"},
+            new TRMPerawatanDetail {IdDetail=4, NomorTransaksi = "TRM002",KodePerawatan = "P002", KodePerawatanPengganti = "", Qty = 2, KeteranganDetail = "Sukses", KodeDokter="DAG"},
+            new TRMPerawatanDetail {IdDetail=5, NomorTransaksi = "TRM003",KodePerawatan = "P003", KodePerawatanPengganti = "", Qty = 1, KeteranganDetail = "Sukses", KodeDokter="DFM"},
+
+        };
+
+        _listTRMPerawatanCustomer = _listTRMPerawatanHeaderCustomer
+            .Select(header => new TRMPerawatan
+            {
+                Header = header,
+                ListDetail = _listTRMPerawatanDetailCustomer
+                    .Where(d => d.NomorTransaksi == header.NomorTransaksi)
+                    .ToList()
+            })
+            .ToList();
+
+        //initial values
+        _perawatanHeaderInForm = _listPerawatanHeader[0];
+
+
+        // ambil data `TRMPerawatan` terbaru dengan status tindakan `onprogress` u/ appointment ini
+        var newTRMPerawatanHeader = new TRMPerawatanHeader { NomorTransaksi = "TRM004", TanggalTransaksi = DateTime.Now, Keterangan = "Iritasi wajah." };
+        var newTRMPerawatanDetail = new List<TRMPerawatanDetail> {
+            new TRMPerawatanDetail {IdDetail=10, NomorTransaksi = "TRM004",KodePerawatan = "P001", KodePerawatanPengganti = "", Qty = 1, KeteranganDetail = "Sukses", KodeDokter="DFM"},
+            new TRMPerawatanDetail {IdDetail=11, NomorTransaksi = "TRM004",KodePerawatan = "P002", KodePerawatanPengganti = "", Qty = 2, KeteranganDetail = "Sukses", KodeDokter="DFM"}
+        };
+        bool isOnprogressExists = true;
+        if (isOnprogressExists)
+        {
+            _trmPerawatanHeaderInForm = newTRMPerawatanHeader;
+            _listTRMPerawatanDetailInTable = _listTRMPerawatanCustomer[0].ListDetail;
+            _tableCfg = new TableConfig(_listTableColumn, _listTRMPerawatanDetailInTable.Cast<object>().ToList());
+        }
+
+    }
+
+
+
+    private async void ShowDialog()
+    {
+
+    }
+
+    private async Task DoSourceChange(string source)
+    {
+        if (source == "lepas")
+        {
+            _perawatanHeaderInForm = _listPerawatanHeader[0];
+        }
+        else if (source == "paket")
+        {
+            _paketTerjualInForm = _listPaketTerjual[0];
+        }
+        _source = source;
+    }
+
+    private async Task DoSaveDetail()
+    {
+        //if new
+        var detail = new TRMPerawatanDetail();
+        if (_trmPerawatanDetailInForm.IdDetail == 0)
+        {
+            //save detail & do request detail list
+
+            //dummy save
+            SvcTRMPerawatan.CopyDetail(_trmPerawatanDetailInForm, detail);
+            _listTRMPerawatanDetailInTable.Add(detail);
+
+        }
+        //if detail, edit is by reference, just need to reload table
+        _tableCfg = new TableConfig(_listTableColumn, _listTRMPerawatanDetailInTable.Cast<object>().ToList());
+
+    }
+
+    //display detail on form
+    private async Task DoEditDetail(Dictionary<string, string> dct)
+    {
+        LogTrace.Info("init", dct, _classPath);
+        string stIdDetail = dct.GetValueOrDefault("IdDetail") ?? "";
+        var res = long.TryParse(stIdDetail, out long idDetail);
+
+        if (!res)
+        {
+            addSnackbar("Data perawatan tidak ditemukan.", Severity.Error);
+            return;
+        }
+
+        _trmPerawatanDetailInForm = _listTRMPerawatanDetailInTable.FirstOrDefault(item => item.IdDetail == idDetail);
+        // _perawatanHeaderInForm = _listPerawatanHeader.FirstOrDefault(item => item.KodePerawatan == _trmPerawatanDetailInForm.KodePerawatan);
+
+    }
+
+    private async Task DoCheckToken()
+    {
+        //get PaketTerjual by token
+        var paketTerjualByToken = _listPaketTerjual[2]; //dummy
+
+
+        if (paketTerjualByToken is null)
+        {
+            var msg = "Token tidak valid atau paket tidak ditemukan";
+            addSnackbar(msg, Severity.Error);
+            LogTrace.Error(msg, new { _tokenPerawatan }, _classPath);
+            return;
+        }
+
+        _paketTerjualInForm = paketTerjualByToken;
+        //get perawatanHeader from PaketTerjual
+        // GetPerawatanHeader(_paketTerjual);
+        _perawatanHeaderInForm = _listPerawatanHeader[2]; //dummy
+
+        //adjust TRMPerawatanDetail in form
+        _trmPerawatanDetailInForm.KodePerawatan = _perawatanHeaderInForm.KodePerawatan;
+        _trmPerawatanDetailInForm.NamaPerawatan = _perawatanHeaderInForm.NamaPerawatan;
+
+    }
+
+    private async Task DoPackageSoldSelected(PaketTerjual selected)
+    {
+        _paketTerjualInForm = selected;
+
+        //get perawatanHeader from package sold
+        var perawatanHeaderSelected = _listPerawatanHeader.Where(item => item.KodePerawatan == selected.KodePerawatan).FirstOrDefault();
+
+        if (perawatanHeaderSelected is null)
+        {
+            var msg = "Tidak ditemukan perawatan yang sesuai";
+            addSnackbar(msg, Severity.Error);
+            LogTrace.Error(msg, new { selected }, _classPath);
+        }
+        else
+        {
+
+            _perawatanHeaderInForm = perawatanHeaderSelected;
+
+            _trmPerawatanDetailInForm.NomorFakturPaket = selected.NomorFaktur;
+            _trmPerawatanDetailInForm.KodePaket = selected.KodePaket;
+            _trmPerawatanDetailInForm.KodePerawatan = _perawatanHeaderInForm.KodePerawatan;
+            _trmPerawatanDetailInForm.NamaPerawatan = _perawatanHeaderInForm.NamaPerawatan;
+            _trmPerawatanDetailInForm.Qty = 0;
+
+        }
+
+    }
+    private async Task DoPerawatanChange(PerawatanHeader selected)
+    {
+        _perawatanHeaderInForm = selected;
+        _trmPerawatanDetailInForm.KodePerawatan = selected.KodePerawatan;
+        _trmPerawatanDetailInForm.NamaPerawatan = selected.NamaPerawatan;
+        // _trmPerawatanDetailInForm.Qty binded
+
+    }
+
+}
+
