@@ -265,7 +265,7 @@ namespace ProfiraClinicWebAPI.Controllers
             var apptDate = dto.TanggalAppointment;              // full date/time from payload
             var year = apptDate.Year.ToString("0000");
             var month = apptDate.Month.ToString("00");
-            var prefix = $"APP/{year}/{month}/";
+            var prefix = $"APP/{year}{month}/";
 
             // find last seq for this month
             var existing = await _context.Appointment
@@ -287,7 +287,7 @@ namespace ProfiraClinicWebAPI.Controllers
                     .Max() + 1;
             }
 
-            var nomorAppointment = $"{prefix}{nextSeq:000}";
+            var nomorAppointment = $"{prefix}{nextSeq:0000}";
 
             var entity = new Appointment
             {
