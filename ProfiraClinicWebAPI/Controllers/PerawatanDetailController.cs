@@ -79,6 +79,15 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("GetByHeader/{idPerawatanHeader}")]
+        public async Task<ActionResult<List<PerawatanDetail>>> GetItemByHeader(long idPerawatanHeader)
+        {
+            var items = await DbSet
+        .Where(c => c.IDPerawatanHeader == idPerawatanHeader)
+        .ToListAsync();
+            return items;
+        }
     }
 
     public class AddPerawatanDetailDto

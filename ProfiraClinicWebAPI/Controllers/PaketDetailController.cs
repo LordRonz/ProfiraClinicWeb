@@ -64,7 +64,7 @@ namespace ProfiraClinicWebAPI.Controllers
                     sqlParameters);
 
                 // Return the newly created paketDetail. Adjust properties as needed.
-                return CreatedAtAction(nameof(GetItem), new { id = newPaketDetail.IDPaketHeader }, newPaketDetail);
+                return CreatedAtAction(nameof(GetItem), new { newPaketDetail.IDPaketHeader }, newPaketDetail);
             }
             catch (SqlException ex)
             {
@@ -75,6 +75,15 @@ namespace ProfiraClinicWebAPI.Controllers
                 // For other exceptions, return a 500 error.
                 return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
+        }
+
+        [HttpGet("GetByHeader/{idPaketHeader}")]
+        public async Task<ActionResult<List<PaketDetail>>> GetItemByHeader(long idPaketHeader)
+        {
+            var items = await DbSet
+        .Where(c => c.IDPaketHeader == idPaketHeader)
+        .ToListAsync();
+            return items;
         }
 
 

@@ -176,16 +176,32 @@
             if (barangApiResponse.StatusCode == 0 && barangApiResponse.Data != null)
                 barangs = barangApiResponse.Data ?? new();
 
-            // var resp = await PerawatanApiService.GetTindakanByCodeAsync(Id);
-            // if (resp.StatusCode == 0 && resp.Data is not null)
-            // {
-            //     perawatanInitial = resp.Data;
-            //     System.Diagnostics.Debug.WriteLine(resp.Data.NamaPerawatan);
-            //     StateHasChanged();
-            // }
+            var resp = await PerawatanApiService.GetTindakanByCodeAsync(Id);
+            if (resp.StatusCode == 0 && resp.Data is not null)
+            {
+                perawatanInitial = resp.Data;
+                System.Diagnostics.Debug.WriteLine(resp.Data.NamaPerawatan);
+                StateHasChanged();
+            }
 
-            // header.NamaPerawatan = perawatanInitial.NamaPerawatan;
-            // header.KodePerawatan = perawatanInitial.KodePerawatan;
+            header.NamaPerawatan = perawatanInitial.NamaPerawatan;
+            header.KodePerawatan = perawatanInitial.KodePerawatan;
+            header.KodeGroupPerawatan = perawatanInitial.KodeGroupPerawatan;
+            header.Aktif = perawatanInitial.Aktif;
+            header.UpdDt = perawatanInitial.UpdDt;
+            header.IDPerawatanHeader = perawatanInitial.IDPerawatanHeader;
+            header.DiscMember = perawatanInitial.DiscMember;
+            header.DiscNonMember = perawatanInitial.DiscNonMember;
+            header.KodeJenis = perawatanInitial.KodeJenis;
+            header.KategoriPerawatan = perawatanInitial.KategoriPerawatan;
+
+            selectedGroup = groupPerawatans.FirstOrDefault(p => p.KodeGroupPerawatan.Trim().Equals(header.KodeGroupPerawatan.Trim()));
+
+            var respDetail = await PerawatanDetailApiService.GetPerawatanDetailsByHeaderAsync(header.IDPerawatanHeader.ToString());
+            foreach (var d in respDetail.Data)
+            {
+                details.Add(d);
+            }
 
             StateHasChanged();
         }
@@ -316,7 +332,7 @@
             UsrId = ""
         };
 
-        var resultHeader = await PerawatanApiService.CreateTindakanAsync(h);
+        var resultHeader = await PerawatanApiService.UpdateTindakanAsync(header.KodePerawatan, h);
         if (resultHeader.StatusCode < 300)
         {
             long idHeader = resultHeader.Data?.IDPerawatanHeader > 0
@@ -327,7 +343,7 @@
             {
                 foreach (var d in details)
                 {
-                    d.KodeBarang = selectedBarang?.KodeBarang ?? "";
+                    d.IDPerawatanHeader = idHeader;
                     await PerawatanDetailApiService.CreatePerawatanDetailAsync(d);
                 }
             }

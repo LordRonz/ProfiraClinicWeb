@@ -290,7 +290,7 @@
         {
             KodePerawatan = header.KodePerawatan,
             KodeJenis = header.KodeJenis,
-            KodeGroupPerawatan = header.KodeGroupPerawatan,
+            KodeGroupPerawatan = selectedGroup.KodeGroupPerawatan,
             KategoriPerawatan = header.KategoriPerawatan,
             NamaPerawatan = header.NamaPerawatan,
             Harga = header.Harga,
@@ -312,7 +312,7 @@
             {
                 foreach (var d in details)
                 {
-                    d.KodeBarang = selectedBarang?.KodeBarang ?? "";
+                    d.IDPerawatanHeader = idHeader;
                     await PerawatanDetailApiService.CreatePerawatanDetailAsync(d);
                 }
             }

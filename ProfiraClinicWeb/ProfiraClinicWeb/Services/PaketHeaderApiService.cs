@@ -50,10 +50,11 @@ namespace ProfiraClinicWeb.Services
 
             // Deserialize the created paket.
             var createdUserGroupResponse = await responseMessage.Content.ReadFromJsonAsync<ApiResponse<PaketHeader>>();
+            System.Diagnostics.Debug.WriteLine(await responseMessage.Content.ReadAsStringAsync());
             return createdUserGroupResponse;
         }
 
-        public async Task<ApiResponse<object>> UpdatePaketHeaderAsync(string kodePaket, PaketHeader paketHeader)
+        public async Task<ApiResponse<PaketHeader>> UpdatePaketHeaderAsync(string kodePaket, PaketHeader paketHeader)
         {
             // The endpoint expects a PUT request with the paket identifier in the URL.
             var responseMessage = await _httpClient.PutAsJsonAsync($"api/PaketHeader/edit/{kodePaket}", paketHeader);
@@ -61,11 +62,11 @@ namespace ProfiraClinicWeb.Services
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating paketheader: {errorMsg}");
+                return new ApiResponse<PaketHeader>((int)responseMessage.StatusCode, $"Error updating paketheader: {errorMsg}");
             }
 
             // If no content is returned from the update call, we can return a successful ApiResponse.
-            return new ApiResponse<object>((int)responseMessage.StatusCode, "PaketHeader updated successfully");
+            return new ApiResponse<PaketHeader>((int)responseMessage.StatusCode, "PaketHeader updated successfully");
         }
 
         public async Task<ApiResponse<PaketHeader>> DeletePaketHeaderByIdAsync(string id)

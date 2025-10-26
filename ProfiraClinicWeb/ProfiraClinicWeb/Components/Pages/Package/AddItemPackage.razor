@@ -20,23 +20,25 @@
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="GroupPaket"
+                                     Label="Pilih Group Paket"
+                                     @bind-Value="selectedGroup"
+                                     SearchFunc="SearchGroup"
+                                     Clearable="true"
+                                     ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
+                                     Dense="true"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" />
+                </MudItem>
             <MudItem xs="12" sm="6">
                 <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
             </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudAutocomplete T="GroupPaket"
-                                 Label="Pilih Group Paket"
-                                 @bind-Value="selectedGroup"
-                                 SearchFunc="SearchGroup"
-                                 Clearable="true"
-                                 ToStringFunc="@(gp=> gp==null?null : $" {gp.KodeGroupPaket} ({gp.NamaGroupPaket})")"
-                                 Dense="true"
-                                 Variant="Variant.Outlined"
-                                 Margin="Margin.Dense" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
-            </MudItem>
+            
+            
             <MudItem xs="12" sm="4">
                 <div class="d-flex align-items-center gap-2">
                         <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" /><span>(Rp)</span>
@@ -298,7 +300,7 @@
             {
                 KodePaket = header.KodePaket,
                 KodeJenis = header.KodeJenis,
-                KodeGroupPaket = header.KodeGroupPaket,
+                KodeGroupPaket = selectedGroup.KodeGroupPaket,
                 NamaPaket = header.NamaPaket,
                 HARGA = header.HARGA,
                 DiscMember = header.DiscMember,
@@ -313,8 +315,10 @@
             if (resultHeader.StatusCode < 300)
             {
                 // Save details
+                System.Diagnostics.Debug.WriteLine(resultHeader);
                 foreach (var d in details)
                 {
+                    d.KodePaket = header.KodePaket;
                     d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
                     await PaketApiService.CreatePaketDetailAsync(d);
                 }
@@ -338,7 +342,7 @@
         flex-wrap: nowrap; /* never wrap to next line */
     }
     .form-container {
-        max-width: 800px; /* adjust this value to control the width */
+        max-width: 1000px; /* adjust this value to control the width */
     }
 
     .save-btn {

@@ -24,6 +24,18 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
+        public async Task<ApiResponse<List<PaketDetail>>> GetPaketDetailsByHeaderAsync(string idPaketHeader)
+        {
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<PaketDetail>>>($"api/PaketDetail/GetByHeader/{idPaketHeader}");
+
+            if (response == null)
+            {
+                throw new HttpRequestException("Failed to retrieve response from API.");
+            }
+
+            return response;
+        }
+
         public async Task<ApiResponse<PaketDetail>> GetPaketDetailByCodeAsync(String id)
         {
             var response = await _httpClient.GetFromJsonAsync<ApiResponse<PaketDetail>>($"api/PaketDetail/GetByCode/{id}");
@@ -41,6 +53,7 @@ namespace ProfiraClinicWeb.Services
             // POST the paket object as JSON to the API.
             var responseMessage = await _httpClient.PostAsJsonAsync("api/PaketDetail/add", paket);
 
+            System.Diagnostics.Debug.WriteLine(await responseMessage.Content.ReadAsStringAsync());
             if (!responseMessage.IsSuccessStatusCode)
             {
                 // Retrieve the error message from the response.
@@ -56,7 +69,7 @@ namespace ProfiraClinicWeb.Services
         public async Task<ApiResponse<object>> UpdatePaketDetailAsync(string kodePaket, PaketDetail paketDetail)
         {
             // The endpoint expects a PUT request with the paket identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/PaketDetail/edit/{kodePaket}", paketDetail);
+            var responseMessage = await _httpClient.PostAsJsonAsync($"api/PaketDetail/edit", paketDetail);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
