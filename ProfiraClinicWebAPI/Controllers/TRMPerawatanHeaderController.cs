@@ -181,5 +181,40 @@ namespace ProfiraClinicWebAPI.Controllers
 
             return Ok(diagnosa);
         }
+
+        [HttpPost("GetListTrm")]
+        public async Task<IActionResult> GetListTrm([FromBody] TRMPerawatanHeaderListDto dto)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userName))
+                return Unauthorized();
+
+            // optional: verify user exists (kept similar to your pattern)
+            var user = await _context.MUser
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.USRID == userName);
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+
+            var sqlParameters = new[]
+            {
+        new SqlParameter("@KodeCustomer", dto.KodeCustomer ?? (object)DBNull.Value),
+    };
+
+            var list = await _context.TRMPerawatanList
+                .FromSqlRaw("EXEC dbo.usp_TRM_Perawatan_List @KodeCustomer", sqlParameters)
+                .ToListAsync();
+
+            var result = new Pagination<TRMPerawatanList>
+            {
+                TotalCount = list.Count,
+                Page = 1,
+                PageSize = list.Count,
+                Items = list
+            };
+
+            return Ok(result);
+        }
+
     }
 }

@@ -17,7 +17,8 @@
     <MudGrid Style="padding: 20px;">
         <MudItem xs="4">
             <MudCard Class="d-flex flex-column align-items-center h-100 w-100 justify-content-center">
-                <MudImage src="/images/pasien.png" Class="rounded-circle" Width="160" Height="160"></MudImage>
+                    <MudImage src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                              Class="rounded-circle" Width="160" Height="160" />
                 <MudText>@customer.NamaCustomer</MudText>
                 <MudText>@customer.KodeCustomer</MudText>
             </MudCard>
@@ -42,8 +43,8 @@
                             @customer.AlamatDomisili
                         </MudText>
                         <MudText>@customer.NomorHP</MudText>
-                        <MudText>@customer.TanggalLahir</MudText>
-                        <MudText>@customer.TanggalRegistrasi</MudText>
+                            <MudText>@customer.TanggalLahir?.ToString("dd-MM-yyyy")</MudText>
+                            <MudText>@customer.TanggalRegistrasi?.ToString("dd-MM-yyyy")</MudText>
                         <MudText>
                             @customer.UPDDT
                         </MudText>
@@ -56,28 +57,28 @@
 
     <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
         <MudTabPanel Text="Produk">
-            <ProfiraClinicWeb.Components.Table.Table Config="ProdukTableConfig" />
+            <ProfiraClinicWeb.Components.Table.Table Config="ProdukTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Perawatan">
-            <ProfiraClinicWeb.Components.Table.Table Config="PerawatanTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="PerawatanTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Paket">
-            <ProfiraClinicWeb.Components.Table.Table Config="PaketTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="PaketTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Sisa Paket">
-            <ProfiraClinicWeb.Components.Table.Table Config="SisaPaketTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="SisaPaketTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Uang Muka">
-            <ProfiraClinicWeb.Components.Table.Table Config="UangMukaTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="UangMukaTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Piutang">
-            <ProfiraClinicWeb.Components.Table.Table Config="PiutangTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="PiutangTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Pemakaian Paket">
-            <ProfiraClinicWeb.Components.Table.Table Config="PerawatanTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="PerawatanTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Rekam Medis">
-            <ProfiraClinicWeb.Components.Table.Table Config="PerawatanTableConfig" />
+                <ProfiraClinicWeb.Components.Table.Table Config="PerawatanTableConfig" WithAdd="false" />
         </MudTabPanel>
         <MudTabPanel Text="Penilaian">
             <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="ChartIndex" XAxisLabels="@XAxisLabels" Width="100%" Height="350px"></MudChart>
@@ -185,7 +186,8 @@ else
                 nomor = x.NOFAK ?? "", // guess/fallback
                 tanggal = x.TGFAK?.ToString("dd/MM/yyyy") ?? "",
                 total = x.NILAI?.ToString("N2") ?? "",
-                sisa = x.SISA?.ToString("N2") ?? ""
+                sisa = x.SISA?.ToString("N2") ?? "",
+                lokasi = x.KETLK,
             }).ToList();
 
             PiutangTableConfig = new TableConfig(
@@ -193,6 +195,7 @@ else
                 {
                     new TableColumn { Caption="Nomor",   DataField="nomor" },
                     new TableColumn { Caption="Tanggal", DataField="tanggal" },
+                    new TableColumn { Caption="Lokasi",      DataField="lokasi" },
                     new TableColumn { Caption="Total",   DataField="total", Align = ColumnAlign.Right },
                     new TableColumn { Caption="Sisa",    DataField="sisa",  Align = ColumnAlign.Right },
                 },
@@ -213,7 +216,8 @@ else
                 kodePaket = x.KDPKT ?? "",
                 namaPaket = x.NMPKT ?? "",
                 qty = x.JUMLA?.ToString() ?? "0",
-                total = x.JUMLA?.ToString("N2") ?? ""
+                total = x.JUMLA?.ToString("N2") ?? "",
+                lokasi = x.KETLK,
             }).ToList();
 
             PaketTableConfig = new TableConfig(
@@ -221,6 +225,7 @@ else
                 {
                     new TableColumn { Caption="No Faktur",  DataField="noFaktur" },
                     new TableColumn { Caption="Tanggal",    DataField="tanggal" },
+                    new TableColumn { Caption="Lokasi",      DataField="lokasi" },
                     new TableColumn { Caption="Kode Paket", DataField="kodePaket" },
                     new TableColumn { Caption="Nama Paket", DataField="namaPaket" },
                     new TableColumn { Caption="Qty",        DataField="qty",   Align = ColumnAlign.Right },
@@ -243,13 +248,15 @@ else
                 kodePerawatan = x.KDPER ?? "",
                 namaPerawatan = x.NMPER ?? "",
                 qty = x.JUMLA?.ToString() ?? "0",
-                total = x.JUMLA?.ToString("N2") ?? ""
+                total = x.JUMLA?.ToString("N2") ?? "",
+                lokasi = x.KETLK,
             }).ToList();
 
             PerawatanTableConfig = new TableConfig(
                 new List<TableColumn>
                 {
                     new TableColumn { Caption="No Faktur",      DataField="noFaktur" },
+                    new TableColumn { Caption="Lokasi",      DataField="lokasi" },
                     new TableColumn { Caption="Tanggal",        DataField="tanggal" },
                     new TableColumn { Caption="Kode Perawatan", DataField="kodePerawatan" },
                     new TableColumn { Caption="Nama Perawatan", DataField="namaPerawatan" },
@@ -273,7 +280,8 @@ else
                 kodeBarang = x.KDBHN ?? "",
                 namaBarang = x.KDBHN ?? "",
                 qty = x.JMLJL?.ToString() ?? "0",
-                total = x.JMLJL?.ToString("N2") ?? ""
+                total = x.JMLJL?.ToString("N2") ?? "",
+                lokasi = x.KETLK,
             }).ToList();
 
             ProdukTableConfig = new TableConfig(
@@ -281,6 +289,7 @@ else
                 {
                     new TableColumn { Caption="No Faktur",   DataField="noFaktur" },
                     new TableColumn { Caption="Tanggal",     DataField="tanggal" },
+                    new TableColumn { Caption="Lokasi",      DataField="lokasi" },
                     new TableColumn { Caption="Kode Barang", DataField="kodeBarang" },
                     new TableColumn { Caption="Nama Barang", DataField="namaBarang" },
                     new TableColumn { Caption="Qty",         DataField="qty",   Align = ColumnAlign.Right },
