@@ -50,6 +50,8 @@ namespace ProfiraClinic.Models.Core
         [MaxLength(10)]
         public string? KodeDokter { get; set; }
 
+        public string NamaDokter { get; set; } = "";
+
         [Column(TypeName = "char(10)")]
         [MaxLength(10)]
         public string? KodePerawat1 { get; set; }
