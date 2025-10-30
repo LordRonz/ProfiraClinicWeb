@@ -15,9 +15,8 @@ namespace ProfiraClinicRME.Services
 
         
         // Retrieves all clinics.
-        public Task<ServiceResult<Pagination<PerawatanHeader>>> GetListAsync();
+        public Task<ServiceResult<Pagination<PerawatanHeader>>> GetListAsync(int pageNum, int pageSize, string filter);
 
-        public Task<ServiceResult<string>> SetAppointmentOnProgress(TRMAppointment apo);
 
 
     }

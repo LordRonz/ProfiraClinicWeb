@@ -66,9 +66,11 @@ namespace ProfiraClinicRME.Infra
             target.NomorFakturPaket = source.NomorFakturPaket;
             target.KodePerawatan = source.KodePerawatan;
             target.KodePerawatanPengganti = source.KodePerawatanPengganti;
+            target.NamaPerawatan = source.NamaPerawatan;
             target.Qty = source.Qty;
             target.KeteranganDetail = source.KeteranganDetail;
             target.KodeDokter = source.KodeDokter;
+            target.NamaDokter = source.NamaDokter;
             target.KodePerawat1 = source.KodePerawat1;
             target.KodePerawat2 = source.KodePerawat2;
         }

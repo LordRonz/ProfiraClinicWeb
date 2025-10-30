@@ -10,7 +10,9 @@ namespace ProfiraClinicRME.Services
     {
 
         // Retrieves all clinics.
-        public Task<ServiceResult<Pagination<DokterListDto>>> GetListAsync();
+        public Task<ServiceResult<Pagination<DokterListDto>>> GetListDokterAsync();
+
+        public Task<ServiceResult<Pagination<DokterListDto>>> GetListNonDokterAsync();
 
     }
 }
