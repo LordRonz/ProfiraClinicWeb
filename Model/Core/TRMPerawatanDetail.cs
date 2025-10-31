@@ -9,11 +9,11 @@ namespace ProfiraClinic.Models.Core
     {
         [Column(TypeName = "char(25)")]
         [MaxLength(25)]
-        [Key]
         public string NomorTransaksi { get; set; } // DIAG/Tahun/Bulan/Nourut
 
-        [Column(TypeName = "int")]
-        public int? NomorUrut { get; set; } = 0;
+        [Key]
+        [Column(TypeName = "bigint")]
+        public long IDDetail { get; set; } // DIAG/Tahun/Bulan/Nourut
 
         [Column(TypeName = "char(1)")]
         [MaxLength(1)]

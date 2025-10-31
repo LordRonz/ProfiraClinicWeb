@@ -83,7 +83,7 @@ namespace ProfiraClinicWebAPI.Controllers
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC dbo.usp_TRM_Perawatan_Header_Add " +
                     "@KodeLokasi, @TanggalTransaksi, @NomorAppointment, " +
-                    "@KodeCustomer, @KodePoli, @Keterangan, @USRID, @NomorTransaksi",
+                    "@KodeCustomer, @KodePoli, @Keterangan, @USRID, @NomorTransaksi OUTPUT",
                     sqlParameters);
 
                 var nomorTransaksi = (nomorParam.Value as string)?.Trim();
@@ -122,7 +122,7 @@ namespace ProfiraClinicWebAPI.Controllers
 
                 // If your delete SP name is different, change it here.
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.usp_TRM_Perawatan_Header_Del @NomorTransaksi", delParams);
+                    "EXEC dbo.usp_TRM_Perawatan_Del @NomorTransaksi", delParams);
 
                 // 2) Re-insert via Edit SP
                 var editParams = new[]

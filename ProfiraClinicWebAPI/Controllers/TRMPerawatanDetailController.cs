@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using System.ComponentModel.DataAnnotations;
@@ -35,13 +34,12 @@ namespace ProfiraClinicWebAPI.Controllers
 
         protected override IOrderedQueryable<TRMPerawatanDetail> ApplyOrder(
             IQueryable<TRMPerawatanDetail> q)
-            => q.OrderBy(d => d.NomorTransaksi).ThenBy(d => d.NomorUrut);
+            => q.OrderBy(d => d.NomorTransaksi).ThenBy(d => d.IDDetail);
 
         // ----------------- DTOs -----------------
         public class AddTRMPerawatanDetailDto
         {
             [Required] public string NomorTransaksi { get; set; } = default!;   // FK to Header
-            public int? NomorUrut { get; set; }                                  // if null, server can assign
             public string? JenisPerawatan { get; set; }                           // 'P' paket / 'R' rawat? (example)
             public string? KodePaket { get; set; }
             public string? NomorFakturPaket { get; set; }
@@ -57,7 +55,7 @@ namespace ProfiraClinicWebAPI.Controllers
         public class EditTRMPerawatanDetailDto : AddTRMPerawatanDetailDto
         {
             [Required] public new string NomorTransaksi { get; set; } = default!;
-            [Required] public new int? NomorUrut { get; set; }                   // identify the row to edit
+            [Required] public new int? IDDetail { get; set; }                   // identify the row to edit
         }
 
         public class GetByNomorTransaksiDto
@@ -92,6 +90,12 @@ namespace ProfiraClinicWebAPI.Controllers
         new SqlParameter("@KodeDokter",                (object?)dto.KodeDokter ?? DBNull.Value),
         new SqlParameter("@KodePerawat1",              (object?)dto.KodePerawat1 ?? DBNull.Value),
         new SqlParameter("@KodePerawat2",              (object?)dto.KodePerawat2 ?? DBNull.Value),
+        new SqlParameter
+        {
+            ParameterName = "@IDDetail",
+            SqlDbType = System.Data.SqlDbType.Int,
+            Direction = System.Data.ParameterDirection.Output
+        }
     };
 
             try
@@ -99,11 +103,13 @@ namespace ProfiraClinicWebAPI.Controllers
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC dbo.usp_TRM_Perawatan_Detail_Add " +
                     "@NomorTransaksi, @JenisPerawatan, @KodePaket, @NomorFakturPaket, " +
-                    "@KodePerawatan, @KodePerawatanPengganti, @QTY, @KodeDokter, @KodePerawat1, @KodePerawat2",
+                    "@KodePerawatan, @KodePerawatanPengganti, @QTY, @KodeDokter, @KodePerawat1, @KodePerawat2, @IDDetail OUTPUT",
                     p);
 
+                var idDetail = p.Last().Value;
+
                 // Note: SP doesn't return NomorUrut. If you need it, query back the last row or add output to SP later.
-                return Ok(new { message = "Detail added.", data = dto });
+                return Ok(new { message = "Detail added.", idDetail });
             }
             catch (SqlException ex)
             {
@@ -116,12 +122,12 @@ namespace ProfiraClinicWebAPI.Controllers
         public async Task<IActionResult> EditDetail([FromBody] EditTRMPerawatanDetailDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            if (dto.NomorUrut is null) return BadRequest("NomorUrut is required for editing.");
+            if (dto.IDDetail is null) return BadRequest("IDDetail is required for editing.");
 
             // 1) Remove existing row by composite key (EF delete; no SP provided for delete)
             var existing = await _context.TRMPerawatanDetail
                 .FirstOrDefaultAsync(d => d.NomorTransaksi == dto.NomorTransaksi
-                                       && d.NomorUrut == dto.NomorUrut.Value);
+                                       && d.IDDetail == dto.IDDetail.Value);
 
             if (existing != null)
             {
@@ -160,6 +166,14 @@ namespace ProfiraClinicWebAPI.Controllers
             {
                 return BadRequest(new { message = "Failed to edit detail.", error = ex.Message });
             }
+        }
+
+        protected override IQueryable<TRMPerawatanDetail> ApplyDeleteFilter(
+    IQueryable<TRMPerawatanDetail> q,
+    string filter)
+        {
+            // delete by code; you can broaden this as needed
+            return q.Where(x => x.IDDetail == (long)Convert.ToDouble(filter));
         }
     }
 }
