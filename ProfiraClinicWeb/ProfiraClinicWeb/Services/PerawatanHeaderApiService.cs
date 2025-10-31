@@ -53,19 +53,19 @@ namespace ProfiraClinicWeb.Services
             return createdUserGroupResponse;
         }
 
-        public async Task<ApiResponse<object>> UpdateTindakanAsync(string kodePaket, PerawatanHeader perawatan)
+        public async Task<ApiResponse<PerawatanHeader>> UpdateTindakanAsync(string kodePaket, PerawatanHeader perawatan)
         {
             // The endpoint expects a PUT request with the paket identifier in the URL.
-            var responseMessage = await _httpClient.PutAsJsonAsync($"api/PerawatanHeader/edit/{kodePaket}", perawatan);
+            var responseMessage = await _httpClient.PostAsJsonAsync($"api/PerawatanHeader/edit", perawatan);
 
             if (!responseMessage.IsSuccessStatusCode)
             {
                 var errorMsg = await responseMessage.Content.ReadAsStringAsync();
-                return new ApiResponse<object>((int)responseMessage.StatusCode, $"Error updating perawatan: {errorMsg}");
+                return new ApiResponse<PerawatanHeader>((int)responseMessage.StatusCode, $"Error updating perawatan: {errorMsg}");
             }
 
             // If no content is returned from the update call, we can return a successful ApiResponse.
-            return new ApiResponse<object>((int)responseMessage.StatusCode, "Tindakan updated successfully");
+            return new ApiResponse<PerawatanHeader>((int)responseMessage.StatusCode, "Tindakan updated successfully");
         }
 
         public async Task<ApiResponse<PerawatanHeader>> DeletePerawatanHeaderByIdAsync(string id)

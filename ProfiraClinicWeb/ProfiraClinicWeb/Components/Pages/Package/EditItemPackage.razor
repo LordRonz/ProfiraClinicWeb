@@ -11,7 +11,7 @@
 @inject PerawatanHeaderApiService PerawatanApiService
 
 <MudCard Class="p-4 h-100">
-    <MudText Typo="Typo.h6" Class="mb-4">Tambah Paket</MudText>
+    <MudText Typo="Typo.h6" Class="mb-4">Edit Paket</MudText>
 
     <div class="form-container">
         <!-- Header Form -->
@@ -19,6 +19,9 @@
             <MudGrid>
                 <MudItem xs="12" sm="6">
                     <MudTextField T="string" MaxLength="10" Label="Kode Paket" @bind-Value="header.KodePaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudTextField T="string" Label="Kode Jenis" @bind-Value="header.KodeJenis" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
@@ -34,9 +37,7 @@
                                      Variant="Variant.Outlined"
                                      Margin="Margin.Dense" />
                 </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudTextField T="string" Label="Nama Paket" @bind-Value="header.NamaPaket" Variant="Variant.Outlined" Required="true" Margin="Margin.Dense" />
-                </MudItem>
+                
                 <MudItem xs="12" sm="4">
                     <div class="d-flex align-items-center gap-2">
                         <MudNumericField T="decimal" Label="Harga Jual" @bind-Value="header.HARGA" Variant="Variant.Outlined" Margin="Margin.Dense" /><span>(Rp)</span>
@@ -133,7 +134,7 @@
     private PaketHeader? paketDetailInitial;
 
     private GroupPaket selectedGroup;
-    private PerawatanHeader? selectedPerawatan; // NEW: holds current perawatan selection
+    private PerawatanHeader? selectedPerawatan;
 
     private bool isActive;
     private bool isEditingDetail = false;
@@ -177,12 +178,21 @@
             header.KodePaket = paketDetailInitial?.KodePaket ?? "";
             header.MasaLaku = paketDetailInitial?.MasaLaku ?? 0;
 
-            selectedGroup = groupPakets.FirstOrDefault(p => p.KodeGroupPaket == header.KodeGroupPaket);
+
             header.KodeGroupPaket = paketDetailInitial.KodeGroupPaket;
             header.IDPaketHeader = paketDetailInitial.IDPaketHeader;
             header.DiscMember = paketDetailInitial.DiscMember;
             header.DiscNonMember = paketDetailInitial.DiscNonMember;
             header.KodeJenis = paketDetailInitial.KodeJenis;
+            selectedGroup = groupPakets.FirstOrDefault(p => p.KodeGroupPaket.Trim().Equals(header.KodeGroupPaket.Trim()));
+            System.Diagnostics.Debug.WriteLine(header.KodeGroupPaket);
+            System.Diagnostics.Debug.WriteLine(groupPakets.Count);
+
+            var respDetail = await PaketApiService.GetPaketDetailsByHeaderAsync(header.IDPaketHeader.ToString());
+            foreach(var d in respDetail.Data)
+            {
+                details.Add(d);
+            }
 
             StateHasChanged();
         }
@@ -332,12 +342,13 @@
             };
 
             // Save header
-            var resultHeader = await PaketHeaderApiService.CreatePaketHeaderAsync(paket);
+            var resultHeader = await PaketHeaderApiService.UpdatePaketHeaderAsync(header.KodePaket, paket);
             if (resultHeader.StatusCode < 300)
             {
                 // Save details
                 foreach (var d in details)
                 {
+                    d.KodePaket = header.KodePaket;
                     d.IDPaketHeader = resultHeader.Data.IDPaketHeader;
                     await PaketApiService.CreatePaketDetailAsync(d);
                 }
@@ -362,7 +373,7 @@
     }
 
     .form-container {
-        max-width: 800px; /* adjust this value to control the width */
+        max-width: 1000px; /* adjust this value to control the width */
     }
 
     .save-btn {

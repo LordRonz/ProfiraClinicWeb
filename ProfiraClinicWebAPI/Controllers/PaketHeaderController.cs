@@ -82,8 +82,10 @@ namespace ProfiraClinicWebAPI.Controllers
                     "@DiscNonMember, @MasaLaku, @AKTIF, @USRID",
                     sqlParameters);
 
+                var paket = await DbSet.FirstOrDefaultAsync(c => c.KodePaket == newPaketHeader.KodePaket);
+
                 // Return the newly created paketHeader. Adjust properties as needed.
-                return CreatedAtAction(nameof(GetItem), new { id = newPaketHeader.KodePaket }, newPaketHeader);
+                return CreatedAtAction(nameof(GetItem), new { paket.IDPaketHeader }, paket);
             }
             catch (SqlException ex)
             {
@@ -190,10 +192,13 @@ namespace ProfiraClinicWebAPI.Controllers
 
                 await transaction.CommitAsync();
 
+                var paket = await DbSet.FirstOrDefaultAsync(c => c.KodePaket == updatedPaketHeader.KodePaket);
+
                 return Ok(new
                 {
                     message = "Paket successfully updated.",
-                    kodePaket = updatedPaketHeader.KodePaket
+                    kodePaket = updatedPaketHeader.KodePaket,
+                    paket.IDPaketHeader,
                 });
             }
             catch (SqlException ex)

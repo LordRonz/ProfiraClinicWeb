@@ -24,6 +24,18 @@ namespace ProfiraClinicWeb.Services
             return response;
         }
 
+        public async Task<ApiResponse<List<PerawatanDetail>>> GetPerawatanDetailsByHeaderAsync(string idPerawatanHeader)
+        {
+            var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<PerawatanDetail>>>($"api/PerawatanDetail/GetByHeader/{idPerawatanHeader}");
+
+            if (response == null)
+            {
+                throw new HttpRequestException("Failed to retrieve response from API.");
+            }
+
+            return response;
+        }
+
         public async Task<ApiResponse<PerawatanDetail>> GetPerawatanDetailByCodeAsync(String id)
         {
             var response = await _httpClient.GetFromJsonAsync<ApiResponse<PerawatanDetail>>($"api/PerawatanDetail/GetByCode/{id}");

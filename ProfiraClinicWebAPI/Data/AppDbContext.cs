@@ -96,6 +96,8 @@ namespace ProfiraClinicWebAPI.Data
         public DbSet<TRMPerawatanHeader> TRMPerawatanHeader { get; set; }
         public DbSet<TRMPerawatanDetail> TRMPerawatanDetail { get; set; }
 
+        public DbSet<TRMPerawatanList> TRMPerawatanList { get; set; }
+
         public DbSet<UserGroupOtorisasi> UserGroupOtorisasi { get; set; }
 
         public DbSet<SaldoPaket> SaldoPaket { get; set; }
