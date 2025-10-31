@@ -6,6 +6,7 @@ using ProfiraClinic.Models.Api;
 using ProfiraClinic.Models.Core;
 using ProfiraClinicWebAPI.Data;
 using ProfiraClinicWebAPI.Services;
+using System.Reflection.PortableExecutable;
 using System.Security.Claims;
 
 namespace ProfiraClinicWebAPI.Controllers
@@ -175,11 +176,26 @@ namespace ProfiraClinicWebAPI.Controllers
             if (string.IsNullOrWhiteSpace(nomorAppointment))
                 return BadRequest(new { message = "NomorAppointment is required." });
 
-            var diagnosa = await _context.TRMPerawatanHeader
+            var header = await _context.TRMPerawatanHeader
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.NomorAppointment == nomorAppointment);
 
-            return Ok(diagnosa);
+            if (header == null)
+                return Ok(null);
+
+            var detail = await _context.TRMPerawatanDetail
+                .AsNoTracking()
+                .Where(d => d.NomorTransaksi == header.NomorTransaksi).ToListAsync();
+
+            dynamic response = new System.Dynamic.ExpandoObject();
+
+            foreach (var prop in header.GetType().GetProperties())
+            {
+                ((IDictionary<string, object>)response)[prop.Name] = prop.GetValue(header);
+            }
+
+            response.detail = detail;
+            return Ok(response);
         }
 
         [HttpPost("GetListTrm")]

@@ -16,10 +16,11 @@ namespace ProfiraClinic.Models.Core
 
         public string? KodePaket { get; set; }
         public string? KodePerawatan { get; set; }
+        public string? NamaPerawatan { get; set; }
         public string? KodeDokter { get; set; }
         public string? KodePerawat1 { get; set; }
         public string? KodePerawat2 { get; set; }
         public string? KeteranganDetail { get; set; }
-        public string? NamaKaryawan { get; set; }
+        public string? NamaDokter { get; set; }
     }
 }
